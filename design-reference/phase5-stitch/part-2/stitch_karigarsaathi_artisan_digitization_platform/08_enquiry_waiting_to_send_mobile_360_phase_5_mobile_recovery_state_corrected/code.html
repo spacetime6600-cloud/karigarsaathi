@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Enquiry Waiting to Send</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#cc8c28",
+                        "surface-variant": "#d9e3f1",
+                        "primary-fixed-dim": "#afc9ea",
+                        "outline": "#74777e",
+                        "surface-container-highest": "#d9e3f1",
+                        "inverse-primary": "#afc9ea",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#17324d",
+                        "on-surface-variant": "#43474d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#701f00",
+                        "surface-container-high": "#dfe9f7",
+                        "tertiary-fixed": "#ffddb5",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d1e4ff",
+                        "secondary-container": "#fd835b",
+                        "on-background": "#121c26",
+                        "surface": "#f7f9ff",
+                        "surface-container-low": "#edf4ff",
+                        "on-secondary-fixed-variant": "#812805",
+                        "on-surface": "#121c26",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#390b00",
+                        "on-tertiary-fixed": "#2a1800",
+                        "surface-bright": "#f7f9ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#819aba",
+                        "secondary": "#a13f1c",
+                        "surface-tint": "#47607e",
+                        "tertiary-container": "#462b00",
+                        "background": "#f7f9ff",
+                        "outline-variant": "#c3c6ce",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "primary": "#001d36",
+                        "on-primary-fixed": "#001d36",
+                        "surface-container": "#e4effd",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "inverse-surface": "#27313c",
+                        "inverse-on-surface": "#e8f2ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "tertiary": "#2a1800",
+                        "surface-dim": "#d1dbe9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "touch-target-min": "48px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "margin-desktop": "48px",
+                        "base": "8px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "body-md": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .soft-shadow-level-1 {
+                box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-sans max-w-[360px] mx-auto relative border-x border-outline-variant">
+<!-- TopAppBar (from JSON) -->
+<header class="w-full top-0 sticky bg-surface shadow-sm z-40">
+<div class="flex items-center px-margin-mobile h-touch-target-min w-full max-w-7xl mx-auto">
+<button class="mr-4 text-primary p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold tracking-tight">KarigarSaathi</h1>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-margin-mobile py-lg pb-24 flex flex-col">
+<!-- Status Header -->
+<div class="flex flex-col items-center text-center mb-lg pt-4">
+<div class="w-20 h-20 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-tertiary-container relative">
+<span class="material-symbols-outlined text-4xl" data-icon="cloud_off">cloud_off</span>
+<div class="absolute bottom-0 right-0 w-6 h-6 bg-surface-container-highest rounded-full border-2 border-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+</div>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Enquiry Waiting to Send</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px]">Saved on this device. Sending will resume when you are back online.</p>
+</div>
+<!-- Status Indicators -->
+<div class="bg-surface-container-lowest rounded-xl p-md mb-lg soft-shadow-level-1 flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[18px]" data-icon="save">save</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Saved on Device</span>
+</div>
+<div class="h-[1px] w-full bg-surface-variant ml-11"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="pending">pending</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Waiting to Send</span>
+</div>
+</div>
+<!-- Context Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md mb-xl soft-shadow-level-1 flex items-start gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-variant shrink-0 overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full" data-alt="A beautifully hand-carved wooden tray resting on a textured woven cloth. The wood grain is rich and warm, highlighted by soft, natural studio lighting that brings out the intricate traditional Indian craftsmanship patterns around the edges. The aesthetic is grounded, earthy, and highly detailed, perfectly matching a premium artisanal digital platform." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB8Unj8E5HHNzdtlB-gDlpibxpkd6nRU3Jre4BteZc66laiS31O-hy5buz5E_fzAuNaozC4scadYKnZj5KsShVkpseZiAz87cU2XZGVOJZY-QLUNO5hG0ejZ4UyJcZQ-wEmkBwG9brubgAbVbamhAhPMEyCQcAi5yhi_19tZ50lKUctcn2SyJoQ3Kew9IpxbhuCnAhYuRiHUpFZNmkRQFZk0H-bKeepvu35RevZxRmD4V2UVHeAili7')"></div>
+</div>
+<div class="flex flex-col justify-center py-1">
+<h3 class="font-title-md text-title-md text-on-surface mb-1">Hand-carved Wooden Tray</h3>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="person">person</span>
+<span class="font-body-md text-body-md text-sm">Buyer: Ramesh Kumar</span>
+</div>
+</div>
+</div>
+<div class="flex-grow"></div>
+<!-- Actions -->
+<div class="flex flex-col gap-3 mt-auto">
+<button class="h-touch-target-min w-full bg-primary text-on-primary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="refresh">refresh</span>
+                Retry Now
+            </button>
+<button class="h-touch-target-min w-full bg-transparent border-2 border-primary text-primary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+                Edit Enquiry
+            </button>
+<button class="h-touch-target-min w-full bg-transparent text-primary font-label-lg text-label-lg rounded-full flex items-center justify-center active:scale-95 transition-transform underline decoration-1 underline-offset-4">
+                Cancel
+            </button>
+</div>
+</main>
+<!-- BottomNavBar (from JSON) -->
+<!-- Suppressed: The navigation shell is excluded because this screen represents a "Linear/Transactional" or specific "Task-Focused" state (managing a waiting enquiry) that implies a temporary departure from the main navigation flow. The UX goal is to prioritize the content canvas and actions for this specific error/waiting state. -->
+
+
+</body></html>

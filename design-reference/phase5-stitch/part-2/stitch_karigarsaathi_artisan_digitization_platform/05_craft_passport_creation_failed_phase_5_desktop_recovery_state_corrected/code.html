@@ -1,0 +1,218 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Craft Passport Creation Failed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#812805",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#17324d",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "secondary-container": "#fd835b",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#121c26",
+                        "surface-container-low": "#edf4ff",
+                        "tertiary-container": "#462b00",
+                        "on-secondary-fixed": "#390b00",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6ce",
+                        "primary-fixed-dim": "#afc9ea",
+                        "on-tertiary-fixed": "#2a1800",
+                        "surface-container-highest": "#d9e3f1",
+                        "error": "#ba1a1a",
+                        "surface": "#f7f9ff",
+                        "background": "#f7f9ff",
+                        "surface-variant": "#d9e3f1",
+                        "inverse-on-surface": "#e8f2ff",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "on-surface-variant": "#43474d",
+                        "on-surface": "#121c26",
+                        "surface-tint": "#47607e",
+                        "on-primary-container": "#819aba",
+                        "on-primary": "#ffffff",
+                        "outline": "#74777e",
+                        "inverse-surface": "#27313c",
+                        "tertiary": "#2a1800",
+                        "on-secondary-container": "#701f00",
+                        "on-primary-fixed": "#001d36",
+                        "secondary": "#a13f1c",
+                        "surface-bright": "#f7f9ff",
+                        "primary": "#001d36",
+                        "on-error": "#ffffff",
+                        "surface-container": "#e4effd",
+                        "primary-fixed": "#d1e4ff",
+                        "surface-dim": "#d1dbe9",
+                        "surface-container-high": "#dfe9f7",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffddb5",
+                        "secondary-fixed": "#ffdbd0",
+                        "inverse-primary": "#afc9ea",
+                        "on-tertiary-container": "#cc8c28",
+                        "tertiary-fixed-dim": "#ffb955"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "base": "8px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "touch-target-min": "48px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "headline-lg-mobile": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .texture-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e4effd' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md texture-overlay">
+<!-- TopAppBar -->
+<header class="bg-background flex justify-between items-center w-full px-margin-desktop h-[72px] sticky top-0 z-50 border-b-0 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+<div class="flex items-center gap-2">
+<span class="font-headline-lg text-headline-lg text-primary tracking-tight">KarigarSaathi</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-lg flex items-center gap-2 h-touch-target-min" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+                    Home
+                </a>
+<a class="text-primary font-bold font-label-lg text-label-lg hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-lg flex items-center gap-2 h-touch-target-min border-b-2 border-secondary pb-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">qr_code_2</span>
+                    My Passport
+                </a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-lg flex items-center gap-2 h-touch-target-min" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    Orders
+                </a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1 text-on-surface-variant font-label-lg hover:bg-surface-variant/50 px-3 h-touch-target-min rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">language</span>
+                EN
+            </button>
+<button class="text-primary hover:bg-surface-variant/50 p-2 rounded-full h-touch-target-min w-touch-target-min flex items-center justify-center transition-colors active:scale-95">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="text-primary hover:bg-surface-variant/50 p-2 rounded-full h-touch-target-min w-touch-target-min flex items-center justify-center transition-colors active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant flex-shrink-0 cursor-pointer">
+<img alt="Artisan profile" class="w-full h-full object-cover" data-alt="A close-up portrait of an Indian artisan wearing traditional woven garments in earthy tones. Soft, natural light illuminates their face, showing experience and warmth. The background is a slightly blurred workshop setting with warm wood tones. High resolution, professional photography, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEMTfr2empGfw5AaclHGHG41I2vdytMDZv-Ojc2Kex_Ite9wd55nzqvgpyxCfP2AWZ6u3WJ7se7pm9cRDs2fHgki3jg9MFpuyUsGvoKjbZL61nUwrE2E-US7a4Dw0A8K9SKT6XuwXpByODI9K5HVKRUY-GNc5L5eZrsmtkc8EsmsqREdnZplBAftkWBVDu87EGgyEzfl15t5nEnj_RQuVJpO5XODR7MfoC3sYVW2cTrYpPkCdsXpPJ">
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center py-xl px-margin-desktop w-full max-w-[1200px] mx-auto">
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-lg border border-error-container/30 relative overflow-hidden">
+<!-- Decorative accent -->
+<div class="absolute top-0 left-0 w-full h-2 bg-primary"></div>
+<div class="text-center mb-lg pt-4">
+<div class="w-20 h-20 bg-error-container rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-[40px] text-error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-4">Passport Creation Not Completed</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
+                    Something went wrong while generating your digital Craft Passport. Don't worry—all your approved product details are safely saved on this device.
+                </p>
+</div>
+<!-- Status Card -->
+<div class="bg-surface p-md rounded-lg mb-8 border border-outline-variant/50 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">sync_problem</span>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Current Status</div>
+<div class="font-title-md text-title-md text-on-surface">Not Created</div>
+</div>
+</div>
+<div class="bg-error-container/50 text-error px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" aria-hidden="true">cancel</span> <span class="font-bold">Status: Failed</span></div>
+</div>
+<!-- Saved Data Confirmation -->
+<div class="mb-lg">
+<h3 class="font-title-md text-title-md text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">save</span>
+                    Draft Saved Securely
+                </h3>
+<div class="bg-surface-container-low p-md rounded-lg flex items-start gap-4">
+<div class="w-16 h-16 bg-surface-variant rounded-md overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A beautifully hand-carved wooden tray resting on a textured linen cloth. The tray features intricate geometric patterns typical of Indian craftsmanship. Warm, directional lighting highlights the texture of the dark wood and casts soft shadows. High quality product photography, earthy warm tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCettKW0DtroRw-Ta_jFpZT0AlrapaHXt1MP84xLDant8pAoDp9cis2ADJg0nH3fl-B5TEH5JE5FMkqy5EaXcG9UFSLXfpOcgrd-TVdHgAwhHzE25zZ__xzVp9DuHOcsHzef4V_Bb0_KeAxahOdoEu9bov37R9Ru_OSwEh1Sij2i2iJK2WFixhcXnS8EDTpDdhwEm7BIy2MhSD3nqDjU7O2U0JEAggkfs7iUW5NP5dkQralb0gf19qy">
+</div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface">Hand-carved Wooden Tray</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Product details, origin story, and material information are saved locally.</p>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-4 mt-8">
+<button class="w-full bg-primary text-on-primary font-label-lg text-label-lg h-touch-target-min rounded-lg hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 border-primary" style="opacity: 0;">
+<span class="material-symbols-outlined">refresh</span>
+                    Retry Creation
+                </button>
+<div class="flex gap-4">
+<button class="flex-1 border-2 border-primary text-primary font-label-lg text-label-lg h-touch-target-min rounded-lg hover:bg-surface-variant/30 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                        Return to Preview
+                    </button>
+<button class="flex-1 text-primary font-label-lg text-label-lg h-touch-target-min rounded-lg hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 border border-outline-variant">
+                        Try Later (Save as Draft)
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/30 py-6 px-margin-desktop text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">© 2024 KarigarSaathi. Empowering Artisans.</p>
+<div class="flex justify-center gap-4 font-label-sm text-label-sm text-primary">
+<a class="hover:underline" href="#">Privacy Policy</a>
+<a class="hover:underline" href="#">Terms of Service</a>
+<a class="hover:underline" href="#">Support</a>
+</div>
+</footer>
+
+
+</body></html>

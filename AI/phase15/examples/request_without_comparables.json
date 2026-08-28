@@ -1,0 +1,63 @@
+{
+  "materials": [
+    {
+      "name": "Teak Wood",
+      "quantity": "10",
+      "unit": "kg",
+      "cost_per_unit": "500",
+      "source_note": "Local supplier",
+      "value_status": "exact"
+    },
+    {
+      "name": "Natural Oil Finish",
+      "quantity": "2",
+      "unit": "L",
+      "cost_per_unit": "800",
+      "source_note": "Online store",
+      "value_status": "exact"
+    }
+  ],
+  "labour": [
+    {
+      "task_name": "Design & Carving",
+      "hours": "8",
+      "hourly_rate": "300",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact",
+      "note": "Complex relief carving"
+    },
+    {
+      "task_name": "Sanding & Finishing",
+      "hours": "4",
+      "hourly_rate": "200",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact"
+    }
+  ],
+  "overhead": [
+    {
+      "name": "Workshop Rent",
+      "amount": "2000",
+      "explanation": "Monthly rent allocation for this product",
+      "value_status": "exact"
+    },
+    {
+      "name": "Electricity & Tools",
+      "amount": "500",
+      "explanation": "Power and tool depreciation",
+      "value_status": "estimated"
+    }
+  ],
+  "margin_mode": "percentage_markup",
+  "margin_value": "25",
+  "comparables": [],
+  "comparable_influence": "20",
+  "max_adjustment": "10",
+  "low_buffer": "5",
+  "high_buffer": "10",
+  "calculation_date": "2025-01-15",
+  "currency": "INR",
+  "locale": "en"
+}

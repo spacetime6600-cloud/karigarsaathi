@@ -1,0 +1,508 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Choose Public Fields</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#2a1800",
+                      "on-surface-variant": "#43474d",
+                      "on-primary-fixed-variant": "#2f4865",
+                      "on-surface": "#121c26",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#47607e",
+                      "inverse-primary": "#afc9ea",
+                      "on-secondary-container": "#701f00",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#dfe9f7",
+                      "outline-variant": "#c3c6ce",
+                      "primary": "#001d36",
+                      "primary-container": "#17324d",
+                      "surface-container-highest": "#d9e3f1",
+                      "tertiary-container": "#462b00",
+                      "on-tertiary-container": "#cc8c28",
+                      "surface-variant": "#d9e3f1",
+                      "secondary": "#a13f1c",
+                      "secondary-container": "#fd835b",
+                      "on-secondary-fixed-variant": "#812805",
+                      "surface-container-low": "#edf4ff",
+                      "on-primary-container": "#819aba",
+                      "inverse-surface": "#27313c",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed-dim": "#ffb955",
+                      "primary-fixed-dim": "#afc9ea",
+                      "surface-container": "#e4effd",
+                      "tertiary-fixed": "#ffddb5",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d1dbe9",
+                      "secondary-fixed": "#ffdbd0",
+                      "on-background": "#121c26",
+                      "surface": "#f7f9ff",
+                      "background": "#f7f9ff",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#633f00",
+                      "primary-fixed": "#d1e4ff",
+                      "secondary-fixed-dim": "#ffb59d",
+                      "inverse-on-surface": "#e8f2ff",
+                      "outline": "#74777e",
+                      "on-secondary-fixed": "#390b00",
+                      "on-tertiary-fixed": "#2a1800",
+                      "surface-bright": "#f7f9ff",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#001d36",
+                      "terracotta": "#C65A35"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "48px",
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "touch-target-min": "48px",
+                      "xs": "4px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Noto Sans"
+                      ],
+                      "headline-lg-mobile": [
+                              "Noto Sans"
+                      ],
+                      "title-md": [
+                              "Noto Sans"
+                      ],
+                      "body-lg": [
+                              "Noto Sans"
+                      ],
+                      "label-sm": [
+                              "Noto Sans"
+                      ],
+                      "headline-lg": [
+                              "Noto Sans"
+                      ],
+                      "label-lg": [
+                              "Noto Sans"
+                      ],
+                      "display-lg": [
+                              "Noto Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-lg": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom styles for toggle switches to match design system */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 32px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #c3c6ce; /* outline-variant */
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #001d36; /* primary */
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 0 2px #ffb955; /* Focus state highlight */
+        }
+        
+        .card-shadow {
+            box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);
+        }
+        
+        .disabled-toggle .slider {
+            background-color: #e4effd;
+            cursor: not-allowed;
+        }
+        .disabled-toggle input:checked + .slider {
+            background-color: #47607e;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation (Hidden in this transactional flow, but keeping semantic structure) -->
+<header class="w-full bg-surface-container shadow-sm h-touch-target-min flex justify-between items-center px-margin-mobile md:px-margin-desktop sticky top-0 z-50">
+<div class="flex items-center gap-sm">
+<button aria-label="Go back" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-headline-lg text-headline-lg text-primary">KarigarSaathi</span>
+</div>
+<div class="flex items-center">
+<span class="font-label-lg text-label-lg text-on-surface-variant hidden md:inline-block mr-sm">Step 8 of 12</span>
+<div class="w-32 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3 rounded-full"></div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Header Section -->
+<div class="mb-xl text-center md:text-left">
+<h1 class="font-display-lg text-display-lg text-primary-container mb-sm">Choose Public Information</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Only the items you select below will be visible to buyers on your Craft Passport. Sensitive details remain private.
+            </p>
+</div>
+<div class="flex flex-col lg:flex-row gap-lg items-start">
+<!-- Left Column: Settings -->
+<div class="w-full lg:w-2/3 space-y-md">
+<!-- Product Details Group -->
+<section class="bg-surface-container-lowest rounded-xl p-md md:p-lg card-shadow">
+<div class="flex items-center gap-sm mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+<h2 class="font-title-md text-title-md text-primary-container">Product Details</h2>
+</div>
+<div class="space-y-sm">
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Product Name</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Handwoven Silk Saree</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-primary hidden md:inline-block font-bold">Required Public</span>
+<label class="toggle-switch disabled-toggle">
+<input checked="" disabled="" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Material Used</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Pure Mulberry Silk</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-primary hidden md:inline-block font-bold">Required Public</span>
+<label class="toggle-switch disabled-toggle">
+<input checked="" disabled="" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Technique</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Jamdani Weave</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-primary hidden md:inline-block font-bold">Required Public</span>
+<label class="toggle-switch disabled-toggle">
+<input checked="" disabled="" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Artisan Story Group -->
+<section class="bg-surface-container-lowest rounded-xl p-md md:p-lg card-shadow">
+<div class="flex items-center gap-sm mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary">person_book</span>
+<h2 class="font-title-md text-title-md text-primary-container">Artisan Story</h2>
+</div>
+<div class="space-y-sm">
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('story-name')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Artisan Name</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rahul Weaver</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-story-name">Public</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input checked="" id="story-name" onchange="updateLabel(this, 'label-story-name')" type="checkbox" aria-label="Toggle Artisan Name visibility">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('story-exp')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Experience</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">15 Years</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-story-exp">Public</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input checked="" id="story-exp" onchange="updateLabel(this, 'label-story-exp')" type="checkbox" aria-label="Toggle Experience visibility">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('story-loc')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Workshop Location</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Varanasi, UP</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-story-loc">Private</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input id="story-loc" onchange="updateLabel(this, 'label-story-loc')" type="checkbox" aria-label="Toggle Workshop Location visibility">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Price & Delivery Group -->
+<section class="bg-surface-container-lowest rounded-xl p-md md:p-lg card-shadow">
+<div class="flex items-center gap-sm mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary">sell</span>
+<h2 class="font-title-md text-title-md text-primary-container">Price &amp; Delivery</h2>
+</div>
+<div class="space-y-sm">
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('price-final')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Final Price</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">₹ 4,500</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-price-final">Public</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input checked="" id="price-final" onchange="updateLabel(this, 'label-price-final')" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('price-ship')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Shipping Time</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">7-10 Days</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-price-ship">Public</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input checked="" id="price-ship" onchange="updateLabel(this, 'label-price-ship')" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Group -->
+<section class="bg-surface-container-lowest rounded-xl p-md md:p-lg card-shadow">
+<div class="flex items-center gap-sm mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary">contact_phone</span>
+<h2 class="font-title-md text-title-md text-primary-container">Contact Information</h2>
+<span class="ml-auto text-label-sm text-on-surface-variant italic">Usually kept private</span>
+</div>
+<div class="space-y-sm">
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('contact-wa')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">WhatsApp Number</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">+91 98765 43210</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-contact-wa">Private</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input id="contact-wa" onchange="updateLabel(this, 'label-contact-wa')" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+<!-- Item -->
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer" onclick="toggleCheckbox('contact-ph')">
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Phone Number</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">+91 98765 43210</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="label-contact-ph">Private</span>
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input id="contact-ph" onchange="updateLabel(this, 'label-contact-ph')" type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Summary Panel -->
+<div class="w-full lg:w-1/3 sticky top-[80px]">
+<div class="bg-surface-container-highest rounded-xl p-md card-shadow border border-outline-variant/30">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary">visibility</span>
+<h3 class="font-title-md text-title-md text-primary-container">Preview: Public Profile</h3>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-md space-y-sm">
+<div class="flex justify-center mb-sm">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px]">account_circle</span>
+</div>
+</div>
+<div class="text-center border-b border-surface-variant pb-sm mb-sm">
+<p class="font-label-lg text-label-lg text-on-surface">Handwoven Silk Saree</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">by Rahul Weaver</p>
+</div>
+<ul class="space-y-xs font-label-sm text-label-sm text-on-surface-variant">
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">check_circle</span> Pure Mulberry Silk</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">check_circle</span> Jamdani Weave</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">check_circle</span> 15 Years Exp.</li>
+<li class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">check_circle</span> ₹ 4,500</li>
+</ul>
+<div class="mt-md pt-sm border-t border-surface-variant text-center">
+<p class="font-label-sm text-label-sm italic text-primary">Craft Passport Preview</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Action Bar (Fixed on Mobile, Flow on Desktop) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-margin-mobile md:static md:bg-transparent md:shadow-none md:p-0 md:mt-xl z-40">
+<div class="max-w-[1200px] mx-auto flex flex-col-reverse md:flex-row justify-between items-center gap-md">
+<button class="w-full md:w-auto px-lg py-sm font-label-lg text-label-lg text-primary border-2 border-primary rounded-full hover:bg-primary/5 transition-colors h-touch-target-min flex justify-center items-center">
+                    Keep as Draft
+                </button>
+<button class="w-full md:w-auto px-xl py-sm font-label-lg text-label-lg text-white bg-secondary rounded-full hover:bg-[#a1492b] transition-colors h-touch-target-min flex justify-center items-center shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
+                    Review Public Information
+                </button>
+</div>
+</div>
+<!-- Spacer for mobile fixed footer -->
+<div class="h-24 md:hidden"></div>
+</main>
+<script>
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(id);
+            if(checkbox && !checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+                updateLabel(checkbox, 'label-' + id);
+            }
+        }
+        
+        function updateLabel(checkbox, labelId) {
+            const label = document.getElementById(labelId);
+            if(label) {
+                if(checkbox.checked) {
+                    label.textContent = "Public";
+                    label.classList.add("text-primary");
+                    label.classList.remove("text-on-surface-variant");
+                } else {
+                    label.textContent = "Private";
+                    label.classList.remove("text-primary");
+                    label.classList.add("text-on-surface-variant");
+                }
+            }
+            // In a real app, this would trigger an update to the Summary Panel preview
+        }
+    </script>
+
+
+</body></html>

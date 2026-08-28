@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isValidImagePayload() {
+      return request.resource.size > 0
+        && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType in ['image/jpeg', 'image/png', 'image/webp'];
+    }
+
+    function isValidMetadata(uid, productId) {
+      return request.resource.metadata != null
+        && request.resource.metadata.ownerId == uid
+        && request.resource.metadata.productId == productId;
+    }
+
+    // =========================================================================
+    // Original Product Photographs: users/{uid}/products/{productId}/originals/{fileId}
+    // =========================================================================
+    match /users/{uid}/products/{productId}/originals/{fileId} {
+      // Only the authenticated owner can read/download original photos
+      allow get: if isOwner(uid);
+
+      // Deny listing files in the storage folder
+      allow list: if false;
+
+      // Only the authenticated owner can upload with valid image type and metadata
+      allow create: if isOwner(uid)
+        && isValidImagePayload()
+        && isValidMetadata(uid, productId);
+
+      // Only the authenticated owner can update
+      allow update: if isOwner(uid)
+        && isValidImagePayload()
+        && isValidMetadata(uid, productId);
+
+      // Only the authenticated owner can delete
+      allow delete: if isOwner(uid);
+    }
+
+    // =========================================================================
+    // Display Product Photographs: users/{uid}/products/{productId}/display/{fileId}
+    // =========================================================================
+    match /users/{uid}/products/{productId}/display/{fileId} {
+      // Only the authenticated owner can read/download display photos
+      allow get: if isOwner(uid);
+
+      // Deny listing files in the storage folder
+      allow list: if false;
+
+      // Only the authenticated owner can upload with valid image type and metadata
+      allow create: if isOwner(uid)
+        && isValidImagePayload()
+        && isValidMetadata(uid, productId);
+
+      // Only the authenticated owner can update
+      allow update: if isOwner(uid)
+        && isValidImagePayload()
+        && isValidMetadata(uid, productId);
+
+      // Only the authenticated owner can delete
+      allow delete: if isOwner(uid);
+    }
+
+    // =========================================================================
+    // Default Deny for all other Storage paths
+    // =========================================================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Public Craft Passport - KarigarSaathi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#fd835b",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#462b00",
+                    "inverse-on-surface": "#e8f2ff",
+                    "secondary-fixed": "#ffdbd0",
+                    "on-background": "#121c26",
+                    "on-secondary-container": "#701f00",
+                    "tertiary": "#2a1800",
+                    "on-tertiary-fixed": "#2a1800",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#afc9ea",
+                    "on-surface": "#121c26",
+                    "surface-tint": "#47607e",
+                    "on-tertiary-fixed-variant": "#633f00",
+                    "primary": "#001d36",
+                    "inverse-primary": "#afc9ea",
+                    "surface": "#f7f9ff",
+                    "surface-bright": "#f7f9ff",
+                    "on-secondary-fixed-variant": "#812805",
+                    "primary-fixed": "#d1e4ff",
+                    "on-tertiary-container": "#cc8c28",
+                    "surface-variant": "#d9e3f1",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#2f4865",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-primary": "#ffffff",
+                    "secondary": "#a13f1c",
+                    "on-primary-container": "#819aba",
+                    "secondary-fixed-dim": "#ffb59d",
+                    "outline": "#74777e",
+                    "surface-dim": "#d1dbe9",
+                    "on-error-container": "#93000a",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#e4effd",
+                    "primary-container": "#17324d",
+                    "surface-container-highest": "#d9e3f1",
+                    "background": "#f7f9ff",
+                    "on-surface-variant": "#43474d",
+                    "surface-container-high": "#dfe9f7",
+                    "outline-variant": "#c3c6ce",
+                    "on-secondary-fixed": "#390b00",
+                    "on-primary-fixed": "#001d36",
+                    "tertiary-fixed-dim": "#ffb955",
+                    "inverse-surface": "#27313c",
+                    "surface-container-low": "#edf4ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "base": "8px",
+                    "margin-desktop": "48px",
+                    "touch-target-min": "48px",
+                    "lg": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Noto Sans"
+                    ],
+                    "body-lg": [
+                            "Noto Sans"
+                    ],
+                    "headline-lg-mobile": [
+                            "Noto Sans"
+                    ],
+                    "label-sm": [
+                            "Noto Sans"
+                    ],
+                    "body-md": [
+                            "Noto Sans"
+                    ],
+                    "title-md": [
+                            "Noto Sans"
+                    ],
+                    "label-lg": [
+                            "Noto Sans"
+                    ],
+                    "headline-lg": [
+                            "Noto Sans"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "18px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-lg": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #FFF9EF; /* Explicitly requested background */
+            color: theme('colors.on-background');
+        }
+        .soft-shadow {
+            box-shadow: 0px 2px 8px rgba(0, 29, 54, 0.06);
+        }
+        .focus-outline:focus-visible {
+            outline: 2px solid theme('colors.tertiary-fixed-dim');
+            outline-offset: 2px;
+        }
+        
+        /* Ikat inspired subtle background pattern */
+        .ikat-pattern {
+             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a13f1c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="min-h-screen font-body-md text-body-md ikat-pattern">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container shadow-sm fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop h-touch-target-min">
+<div class="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">KarigarSaathi</div>
+<div class="hidden md:flex items-center gap-lg h-full">
+<!-- No internal nav items, just public actions -->
+<button aria-label="Language" class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center px-sm focus-outline min-h-[48px]">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button aria-label="Accessibility Voice" class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center px-sm focus-outline min-h-[48px]">
+<span class="material-symbols-outlined">record_voice_over</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas - Desktop 1440px Focus -->
+<main class="max-w-[1200px] mx-auto mt-24 px-margin-desktop pb-24">
+<!-- Provenance Banner -->
+<div class="mb-lg flex items-center gap-sm text-surface-tint">
+<a class="font-label-lg text-label-lg hover:underline text-on-surface-variant focus-outline min-h-[48px]" href="#">Artisans</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="font-label-lg text-label-lg hover:underline text-on-surface-variant focus-outline min-h-[48px]" href="#">Textiles</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="font-label-lg text-label-lg text-primary">Handloom Silk Saree</span>
+</div>
+<div class="flex flex-col lg:flex-row gap-xl">
+<!-- Left Column: Visuals & Story (The Experience) -->
+<div class="flex-1 space-y-xl">
+<!-- Hero Image Gallery (Bento style) -->
+<div class="grid grid-cols-4 grid-rows-2 gap-sm rounded-xl overflow-hidden h-[600px] soft-shadow bg-surface-container-lowest p-sm">
+<div class="col-span-3 row-span-2 relative group rounded-lg overflow-hidden">
+<img alt="Main Product Image" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A highly detailed close-up shot of a magnificent hand-woven silk saree draped elegantly. The intricate geometric Jamdani motifs are visible in a palette of deep indigo and rich terracotta against a warm off-white base. The lighting is soft and natural, emphasizing the texture and slight sheen of the natural silk fibers, evoking a grounded, authentic artisanal quality in a professional light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf6aeeES2cqJ_t4wamNi00urcHremf8pkT37iCiMqexYmt1K8LY6OWh1ZpHgdiJBkoaakL1uF-pOhwAv6VT1CPUQaBmQxGdO62ttxX2WwZC5PPZ6gErcT5_xJwkCf_IuK8afRGTZh7lT6XUZ21r6AHO_C7akkvTop5sljiiBq4ycc3yE8Vn5w5Kbgi9lkyru0iNVEn2eGwQVPT3IJMNLVedK09rzlm_KVXBiMsZuZZD1U0XbYd_WdM">
+<div class="absolute top-md left-md bg-surface-container-lowest/90 backdrop-blur-sm rounded-full px-md py-xs flex items-center gap-xs shadow-md border border-surface-variant">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span class="font-label-lg text-label-lg text-primary">Verified Origin</span>
+</div>
+</div>
+<div class="col-span-1 row-span-1 rounded-lg overflow-hidden relative">
+<img alt="Artisan working" class="w-full h-full object-cover" data-alt="A skilled Indian artisan's hands working carefully on a traditional wooden handloom, weaving vibrant terracotta and indigo silk threads. The workshop is bathed in warm, diffused natural sunlight streaming from a side window, highlighting the dust motes and creating an atmosphere of deep concentration and timeless craft. Professional documentary style photography suitable for a light-mode layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcIb_3n_jKGy8FKg5OhbzJJ4NczZfFcqLyqqCJCgUvId0DvRi1Er5FVJqHv8O5qA-ISnNwCWUJE-EwPuu-qoswI4X7qvvAjOZfw4UJtxfIqmjPyWcVS2tH4XvnvITlkgUWWdjD3hz9wI7CrRzPjo6wHZmz8wIN1ow2nmYLP39tjJUyMDyD9CELrPtZZuw0MNQlVHcsPb4ZikKyaRxw5MTQWnYySWXYZRBQdDiUxpbOUhW3oKesP2K7">
+</div>
+<div class="col-span-1 row-span-1 rounded-lg overflow-hidden relative">
+<img alt="Materials used" class="w-full h-full object-cover" data-alt="A detailed, macro shot of natural silk yarns dyed in earthy terracotta and deep indigo, resting on a textured wooden surface next to some traditional weaving shuttles. The composition is balanced and serene, lit by soft, bright, even studio lighting that matches a warm, modern UI design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClwGQbNBcZQ5LlXf6ZUjX2sICOiucpgMlIqY_VAsD6-qpf2PfiYKFOym8pnaLKR9xa9w5VHQBFL8a27DA4wqQwrd_mphQmM2fNzkrW03GPBYryVUCXghUeHKMJDS-HKGBAyb1j83aACeioEwkLma6brCXlHPSQiafrw7NMN913rGgIh-zbkiKIqMNBPImhWsC3d7KBha4VvKccsKbXzDUOrRzFzo_20xOAmRiTuUH4FqRcf-z5Z1CN">
+</div>
+</div>
+<!-- Product Details Canvas -->
+<div class="bg-surface-container-lowest rounded-xl p-xl soft-shadow space-y-lg">
+<div class="flex justify-between items-start border-b border-surface-variant pb-md">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-xs">Indigo &amp; Terracotta Silk Jamdani</h1>
+<p class="font-title-md text-title-md text-on-surface-variant">By Master Weaver Ravi Kumar</p>
+</div>
+<div class="text-right">
+<div class="font-display-lg text-display-lg text-primary">₹14,500</div>
+<div class="font-label-sm text-label-sm text-outline">Base Price (excl. shipping)</div>
+</div>
+</div>
+<div class="prose max-w-none text-on-surface">
+<p class="font-body-lg text-body-lg leading-relaxed">
+                            This piece represents over 120 hours of meticulous hand-weaving using traditional Jamdani techniques. The geometric motifs are inspired by local temple architecture, rendered in natural dyes that age beautifully over time.
+                        </p>
+</div>
+<!-- Material & Process Tags -->
+<div class="flex flex-wrap gap-sm pt-sm">
+<div class="flex items-center gap-xs bg-surface-container px-md py-sm rounded-lg border border-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px]">grass</span>
+<span class="font-label-lg text-label-lg text-primary">100% Pure Mulberry Silk</span>
+</div>
+<div class="flex items-center gap-xs bg-surface-container px-md py-sm rounded-lg border border-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px]">palette</span>
+<span class="font-label-lg text-label-lg text-primary">Natural Indigo &amp; Madder Dyes</span>
+</div>
+<div class="flex items-center gap-xs bg-surface-container px-md py-sm rounded-lg border border-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px]">handyman</span>
+<span class="font-label-lg text-label-lg text-primary">Handloom Woven (Jamdani)</span>
+</div>
+</div>
+</div>
+<!-- Artisan Story -->
+<div class="bg-surface-container-lowest rounded-xl p-xl soft-shadow flex flex-col md:flex-row gap-lg items-center">
+<div class="w-32 h-32 rounded-full overflow-hidden shrink-0 border-4 border-surface-container">
+<img alt="Artisan Portrait" class="w-full h-full object-cover" data-alt="A warm, engaging portrait of a dignified Indian artisan, a middle-aged man with a gentle smile, standing in front of his wooden handloom. He wears a simple, clean cotton kurta. The lighting is soft and flattering, highlighting his weathered but skilled hands. The background is slightly out of focus, showing colorful spools of yarn. The overall mood is respectful, authentic, and fits a high-end artisanal brand's light theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwAdBFoHYtPZiG7GHjOme0zr-nkd1kpPdSD4ipNvMYlAulElsxszWpaGN51hlX71mg9rdXAUjrjYh8AQBPU08X7sOxNO-L1Mk1j9vwmV9fWYwq5FU0x01O3CFKhA14taqh9b874Ge6lGFvAclcgTTjSOQHsYtwaj6U-AS2DmXSbx0Y7pUA9O3vh8U_SHtZ8QG6MUHSvS5cFo1bpzjDXdC-fgd45jRcSXt4e1OmxP4ZSg1rOHO2jplg">
+</div>
+<div class="flex-1 space-y-sm">
+<h3 class="font-title-md text-title-md text-primary">The Artisan's Journey</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                            Ravi Kumar comes from a lineage of weavers stretching back four generations in Varanasi. Despite the rise of power looms, he has dedicated his life to preserving the intricate art of hand-woven Jamdani, ensuring each piece retains its unique human touch and cultural soul.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Right Column: Action & Provenance Card (The Anchor) -->
+<div class="w-full lg:w-[380px] shrink-0">
+<div class="sticky top-24 space-y-md">
+<!-- Primary Action Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg soft-shadow border border-surface-variant flex flex-col space-y-md">
+<div class="space-y-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">star</span>
+<span class="font-title-md text-title-md text-primary">Master Grade Craft</span>
+</div>
+<p class="font-label-lg text-label-lg text-on-surface-variant">Estimated completion for new orders: 3-4 Weeks</p>
+</div>
+<div class="pt-sm pb-md">
+<div class="w-full h-[1px] bg-outline-variant opacity-50 mb-md"></div>
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg py-3 px-6 rounded-lg font-bold hover:bg-primary transition-colors min-h-[48px] focus-outline flex justify-center items-center gap-sm shadow-md">
+<span class="material-symbols-outlined">send</span>
+                                 Send Enquiry
+                             </button>
+<p class="font-label-sm text-label-sm text-outline text-center mt-sm">Connect directly with the artisan's representative to discuss customization or bulk orders.</p>
+</div>
+</div>
+<!-- Origin Info Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg soft-shadow">
+<h4 class="font-title-md text-title-md text-primary mb-md border-b border-surface-variant pb-xs">Origin Details</h4>
+<ul class="space-y-sm">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-surface-tint mt-1 text-[20px]">location_on</span>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface">Region</div>
+<div class="font-body-md text-body-md text-on-surface-variant">Varanasi, Uttar Pradesh, India</div>
+</div>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-surface-tint mt-1 text-[20px]">history</span>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface">Craft Heritage</div>
+<div class="font-body-md text-body-md text-on-surface-variant">GI Tagged Traditional Weaving</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-xl px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-high mt-xl">
+<div class="font-bold text-primary">KarigarSaathi</div>
+<div class="text-on-surface-variant font-label-sm text-label-sm">
+            © 2024 KarigarSaathi. Handmade with pride.
+        </div>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-sm text-label-sm focus-outline" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-sm text-label-sm focus-outline" href="#">Privacy Policy</a>
+</div>
+</footer>
+
+
+</body></html>

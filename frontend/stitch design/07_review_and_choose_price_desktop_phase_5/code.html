@@ -1,0 +1,245 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Review and Choose Price</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#dfe9f7",
+                        "primary-container": "#17324d",
+                        "primary-fixed-dim": "#afc9ea",
+                        "on-background": "#121c26",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6ce",
+                        "secondary": "#a13f1c",
+                        "inverse-surface": "#27313c",
+                        "surface-tint": "#47607e",
+                        "inverse-on-surface": "#e8f2ff",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f7f9ff",
+                        "inverse-primary": "#afc9ea",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#74777e",
+                        "on-tertiary-fixed": "#2a1800",
+                        "surface": "#f7f9ff",
+                        "surface-container": "#e4effd",
+                        "on-surface-variant": "#43474d",
+                        "surface-dim": "#d1dbe9",
+                        "secondary-container": "#fd835b",
+                        "on-surface": "#121c26",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-primary-fixed": "#001d36",
+                        "surface-variant": "#d9e3f1",
+                        "on-secondary-fixed": "#390b00",
+                        "on-primary-container": "#819aba",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "on-secondary-container": "#701f00",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d1e4ff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#d9e3f1",
+                        "surface-container-low": "#edf4ff",
+                        "on-secondary-fixed-variant": "#812805",
+                        "on-tertiary-container": "#cc8c28",
+                        "primary": "#001d36",
+                        "tertiary-container": "#462b00",
+                        "tertiary": "#2a1800",
+                        "background": "#f7f9ff",
+                        "brand-bg": "#FFF9EF",
+                        "brand-indigo": "#17324D",
+                        "brand-terracotta": "#C65A35",
+                        "brand-marigold": "#F4B942"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "base": "8px",
+                        "touch-target-min": "48px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "margin-desktop": "48px"
+                    },
+                    fontFamily: {
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg-mobile": ["20px", { lineHeight: "28px", fontWeight: "700" }],
+                        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+                        "display-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "title-md": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "500" }]
+                    },
+                    boxShadow: {
+                        'soft-card': '0 2px 8px 0 rgba(23, 50, 77, 0.06)',
+                        'lifted-card': '0 4px 16px 0 rgba(23, 50, 77, 0.10)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Noto Sans', sans-serif; background-color: #FFF9EF; color: #17324D; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .focus-ring:focus-within { outline: 2px solid #F4B942; outline-offset: 2px; }
+    </style>
+</head>
+<body class="min-h-screen pb-32 md:pb-0">
+<!-- Top Navigation Area -->
+<header class="bg-surface dark:bg-surface border-b-2 border-primary dark:border-outline flat no shadows flex justify-between items-center w-full px-margin-desktop md:px-margin-desktop max-w-[1200px] mx-auto h-[64px] sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="w-[48px] h-[48px] flex items-center justify-center text-primary hover:bg-surface-container-highest rounded-full transition-colors">
+<span aria-hidden="true" class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-on-surface tracking-tight">KarigarSaathi</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="h-[48px] px-4 flex items-center gap-2 text-primary hover:bg-surface-container-highest rounded-full transition-colors font-label-lg text-label-lg font-bold">
+<span aria-hidden="true" class="material-symbols-outlined">volume_up</span>
+                Listen
+            </button>
+<button aria-label="Change language" class="w-[48px] h-[48px] flex items-center justify-center text-primary hover:bg-surface-container-highest rounded-full transition-colors">
+<span aria-hidden="true" class="material-symbols-outlined">language</span>
+</button>
+</div>
+</header>
+<main class="max-w-[800px] mx-auto px-margin-mobile md:px-0 py-8 md:py-12">
+<!-- Progress Header -->
+<div class="mb-8">
+<p class="font-label-lg text-label-lg text-brand-indigo/70 mb-2 uppercase tracking-wide font-bold">Step 7 of 12</p>
+<h1 class="font-display-lg text-display-lg text-brand-indigo mb-2">Review &amp; Choose Price</h1>
+<p class="font-body-lg text-body-lg text-brand-indigo/80">Product: <span class="font-bold">Handwoven Cotton Saree</span></p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Cost Breakdown Column -->
+<div class="md:col-span-5 space-y-6">
+<div class="bg-white rounded-xl p-6 shadow-soft-card border border-outline-variant/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-brand-terracotta/5 rounded-bl-[100px] pointer-events-none"></div>
+<h2 class="font-title-md text-title-md text-brand-indigo mb-6 border-b border-outline-variant/20 pb-4">Cost to Make</h2>
+<div class="space-y-5">
+<div class="focus-ring rounded-lg">
+<label class="block font-label-lg text-label-lg text-brand-indigo mb-1" for="materialCost">Material Cost (₹)</label>
+<input class="w-full h-[48px] px-4 rounded-xl border-1.5 border-outline-variant bg-white text-brand-indigo font-body-lg text-body-lg focus:border-brand-indigo focus:ring-0 transition-colors" id="materialCost" placeholder="e.g. 1200" type="number" value="1200">
+</div>
+<div class="focus-ring rounded-lg">
+<label class="block font-label-lg text-label-lg text-brand-indigo mb-1" for="laborCost">Labor Cost (₹)</label>
+<div class="text-sm text-brand-indigo/60 mb-2">Based on 15 hours of work</div>
+<input class="w-full h-[48px] px-4 rounded-xl border-1.5 border-outline-variant bg-white text-brand-indigo font-body-lg text-body-lg focus:border-brand-indigo focus:ring-0 transition-colors" id="laborCost" placeholder="e.g. 800" type="number" value="800">
+</div>
+<div class="focus-ring rounded-lg">
+<label class="block font-label-lg text-label-lg text-brand-indigo mb-1" for="overheadCost">Overhead (₹)</label>
+<div class="text-sm text-brand-indigo/60 mb-2">Packaging, transport, etc.</div>
+<input class="w-full h-[48px] px-4 rounded-xl border-1.5 border-outline-variant bg-white text-brand-indigo font-body-lg text-body-lg focus:border-brand-indigo focus:ring-0 transition-colors" id="overheadCost" placeholder="e.g. 150" type="number" value="150">
+</div>
+</div>
+<div class="mt-6 pt-4 border-t-2 border-brand-indigo/10 flex justify-between items-center bg-brand-bg/50 p-4 rounded-lg flex-wrap">
+<span class="font-title-md text-title-md text-brand-indigo font-bold">Subtotal Cost:</span>
+<span class="font-headline-lg text-headline-lg text-brand-indigo font-bold">₹2,150</span>
+</div>
+</div>
+</div>
+<!-- Pricing Suggestions Column -->
+<div class="md:col-span-7 space-y-6">
+<div class="bg-white rounded-xl p-6 shadow-soft-card border border-outline-variant/30">
+<div class="flex items-start gap-3 mb-6">
+<span aria-hidden="true" class="material-symbols-outlined text-brand-terracotta mt-1" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<div>
+<h2 class="font-title-md text-title-md text-brand-indigo mb-1">Suggested Selling Prices</h2>
+<p class="font-body-md text-body-md text-brand-indigo/70">These are estimates to help you decide. You can choose one or enter your own price below.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+<!-- Suggestion Card 1 -->
+<button class="group flex flex-col p-4 rounded-xl border-2 border-outline-variant/30 hover:border-brand-indigo hover:bg-brand-bg/30 text-left transition-all h-full relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-marigold focus-visible:ring-offset-2">
+<span class="font-label-lg text-label-lg text-brand-indigo/60 mb-2 uppercase">Fair Margin</span>
+<span class="font-headline-lg text-headline-lg text-brand-indigo font-bold mb-1 group-hover:text-brand-terracotta transition-colors">₹2,500</span>
+<span class="font-body-md text-body-md text-brand-indigo/70 mt-auto">+₹350 Profit</span>
+</button>
+<!-- Suggestion Card 2 (Recommended) -->
+<button class="group flex flex-col p-4 rounded-xl border-2 border-brand-indigo bg-brand-bg/40 text-left transition-all h-full relative overflow-hidden shadow-lifted-card focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-marigold focus-visible:ring-offset-2">
+<div class="absolute top-0 right-0 bg-brand-indigo text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">Recommended</div>
+<span class="font-label-lg text-label-lg text-brand-indigo mb-2 uppercase">Good Margin</span>
+<span class="font-headline-lg text-headline-lg text-brand-indigo font-bold mb-1">₹3,000</span>
+<span class="font-body-md text-body-md text-brand-indigo/80 mt-auto">+₹850 Profit</span>
+</button>
+<!-- Suggestion Card 3 -->
+<button class="group flex flex-col p-4 rounded-xl border-2 border-outline-variant/30 hover:border-brand-indigo hover:bg-brand-bg/30 text-left transition-all h-full relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-marigold focus-visible:ring-offset-2">
+<span class="font-label-lg text-label-lg text-brand-indigo/60 mb-2 uppercase">High Margin</span>
+<span class="font-headline-lg text-headline-lg text-brand-indigo font-bold mb-1 group-hover:text-brand-terracotta transition-colors">₹3,500</span>
+<span class="font-body-md text-body-md text-brand-indigo/70 mt-auto">+₹1,350 Profit</span>
+</button>
+</div>
+<!-- Custom Price Selection -->
+<div class="bg-brand-bg p-6 rounded-xl border border-brand-indigo/10">
+<label class="block font-title-md text-title-md text-brand-indigo mb-2 font-bold" for="finalPrice">Your Final Selling Price (₹)</label>
+<p class="font-body-md text-body-md text-brand-indigo/70 mb-4">Select a suggestion above or enter your own price here.</p>
+<div class="flex items-center gap-4">
+<div class="relative flex-grow focus-ring rounded-xl">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 font-headline-lg text-headline-lg text-brand-indigo/50">₹</span>
+<input class="w-full h-[64px] pl-10 pr-4 rounded-xl border-2 border-brand-indigo bg-white text-brand-indigo font-headline-lg text-headline-lg font-bold focus:border-brand-indigo focus:ring-0 shadow-sm" id="finalPrice" placeholder="Enter amount" type="number" value="3000">
+</div>
+<div class="hidden sm:flex flex-col">
+<span class="font-label-sm text-label-sm text-brand-indigo/60 uppercase">Profit Margin</span>
+<span class="font-title-md text-title-md text-emerald-700 font-bold"><span class="sr-only">Profit: </span>+₹850</span>
+</div>
+</div>
+<!-- Warning state example (hidden by default, shown for demonstration) -->
+<div class="mt-4 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg hidden">
+<span aria-hidden="true" class="material-symbols-outlined text-red-600 shrink-0">warning</span>
+<p class="font-body-md text-body-md text-red-800">This price is below your calculated cost to make (₹2,150). You will make a loss.</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-high/50 p-4 rounded-lg flex items-start gap-3">
+<span aria-hidden="true" class="material-symbols-outlined text-brand-indigo/50 mt-0.5">info</span>
+<p class="font-body-md text-body-md text-brand-indigo/70 italic text-sm">Note: Sample calculations only. Final payouts depend on platform fees and actual shipping costs discussed in the next steps.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Actions -->
+<div class="fixed md:static bottom-0 left-0 w-full bg-white md:bg-transparent border-t border-outline-variant/30 md:border-none p-4 md:p-0 md:mt-12 z-40">
+<div class="max-w-[800px] mx-auto flex flex-col-reverse md:flex-row justify-between items-center gap-4">
+<button class="w-full md:w-auto min-h-[48px] px-6 py-3 rounded-full border-2 border-brand-indigo text-brand-indigo font-label-lg text-label-lg font-bold hover:bg-brand-bg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-marigold focus-visible:ring-offset-2 bg-white h-[48px]">
+                Save as Draft
+            </button>
+<button class="w-full md:w-auto min-h-[48px] px-8 py-3 rounded-full bg-brand-terracotta text-white font-label-lg text-label-lg font-bold hover:bg-[#A84A2A] shadow-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-marigold focus-visible:ring-offset-2 flex items-center justify-center gap-2">
+                Confirm Price &amp; Continue
+                <span aria-hidden="true" class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+
+
+</body></html>

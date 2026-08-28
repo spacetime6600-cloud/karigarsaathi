@@ -1,0 +1,217 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Microphone Access - KarigarSaathi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#ffdbd0",
+                      "on-secondary-container": "#701f00",
+                      "on-surface": "#121c26",
+                      "on-tertiary-fixed": "#2a1800",
+                      "primary-fixed-dim": "#afc9ea",
+                      "on-primary": "#ffffff",
+                      "secondary": "#a13f1c",
+                      "on-background": "#121c26",
+                      "on-error-container": "#93000a",
+                      "secondary-container": "#fd835b",
+                      "surface-container-high": "#dfe9f7",
+                      "surface-bright": "#f7f9ff",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#ffb955",
+                      "outline-variant": "#c3c6ce",
+                      "background": "#f7f9ff",
+                      "secondary-fixed-dim": "#ffb59d",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#27313c",
+                      "primary-fixed": "#d1e4ff",
+                      "outline": "#74777e",
+                      "tertiary-container": "#462b00",
+                      "on-secondary-fixed": "#390b00",
+                      "on-tertiary-fixed-variant": "#633f00",
+                      "on-surface-variant": "#43474d",
+                      "on-primary-container": "#819aba",
+                      "tertiary-fixed": "#ffddb5",
+                      "on-tertiary-container": "#cc8c28",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#d9e3f1",
+                      "surface-container-highest": "#d9e3f1",
+                      "primary-container": "#17324d",
+                      "tertiary": "#2a1800",
+                      "surface-dim": "#d1dbe9",
+                      "primary": "#001d36",
+                      "surface": "#f7f9ff",
+                      "on-primary-fixed": "#001d36",
+                      "on-secondary-fixed-variant": "#812805",
+                      "inverse-primary": "#afc9ea",
+                      "surface-container": "#e4effd",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#edf4ff",
+                      "surface-tint": "#47607e",
+                      "inverse-on-surface": "#e8f2ff",
+                      "on-primary-fixed-variant": "#2f4865"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "base": "8px",
+                      "touch-target-min": "48px",
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "xs": "4px",
+                      "margin-desktop": "48px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Noto Sans"
+                      ],
+                      "headline-lg": [
+                              "Noto Sans"
+                      ],
+                      "body-md": [
+                              "Noto Sans"
+                      ],
+                      "body-lg": [
+                              "Noto Sans"
+                      ],
+                      "title-md": [
+                              "Noto Sans"
+                      ],
+                      "label-sm": [
+                              "Noto Sans"
+                      ],
+                      "label-lg": [
+                              "Noto Sans"
+                      ],
+                      "headline-lg-mobile": [
+                              "Noto Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-lg": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col relative overflow-hidden">
+<!-- Top Nav Bar Shell Component (Suppressed as this is a transactional flow) -->
+<header class="w-full flex justify-between items-center px-margin-desktop py-lg fixed top-0 z-10">
+<button aria-label="Go Back" class="flex items-center gap-sm text-primary hover:text-primary-fixed-dim transition-colors h-touch-target-min">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+<span class="font-title-md text-title-md">Back</span>
+</button>
+</header>
+<main class="flex-grow flex items-center justify-center p-margin-desktop">
+<!-- Main Recovery Card -->
+<div class="bg-surface-container-lowest rounded-xl p-xl shadow-lg w-full max-w-2xl flex flex-col items-center text-center relative z-10 border border-outline-variant">
+<!-- Icon Container -->
+<div class="bg-surface-variant rounded-full w-24 h-24 flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined text-outline" data-icon="mic_off" style="font-size: 48px; font-variation-settings: 'FILL' 1;">mic_off</span>
+</div>
+<!-- Content -->
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-md">Microphone Access Not Allowed</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-xl">
+                Voice entry helps you add product details faster, but it is entirely optional. You can continue adding items using the standard form.
+            </p>
+<!-- Actions Stack -->
+<div class="flex flex-col gap-md w-full max-w-md">
+<!-- Primary Action -->
+<button class="w-full bg-primary-container text-on-primary font-label-lg text-label-lg rounded-full h-touch-target-min flex items-center justify-center shadow-sm hover:shadow-md transition-shadow" aria-label="Try requesting microphone access again" style="opacity: 0;">
+                    Enter Details Manually
+                </button>
+<div class="flex gap-md w-full">
+<!-- Secondary Action 1 -->
+<button class="flex-1 border-2 border-primary text-primary font-label-lg text-label-lg rounded-full h-touch-target-min flex items-center justify-center hover:bg-surface-container-low transition-colors" aria-label="Try requesting microphone access again">
+                        Try Again
+                    </button>
+<!-- Secondary Action 2 -->
+<button class="flex-1 bg-transparent text-primary underline font-label-lg text-label-lg h-touch-target-min flex items-center justify-center hover:text-primary-fixed-dim transition-colors px-md">
+                        Open Settings
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Subtle Background Element for visual depth -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center opacity-30">
+<div class="w-[800px] h-[800px] rounded-full bg-surface-variant blur-3xl absolute -top-[400px] -right-[200px]"></div>
+<div class="w-[600px] h-[600px] rounded-full bg-surface-container blur-3xl absolute -bottom-[200px] -left-[200px]"></div>
+</div>
+
+
+</body></html>

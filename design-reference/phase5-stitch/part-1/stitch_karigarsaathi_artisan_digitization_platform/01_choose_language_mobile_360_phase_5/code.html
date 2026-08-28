@@ -1,0 +1,260 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>KarigarSaathi - Choose Language</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-background": "#121c26",
+                        "surface-bright": "#f7f9ff",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "surface-tint": "#47607e",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#812805",
+                        "surface-variant": "#d9e3f1",
+                        "on-surface-variant": "#43474d",
+                        "primary-container": "#17324d",
+                        "tertiary-fixed": "#ffddb5",
+                        "surface-container-highest": "#d9e3f1",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#e8f2ff",
+                        "on-surface": "#121c26",
+                        "primary-fixed-dim": "#afc9ea",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "tertiary": "#2a1800",
+                        "on-primary-fixed": "#001d36",
+                        "primary-fixed": "#d1e4ff",
+                        "tertiary-container": "#462b00",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "outline": "#74777e",
+                        "background": "#f7f9ff",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "surface-container": "#e4effd",
+                        "surface-dim": "#d1dbe9",
+                        "secondary-fixed": "#ffdbd0",
+                        "surface-container-high": "#dfe9f7",
+                        "outline-variant": "#c3c6ce",
+                        "on-tertiary-fixed": "#2a1800",
+                        "on-secondary-container": "#701f00",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#a13f1c",
+                        "secondary-container": "#fd835b",
+                        "on-secondary-fixed": "#390b00",
+                        "inverse-surface": "#27313c",
+                        "on-tertiary-container": "#cc8c28",
+                        "inverse-primary": "#afc9ea",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "surface": "#f7f9ff",
+                        "primary": "#001d36",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#819aba",
+                        "surface-container-low": "#edf4ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-desktop": "48px",
+                        "md": "16px",
+                        "touch-target-min": "48px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #FFF9EF; /* Level 0 Background */
+        }
+        
+        /* Focus state accessibility */
+        *:focus-visible {
+            outline: 2px solid #cc8c28; /* Marigold highlight */
+            outline-offset: 2px;
+        }
+
+        .lang-card {
+            transition: all 0.2s ease;
+        }
+        
+        .lang-card[aria-selected="true"] {
+            border: 2px solid #a13f1c; /* Terracotta secondary */
+            background-color: #F3E8D5; /* Level 2 */
+            box-shadow: 0 4px 16px rgba(0, 29, 54, 0.1); /* Primary color shadow */
+        }
+        
+        .lang-card[aria-selected="false"] {
+            border: 1.5px solid #d1dbe9; /* Surface dim */
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);
+        }
+        
+        .lang-card[aria-selected="true"] .checkmark {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .lang-card[aria-selected="false"] .checkmark {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        /* Prevent clipping at 200% scaling */
+        .native-text {
+            line-height: 1.2;
+            word-break: keep-all;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background min-h-screen flex flex-col max-w-[360px] mx-auto overflow-x-hidden relative">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface-dim shadow-sm z-50 flex flex-col px-margin-mobile h-touch-target-min w-full">
+<div class="flex justify-between items-center w-full h-full">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">
+                KarigarSaathi
+            </h1>
+<button aria-label="Listen to page text" class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">volume_up</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-margin-mobile py-lg pb-32 flex flex-col gap-md">
+<div class="mb-sm">
+<h2 class="font-title-md text-title-md text-on-surface mb-xs">Choose Language</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Select the language you are most comfortable with.</p>
+</div>
+<!-- Language Cards Stack -->
+<div aria-label="Select language" class="flex flex-col gap-sm" role="radiogroup">
+<!-- English -->
+<button aria-checked="false" aria-selected="false" class="lang-card w-full text-left p-md rounded-xl flex items-center justify-between min-h-touch-target-min cursor-pointer" onclick="selectLang(this)" role="radio">
+<div class="flex flex-col gap-xs pr-sm">
+<span class="font-title-md text-title-md text-on-surface native-text">English</span>
+</div>
+<div class="checkmark w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 opacity-0 scale-80 bg-primary-container">
+<span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Hindi -->
+<button aria-checked="false" aria-selected="false" class="lang-card w-full text-left p-md rounded-xl flex items-center justify-between min-h-touch-target-min cursor-pointer" onclick="selectLang(this)" role="radio">
+<div class="flex flex-col gap-xs pr-sm">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface native-text mb-1">हिन्दी</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Hindi</span>
+</div>
+<div class="checkmark w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 opacity-0 scale-80 bg-primary-container">
+<span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Odia -->
+<button aria-checked="false" aria-selected="false" class="lang-card w-full text-left p-md rounded-xl flex items-center justify-between min-h-touch-target-min cursor-pointer" onclick="selectLang(this)" role="radio">
+<div class="flex flex-col gap-xs pr-sm">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface native-text mb-1">ଓଡ଼ିଆ</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Odia</span>
+</div>
+<div class="checkmark w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 opacity-0 scale-80 bg-primary-container">
+<span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Bengali -->
+<button aria-checked="false" aria-selected="false" class="lang-card w-full text-left p-md rounded-xl flex items-center justify-between min-h-touch-target-min cursor-pointer" onclick="selectLang(this)" role="radio">
+<div class="flex flex-col gap-xs pr-sm">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface native-text mb-1">বাংলা</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Bengali</span>
+</div>
+<div class="checkmark w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 opacity-0 scale-80 bg-primary-container">
+<span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+<!-- Telugu -->
+<button aria-checked="false" aria-selected="false" class="lang-card w-full text-left p-md rounded-xl flex items-center justify-between min-h-touch-target-min cursor-pointer" onclick="selectLang(this)" role="radio">
+<div class="flex flex-col gap-xs pr-sm">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface native-text mb-1">తెలుగు</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Telugu</span>
+</div>
+<div class="checkmark w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 opacity-0 scale-80 bg-primary-container">
+<span class="material-symbols-outlined text-on-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-0 left-0 right-0 bg-[#FFF9EF] px-margin-mobile pb-lg pt-sm max-w-[360px] mx-auto z-40 before:content-[''] before:absolute before:-top-6 before:left-0 before:right-0 before:h-6 before:bg-gradient-to-t before:from-[#FFF9EF] before:to-transparent">
+<!-- Provisional Notice -->
+<p class="font-label-sm text-label-sm text-center text-on-surface-variant mb-sm">
+            Provisional translations — human review required.
+        </p>
+<!-- Continue Button -->
+<button class="w-full h-touch-target-min bg-primary-container text-on-secondary font-title-md text-title-md rounded-xl disabled:opacity-50 disabled:bg-surface-variant disabled:text-on-surface-variant transition-colors flex items-center justify-center" disabled="" id="continueBtn">Continue</button>
+<!-- Footer Footer (from JSON) -->
+<footer class="w-full mt-sm flex flex-col items-center gap-xs w-full">
+<p class="font-label-sm text-label-sm text-center text-on-surface-variant dark:text-outline font-semibold">
+                © 2024 KarigarSaathi. Translations are provisional.
+             </p>
+<div class="flex gap-md font-label-sm text-label-sm text-center">
+<a class="text-on-surface-variant hover:text-primary transition-opacity duration-200" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity duration-200" href="#">Privacy</a>
+</div>
+</footer>
+</div>
+<script>
+        function selectLang(selectedEl) {
+            // Reset all
+            const cards = document.querySelectorAll('.lang-card');
+            cards.forEach(card => {
+                card.setAttribute('aria-selected', 'false');
+                card.setAttribute('aria-checked', 'false');
+            });
+
+            // Set active
+            selectedEl.setAttribute('aria-selected', 'true');
+            selectedEl.setAttribute('aria-checked', 'true');
+
+            // Enable continue button
+            const btn = document.getElementById('continueBtn');
+            btn.removeAttribute('disabled');
+        }
+    </script>
+
+
+</body></html>

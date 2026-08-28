@@ -1,0 +1,328 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Buyer Enquiry - KarigarSaathi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "error-container": "#ffdad6",
+                "surface-variant": "#dfe3e9",
+                "background": "#f6f9ff",
+                "on-secondary-container": "#596372",
+                "on-primary-fixed": "#141b2b",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#bdc7d8",
+                "on-secondary-fixed-variant": "#3e4755",
+                "on-secondary-fixed": "#121c28",
+                "inverse-on-surface": "#edf1f7",
+                "on-surface": "#171c20",
+                "primary-fixed-dim": "#c0c6db",
+                "surface-dim": "#d6dae0",
+                "surface-tint": "#575e70",
+                "tertiary-fixed": "#f9debf",
+                "outline": "#76777d",
+                "surface": "#f6f9ff",
+                "inverse-primary": "#c0c6db",
+                "secondary-container": "#d6e0f1",
+                "surface-container-low": "#f0f4fa",
+                "error": "#ba1a1a",
+                "surface-container-lowest": "#ffffff",
+                "primary-container": "#141b2b",
+                "primary": "#000000",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed-variant": "#55442d",
+                "on-tertiary-fixed": "#261906",
+                "on-tertiary-container": "#968065",
+                "surface-container": "#eaeef4",
+                "on-background": "#171c20",
+                "on-error-container": "#93000a",
+                "on-surface-variant": "#45464c",
+                "on-error": "#ffffff",
+                "on-primary": "#ffffff",
+                "surface-container-high": "#e5e8ee",
+                "tertiary-fixed-dim": "#dcc2a4",
+                "inverse-surface": "#2c3136",
+                "outline-variant": "#c6c6cd",
+                "on-primary-fixed-variant": "#404758",
+                "primary-fixed": "#dce2f7",
+                "secondary-fixed": "#d9e3f4",
+                "on-primary-container": "#7d8497",
+                "tertiary-container": "#261906",
+                "surface-bright": "#f6f9ff",
+                "surface-container-highest": "#dfe3e9",
+                "secondary": "#555f6d",
+                "tertiary": "#000000",
+                "terracotta": "#C65A35",
+                "indigo-text": "#17324d",
+                "warm-surface": "#f7f9ff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-max": "1200px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "touch-target-min": "48px",
+                "margin-desktop": "40px",
+                "unit": "8px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "display": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "body-lg": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "body-md": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "headline-md": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "headline-lg": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "label-lg": [
+                        "Noto Sans", "sans-serif"
+                ],
+                "status-label": [
+                        "Noto Sans", "sans-serif"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "34px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "body-lg": [
+                        "20px",
+                        {
+                                "lineHeight": "30px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "status-label": [
+                        "16px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-warm-surface text-indigo-text font-body-md min-h-screen flex flex-col md:flex-row antialiased">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile h-[64px] bg-warm-surface shadow-sm sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button aria-label="Back" class="text-indigo-text min-h-touch-target-min">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+<span class="sr-only">Back</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-indigo-text">KarigarSaathi</span>
+</div>
+<div class="flex gap-4">
+<button aria-label="Language" class="text-indigo-text min-h-touch-target-min">
+<span class="material-symbols-outlined text-2xl">language</span>
+</button>
+<button aria-label="Listen" class="text-indigo-text min-h-touch-target-min">
+<span class="material-symbols-outlined text-2xl">settings_voice</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 py-8 px-6 bg-surface-container-low shadow-md w-64 z-40">
+<div class="mb-8">
+<div class="font-headline-lg text-headline-lg font-bold text-indigo-text">KarigarSaathi</div>
+<div class="font-label-lg text-sm text-secondary mt-1">Artisan Dashboard</div>
+</div>
+<ul class="flex flex-col w-full space-y-2 flex-grow">
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface flex items-center gap-4 px-4 py-3 font-label-lg rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+                    Home
+                </a>
+</li>
+<li>
+<a class="text-indigo-text font-bold border-l-4 border-terracotta bg-surface-container-highest flex items-center gap-4 px-4 py-3 font-label-lg rounded-r-lg" href="#">
+<span class="material-symbols-outlined text-terracotta" data-icon="assignment" data-weight="fill">assignment</span>
+                    My Tasks
+                </a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface flex items-center gap-4 px-4 py-3 font-label-lg rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                    Inventory
+                </a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface flex items-center gap-4 px-4 py-3 font-label-lg rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                    Profile
+                </a>
+</li>
+</ul>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<ul class="flex flex-col w-full space-y-2">
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface flex items-center gap-4 px-4 py-3 font-label-lg rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface flex items-center gap-4 px-4 py-3 font-label-lg rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                        Logout
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow lg:ml-64 pb-[96px] md:pb-12 pt-6 md:pt-12 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Header -->
+<div class="mb-10">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-indigo-text mb-2 font-bold">Buyer Enquiries</h1>
+<p class="font-body-lg text-body-lg text-secondary">Review and respond to potential buyers.</p>
+</div>
+<!-- Enquiries List -->
+<div class="flex flex-col w-full gap-8">
+<!-- New Enquiry Item -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="p-6 md:p-8 flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
+<div class="flex-grow">
+<div class="flex items-center gap-4 mb-4">
+<span class="font-status-label text-xs bg-terracotta text-white px-3 py-1 rounded-full uppercase tracking-wider font-bold px-4">ONE NEW BUYER ENQUIRY</span>
+<span class="flex items-center gap-1 text-secondary text-sm font-medium">
+<span class="material-symbols-outlined text-[18px]">schedule</span> 2 hours ago
+</span>
+</div>
+<div class="mb-2">
+<span class="inline-block bg-primary-fixed text-primary-container px-2 py-1 rounded text-sm font-semibold mb-2">Product: Wooden Carvings</span>
+<h2 class="font-headline-md text-headline-md text-indigo-text">Large order for Wooden Carvings</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 max-w-3xl leading-relaxed">
+                            Buyer is interested in a bulk order of 50 hand-carved wooden elephants. Requesting details on timeline, safe shipping methods, and bulk pricing.
+                        </p>
+<div class="flex items-center gap-2 text-secondary font-label-lg text-sm bg-surface-container-low p-3 rounded-lg inline-flex">
+<span class="material-symbols-outlined text-terracotta">shield</span>
+<span class="font-medium text-indigo-text">Safe Contact: Messaging Only</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row lg:flex-col gap-4 w-full lg:w-auto shrink-0">
+<button class="bg-terracotta text-white font-label-lg text-label-lg min-h-[48px] px-8 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-[#a54a2b] focus:ring-4 focus:ring-[#f9debf] focus:outline-none transition-colors w-full lg:w-auto font-semibold min-h-touch-target-min">
+<span class="material-symbols-outlined">chat</span>
+                            Contact Buyer
+                        </button>
+<button class="bg-transparent text-indigo-text border border-outline font-label-lg text-label-lg min-h-[48px] px-8 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container-high focus:ring-4 focus:ring-surface-variant focus:outline-none transition-colors w-full lg:w-auto font-semibold min-h-touch-target-min">
+<span class="material-symbols-outlined">bookmark_add</span>
+                            Mark for Later
+                        </button>
+</div>
+</div>
+</article>
+<!-- Separator -->
+<div class="border-t border-outline-variant w-full my-4"></div>
+<h3 class="font-headline-md text-xl text-indigo-text mb-4 font-semibold">Previous Enquiries</h3>
+<!-- Older Enquiry Item -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-6 hover:shadow-md transition-shadow">
+<div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+<div class="flex-grow">
+<h4 class="font-label-lg text-lg text-indigo-text mb-1 font-semibold">Custom Pottery Set</h4>
+<p class="font-body-md text-base text-secondary">Responded yesterday. Awaiting buyer reply.</p>
+</div>
+<button class="bg-transparent text-terracotta border border-terracotta font-label-lg text-base px-6 py-2 rounded-lg flex items-center justify-center hover:bg-surface-container-low focus:ring-4 focus:ring-[#f9debf] focus:outline-none transition-colors w-full sm:w-auto font-medium min-h-touch-target-min">
+                        View Details
+                    </button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-[72px] bg-surface-container-lowest shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 rounded-t-xl px-margin-mobile py-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 w-full h-full active:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="home">home</span>
+<span class="font-label-sm text-xs font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="assignment" data-weight="fill">assignment</span>
+<span class="font-label-sm text-xs font-bold">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 w-full h-full active:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-sm text-xs font-medium">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 w-full h-full active:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" data-icon="person">person</span>
+<span class="font-label-sm text-xs font-medium">Profile</span>
+</a>
+</nav>
+
+
+</body></html>

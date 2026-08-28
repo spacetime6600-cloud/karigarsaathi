@@ -1,0 +1,31 @@
+# KarigarSaathi AI Image Studio - Microservice .gitignore
+
+# Environment
+.env
+*.env*
+!*.env.example
+
+# Local storage (replaced by cloud/storage in production)
+/storage/uploads/
+/storage/outputs/
+
+# Cache and runtime
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+env/
+venv/
+
+# Model weights (downloaded on-demand at runtime)
+models/*.onnx
+models/*.bin
+models/*.pt
+~/.cache/rembg/
+
+# Generated reports
+/evaluation/report.csv
+/evaluation/evaluation_report.json

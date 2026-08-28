@@ -1,0 +1,353 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is string && ts.size() >= 10;
+    }
+
+    // =========================================================================
+    // =========================================================================
+    // 1. Private User Accounts (/users/{uid})
+    // =========================================================================
+    match /users/{uid} {
+      // Listing user accounts is strictly prohibited
+      allow list: if false;
+
+      // Only the account owner can read their account
+      allow get: if isOwner(uid);
+
+      // Self-registration in Phase 8 allows only 'artisan' role
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.role == 'artisan'
+        && request.resource.data.keys().hasAll(['uid', 'role', 'displayName', 'email', 'preferredLanguage', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['uid', 'role', 'displayName', 'email', 'preferredLanguage', 'createdAt', 'updatedAt', 'phone'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 150
+        && request.resource.data.preferredLanguage is string
+        && request.resource.data.preferredLanguage.size() <= 10
+        && isValidTimestamp(request.resource.data.createdAt)
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      // Account owner updates: cannot modify immutable fields (uid, role, email, createdAt)
+      allow update: if isOwner(uid)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.keys().hasOnly(['uid', 'role', 'displayName', 'email', 'preferredLanguage', 'createdAt', 'updatedAt', 'phone'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 100
+        && request.resource.data.preferredLanguage is string
+        && request.resource.data.preferredLanguage.size() <= 10
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      // Deletion is denied by default
+      allow delete: if false;
+
+      // Subcollection: Craft Passports
+      match /craftPassports/{passportId} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.ownerId == uid
+          && request.resource.data.status in ['inactive', 'active', 'revoked']
+          && isValidTimestamp(request.resource.data.createdAt)
+          && isValidTimestamp(request.resource.data.updatedAt);
+        allow update: if isOwner(uid)
+          && request.resource.data.ownerId == uid
+          && request.resource.data.status in ['inactive', 'active', 'revoked']
+          && isValidTimestamp(request.resource.data.updatedAt);
+        allow delete: if isOwner(uid);
+      }
+
+      // Subcollection: Consent Records
+      match /consentRecords/{consentId} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.ownerId == uid
+          && request.resource.data.actorUid == uid
+          && isValidTimestamp(request.resource.data.createdAt);
+        allow update: if isOwner(uid)
+          && request.resource.data.ownerId == uid;
+        allow delete: if false;
+      }
+
+      // Subcollection: Export Audit Records (Append-Only)
+      match /exportAuditRecords/{recordId} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.ownerId == uid
+          && request.resource.data.status in ['pending', 'completed', 'failed']
+          && isValidTimestamp(request.resource.data.createdAt);
+        allow update, delete: if false;
+      }
+    }
+
+    // =========================================================================
+    // 2. Private Artisan Profiles (/artisanProfiles/{uid})
+    // =========================================================================
+    match /artisanProfiles/{uid} {
+      // Listing profiles is denied
+      allow list: if false;
+
+      // Only the profile owner can read their profile
+      allow get: if isOwner(uid);
+
+      // Profile creation by authenticated owner
+      allow create: if isAuthenticated()
+        && request.auth.uid == uid
+        && request.resource.data.ownerId == uid
+        && request.resource.data.keys().hasAll(['ownerId', 'artisanName', 'craftType', 'state', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly([
+          'ownerId', 'artisanName', 'craftType', 'state', 'district', 'bio',
+          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.artisanName is string
+        && request.resource.data.artisanName.size() >= 1
+        && request.resource.data.artisanName.size() <= 100
+        && request.resource.data.craftType is string
+        && request.resource.data.craftType.size() <= 120
+        && request.resource.data.state is string
+        && request.resource.data.state.size() <= 100
+        && request.resource.data.languages is list
+        && request.resource.data.languages.size() <= 10
+        && isValidTimestamp(request.resource.data.createdAt)
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      // Profile updates: owner only, immutable ownerId & createdAt
+      allow update: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.keys().hasOnly([
+          'ownerId', 'artisanName', 'craftType', 'state', 'district', 'bio',
+          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.artisanName is string
+        && request.resource.data.artisanName.size() >= 1
+        && request.resource.data.artisanName.size() <= 100
+        && request.resource.data.craftType is string
+        && request.resource.data.craftType.size() <= 120
+        && request.resource.data.state is string
+        && request.resource.data.state.size() <= 100
+        && request.resource.data.languages is list
+        && request.resource.data.languages.size() <= 10
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      allow delete: if false;
+    }
+
+    // =========================================================================
+    // 3. Private Product Records & Drafts (/products/{productId})
+    // =========================================================================
+    match /products/{productId} {
+      // Owner-scoped list queries (must include where('ownerId', '==', auth.uid))
+      allow list: if isAuthenticated()
+        && (request.query.limit == null || request.query.limit <= 100)
+        && resource.data.ownerId == request.auth.uid;
+
+      // Only the owner can read their product records
+      allow get: if isAuthenticated() && (resource == null || resource.data.ownerId == request.auth.uid);
+
+      // Product creation by authenticated owner
+      allow create: if isAuthenticated()
+        && request.resource.data.id == productId
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.keys().hasAll(['id', 'ownerId', 'title', 'description', 'category', 'craftType', 'state', 'price', 'currency', 'stockQuantity', 'status', 'photoPaths', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly([
+          'id', 'ownerId', 'artisanId', 'title', 'titleHindi', 'description', 'descriptionHindi',
+          'category', 'subcategory', 'craftType', 'state', 'material', 'materials', 'colour',
+          'dimensions', 'dimensionsObj', 'weightObj', 'price', 'currency', 'stockQuantity', 'sku',
+          'status', 'tags', 'makingTime', 'careInstructions', 'customisationAvailable', 'shippingNotes',
+          'photoPaths', 'images', 'primaryImageId', 'thumbnailPath', 'technique', 'origin', 'story',
+          'coverPhotoIndex', 'voiceNoteUrl', 'voiceTranscript', 'voiceConfidence', 'confirmedFacts',
+          'needsReviewFacts', 'costBreakdown', 'pricingStrategy', 'publicFields', 'suggestionMetadata',
+          'completionState', 'passportId', 'passportStatus', 'passportSlug', 'lifecycleStatus',
+          'statusHistory', 'createdAt', 'updatedAt', 'lastAutosavedAt', 'archivedAt',
+          'duplicatedFrom', 'schemaVersion'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 5000
+        && request.resource.data.category is string
+        && request.resource.data.category.size() >= 1
+        && request.resource.data.category.size() <= 100
+        && request.resource.data.craftType is string
+        && request.resource.data.craftType.size() <= 120
+        && request.resource.data.state is string
+        && request.resource.data.state.size() <= 100
+        && request.resource.data.currency is string
+        && request.resource.data.currency.size() <= 10
+        && request.resource.data.status in ['draft', 'ready', 'shared', 'enquiry_received', 'published', 'archived']
+        && (request.resource.data.price is int || request.resource.data.price is float)
+        && request.resource.data.price >= 0
+        && request.resource.data.price <= 10000000
+        && request.resource.data.stockQuantity is int
+        && request.resource.data.stockQuantity >= 0
+        && request.resource.data.stockQuantity <= 1000000
+        && request.resource.data.photoPaths is list
+        && request.resource.data.photoPaths.size() <= 10
+        && isValidTimestamp(request.resource.data.createdAt)
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      // Product update: only owner, immutable id/ownerId/createdAt, validated fields
+      allow update: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid
+        && (!('id' in resource.data) || request.resource.data.id == resource.data.id)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt)
+        && request.resource.data.keys().hasOnly([
+          'id', 'ownerId', 'artisanId', 'title', 'titleHindi', 'description', 'descriptionHindi',
+          'category', 'subcategory', 'craftType', 'state', 'material', 'materials', 'colour',
+          'dimensions', 'dimensionsObj', 'weightObj', 'price', 'currency', 'stockQuantity', 'sku',
+          'status', 'tags', 'makingTime', 'careInstructions', 'customisationAvailable', 'shippingNotes',
+          'photoPaths', 'images', 'primaryImageId', 'thumbnailPath', 'technique', 'origin', 'story',
+          'coverPhotoIndex', 'voiceNoteUrl', 'voiceTranscript', 'voiceConfidence', 'confirmedFacts',
+          'needsReviewFacts', 'costBreakdown', 'pricingStrategy', 'publicFields', 'suggestionMetadata',
+          'completionState', 'passportId', 'passportStatus', 'passportSlug', 'lifecycleStatus',
+          'statusHistory', 'createdAt', 'updatedAt', 'lastAutosavedAt', 'archivedAt',
+          'duplicatedFrom', 'schemaVersion'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 5000
+        && request.resource.data.category is string
+        && request.resource.data.category.size() >= 1
+        && request.resource.data.category.size() <= 100
+        && request.resource.data.craftType is string
+        && request.resource.data.craftType.size() <= 120
+        && request.resource.data.state is string
+        && request.resource.data.state.size() <= 100
+        && request.resource.data.currency is string
+        && request.resource.data.currency.size() <= 10
+        && request.resource.data.status in ['draft', 'ready', 'shared', 'enquiry_received', 'published', 'archived']
+        && (request.resource.data.price is int || request.resource.data.price is float)
+        && request.resource.data.price >= 0
+        && request.resource.data.price <= 10000000
+        && request.resource.data.stockQuantity is int
+        && request.resource.data.stockQuantity >= 0
+        && request.resource.data.stockQuantity <= 1000000
+        && request.resource.data.photoPaths is list
+        && request.resource.data.photoPaths.size() <= 10
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      // Product deletion: owner only
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // =========================================================================
+    // 4. Sanitized Public Craft Passports (/publicCraftPassports/{slug})
+    // =========================================================================
+    match /publicCraftPassports/{slug} {
+      // Single-document unauthenticated read allowed for active/revoked passports
+      allow get: if true;
+
+      // Scraping/listing the entire public passport collection is denied
+      allow list: if false;
+
+      // Create/Update/Delete only by authenticated owner of the passport
+      allow create: if isAuthenticated()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.slug == slug
+        && request.resource.data.status in ['active', 'revoked']
+        && isValidTimestamp(request.resource.data.activatedAt)
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      allow update: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.status in ['active', 'revoked']
+        && isValidTimestamp(request.resource.data.updatedAt);
+
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // =========================================================================
+    // 5. Buyer Enquiries (/buyerEnquiries/{enquiryId})
+    // =========================================================================
+    match /buyerEnquiries/{enquiryId} {
+      // Direct client creation is strictly forbidden.
+      // All enquiries must be routed through the trusted server endpoint.
+      allow create: if false;
+
+      // Only the recipient artisan can read or list their incoming enquiries
+      allow get: if isAuthenticated()
+        && (resource == null || resource.data.artisanId == request.auth.uid);
+
+      allow list: if isAuthenticated()
+        && (request.query.limit == null || request.query.limit <= 100);
+
+      // Authenticated artisan can update only status and workflow fields (cannot forge IDs, timestamps, or recipient)
+      allow update: if isAuthenticated()
+        && resource.data.artisanId == request.auth.uid
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.artisanId == resource.data.artisanId
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.status in ['new', 'acknowledged', 'contacted', 'closed', 'spam', 'viewed', 'replied', 'order_confirmed', 'pending_sync'];
+
+      // Deletion is prohibited to preserve audit trail
+      allow delete: if false;
+    }
+
+    // =========================================================================
+    // 6. Coordinator Assignments (/coordinatorAssignments/{assignmentId})
+    // =========================================================================
+    match /coordinatorAssignments/{assignmentId} {
+      // Coordinator or assigned artisan can read their active assignment
+      allow get, list: if isAuthenticated()
+        && (resource.data.coordinatorUid == request.auth.uid || resource.data.artisanUid == request.auth.uid);
+
+      // Client creation, update, and deletion are strictly forbidden
+      allow create, update, delete: if false;
+    }
+
+    // =========================================================================
+    // 7. Coordinator Projections (/coordinatorProjections/{artisanUid})
+    // =========================================================================
+    match /coordinatorProjections/{artisanUid} {
+      // Authenticated coordinators can read privacy-safe aggregate projections
+      allow get, list: if isAuthenticated();
+
+      // Client mutation is strictly forbidden (server projection only)
+      allow create, update, delete: if false;
+    }
+
+    // =========================================================================
+    // 8. Internal Server Rate Limiting & Idempotency Stores
+    // =========================================================================
+    match /_enquiryRateLimits/{limitId} {
+      allow read, write: if false;
+    }
+
+    match /_enquiryIdempotency/{idempotencyId} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // 9. Default Deny for all unmatched collections
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

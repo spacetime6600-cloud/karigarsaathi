@@ -1,0 +1,199 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>12 — Buyer Enquiry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "tertiary": "#000000",
+                        "inverse-primary": "#c0c6db",
+                        "on-secondary": "#ffffff",
+                        "primary": "#C65A35",
+                        "on-secondary-fixed": "#121c28",
+                        "on-surface": "#17324d",
+                        "tertiary-fixed-dim": "#dcc2a4",
+                        "outline": "#76777d",
+                        "on-tertiary-container": "#968065",
+                        "on-primary-container": "#7d8497",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#141b2b",
+                        "surface": "#f7f9ff",
+                        "tertiary-container": "#261906",
+                        "surface-container": "#eaeef4",
+                        "secondary": "#555f6d",
+                        "surface-container-highest": "#dfe3e9",
+                        "surface-dim": "#d1dbe9",
+                        "on-primary-fixed-variant": "#404758",
+                        "on-surface-variant": "#45464c",
+                        "surface-variant": "#dfe3e9",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#d6e0f1",
+                        "inverse-on-surface": "#edf1f7",
+                        "surface-container-low": "#edf4ff",
+                        "inverse-surface": "#2c3136",
+                        "on-primary-fixed": "#141b2b",
+                        "on-tertiary-fixed": "#261906",
+                        "outline-variant": "#c6c6cd",
+                        "background": "#f7f9ff",
+                        "surface-container-high": "#e5e8ee",
+                        "secondary-fixed-dim": "#bdc7d8",
+                        "on-tertiary-fixed-variant": "#55442d",
+                        "on-secondary-container": "#596372",
+                        "secondary-fixed": "#d9e3f4",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f7f9ff",
+                        "primary-fixed": "#dce2f7",
+                        "on-secondary-fixed-variant": "#3e4755",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#575e70",
+                        "primary-fixed-dim": "#c0c6db",
+                        "tertiary-fixed": "#f9debf",
+                        "on-background": "#17324d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "touch-target-min": "48px",
+                        "container-max": "360px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Sans"],
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "status-label": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "display": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "sans": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "status-label": ["16px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "label-lg": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["20px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-[64px]">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-on-surface z-40 shadow-sm">
+<div class="flex items-center justify-between px-margin-mobile h-touch-target-min w-full max-w-container-max mx-auto">
+<button aria-label="Go back" class="text-on-surface hover:bg-surface-container-low transition-colors focus:outline-dashed focus:outline-4 focus:outline-offset-4 rounded-full p-2 cursor-pointer active:scale-95 min-h-touch-target-min">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-on-surface tracking-tight">KarigarSaathi</h1>
+<button aria-label="Switch Language" class="font-label-lg text-label-lg text-on-surface hover:bg-surface-container-low transition-colors focus:outline-dashed focus:outline-4 focus:outline-offset-4 px-2 py-1 rounded cursor-pointer active:scale-95 min-h-touch-target-min">
+                HINDI
+            </button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="w-full px-margin-mobile py-[48px] max-w-container-max mx-auto flex flex-col gap-[48px]">
+<!-- Header Section -->
+<section class="flex flex-col gap-unit">
+<div class="inline-flex items-center bg-primary-container/10 px-3 py-1.5 self-start mb-unit rounded-full">
+<span class="font-status-label text-status-label text-primary uppercase" style="color: rgb(176, 74, 33);">ONE NEW BUYER ENQUIRY</span>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Buyer Enquiries</h2>
+</section>
+<!-- Enquiry Details Card -->
+<section class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm">
+<div class="p-4 border-b border-outline-variant flex flex-col gap-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Large order for Wooden Carvings</h3>
+<p class="font-body-md text-body-md text-secondary break-words">Interested in 500 units of the intricately carved wooden elephants. Seeking quote and delivery timeline.</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="flex items-center gap-2 text-on-surface-variant bg-surface-container-low p-3 rounded-lg">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-lg text-label-lg font-bold">Safe Contact: Messaging Only</span>
+</div>
+<div class="flex flex-col gap-margin-mobile mt-2">
+<button class="w-full bg-primary text-on-primary min-h-touch-target-min rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-2 focus:outline-dashed focus:outline-4 focus:outline-offset-4 transition-colors hover:bg-primary/90 active:scale-[0.98]" style="background-color: rgb(176, 74, 33);">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+                        Contact Buyer
+                    </button>
+<button class="w-full bg-transparent text-primary border-2 border-primary min-h-touch-target-min rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-2 focus:outline-dashed focus:outline-4 focus:outline-offset-4 transition-colors hover:bg-primary/10 active:scale-[0.98]" style="border-color: rgb(176, 74, 33); color: rgb(176, 74, 33);">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+                        Mark for Later
+                    </button>
+</div>
+</div>
+</section>
+<!-- Previous Enquiries Placeholder -->
+<section class="flex flex-col gap-gutter">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-2">Previous Enquiries</h3>
+<div class="flex flex-col gap-4">
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm flex flex-col gap-2">
+<h4 class="font-label-lg text-label-lg text-on-surface">Silk Sarees - Bulk Order</h4>
+<div class="flex items-center gap-1.5 text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span class="font-status-label text-status-label uppercase">RESPONDED</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm flex flex-col gap-2">
+<h4 class="font-label-lg text-label-lg text-on-surface">Custom Pottery Set</h4>
+<div class="flex items-center gap-1.5 text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="cancel">cancel</span>
+<span class="font-status-label text-status-label uppercase">CLOSED</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container dark:bg-surface-container-highest shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
+<div class="flex justify-around items-center h-16 w-full px-2 max-w-container-max mx-auto">
+<a aria-label="Home" class="flex flex-col items-center justify-center text-on-surface-variant w-full h-full hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[12px] font-semibold mt-1">Home</span>
+</a>
+<a aria-label="Tasks" class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 w-full h-full hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assignment" data-weight="fill" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="text-[12px] font-semibold mt-1">Tasks</span>
+</a>
+<a aria-label="Listen" class="flex flex-col items-center justify-center text-on-surface-variant w-full h-full hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="volume_up">volume_up</span>
+<span class="text-[12px] font-semibold mt-1">Listen</span>
+</a>
+<a aria-label="Profile" class="flex flex-col items-center justify-center text-on-surface-variant w-full h-full hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[12px] font-semibold mt-1">Profile</span>
+</a>
+</div>
+</nav>
+
+
+</body></html>

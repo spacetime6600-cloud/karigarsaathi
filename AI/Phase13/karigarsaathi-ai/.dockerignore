@@ -1,0 +1,26 @@
+# Docker ignore file for KarigarSaathi AI Image Studio
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+*.env*
+
+# Local storage (replaced by volumes in production)
+storage/
+# evaluation data
+evaluation/
+
+# Cache and temp
+*.cache
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+
+# Docker context cleanup
+README.md

@@ -1,0 +1,9 @@
+export { LanguageSelectionPage } from './LanguageSelectionPage';
+export { ConsentPage } from './ConsentPage';
+export { RecordingPage } from './RecordingPage';
+export { TranscriptReviewPage } from './TranscriptReviewPage';
+export { ClarificationPage } from './ClarificationPage';
+export { CatalogueReviewPage } from './CatalogueReviewPage';
+export { ApprovalPage } from './ApprovalPage';
+export { DeletionPage } from './DeletionPage';
+export { SessionResumePage } from './SessionResumePage';

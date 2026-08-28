@@ -1,0 +1,29 @@
+# Evaluation Manifest Template for KarigarSaathi AI Image Studio - Phase 13
+
+# This CSV documents the evaluation dataset used to verify Phase 13 completion gates.
+# All samples must have consent documented. No copyrighted or private photographs
+# should be included in the repository.
+
+# Column descriptions:
+# - sample_id: Unique identifier for this sample (UUID or artisan-generated)
+# - category: Textile|Reflective|Intricate_Edges|Poor_Lighting|Cluttered_Background
+# - file_path: Path to the original photograph (relative to evaluation/ folder)
+# - consent_granted: true|false|pending
+# - artisan_id: Artisan identifier (or "reviewer-N")
+# - product_type: Textile|Pottery|Jewellery|Wooden|Bamboo|Painting|Other
+# - before_manual_review: helped|neutral|harm (reviewer decision)
+# - after_manual_review: helped|neutral|harm (final decision, may differ from before)
+# - rejection_reason: Free-text description if image was rejected
+# - processing_status: succeeded|succeeded_with_warnings|retryable_failure|permanent_failure|timed_out|rejected
+# - processing_time_ms: Duration of processing in milliseconds
+# - metrics_json: JSON string of quality metrics calculated
+# - warnings_json: JSON string of warnings generated
+# - original_checksum_sha256: SHA-256 of original image bytes
+# - enhanced_checksum_sha256: SHA-256 of enhanced image bytes (or null if fallback)
+
+sample_id,category,file_path,consent_granted,artisan_id,product_type,before_manual_review,after_manual_review,rejection_reason,processing_status,processing_time_ms,metrics_json,warnings_json,original_checksum_sha256,enhanced_checksum_sha256
+
+# Example entries:
+# e2e-001-textile,Textile,samples/textile-001.jpg,true,artisan-001,Textile,helped,helped,,succeeded,1250,"{"mean_delta_e": 1.2, "luminance_ssim": 0.96, "edge_preservation_ratio": 0.95},"["color shift within limits"]","a1b2c3d4e5f60123456789abcdef0123456789abcdef0123456789abcdef01234567"
+# e2e-002-reflective,Reflective,samples/reflective-001.jpg,true,artisan-002,Reflective,neutral,neutral,,succeeded_with_warnings,890,"{"mean_delta_e": 2.8, "edge_preservation_ratio": 0.88},"["marginal edge loss"]",null,null
+# e2e-003-poor-light,Poor_Lighting,samples/poor-light-001.jpg,false,artisan-003,Textile,harmed,harmed,"Insufficient consent",rejected,0,,,"", null

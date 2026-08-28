@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Below-Cost Price Confirmation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#cc8c28",
+                        "on-surface-variant": "#43474d",
+                        "primary-container": "#17324d",
+                        "surface-variant": "#d9e3f1",
+                        "inverse-on-surface": "#e8f2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#afc9ea",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c3c6ce",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "surface-tint": "#47607e",
+                        "on-secondary-fixed-variant": "#812805",
+                        "surface-container-low": "#edf4ff",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface": "#121c26",
+                        "surface-container": "#e4effd",
+                        "secondary": "#a13f1c",
+                        "surface-container-highest": "#d9e3f1",
+                        "secondary-container": "#fd835b",
+                        "on-secondary-container": "#701f00",
+                        "outline": "#74777e",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d1e4ff",
+                        "on-tertiary-fixed": "#2a1800",
+                        "inverse-surface": "#27313c",
+                        "on-primary": "#ffffff",
+                        "background": "#f7f9ff",
+                        "surface-dim": "#d1dbe9",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "on-primary-fixed": "#001d36",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#ffdbd0",
+                        "surface-bright": "#f7f9ff",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "tertiary": "#2a1800",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "primary": "#001d36",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dfe9f7",
+                        "on-background": "#121c26",
+                        "tertiary-container": "#462b00",
+                        "on-primary-container": "#819aba",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7f9ff",
+                        "on-secondary-fixed": "#390b00",
+                        "primary-fixed-dim": "#afc9ea"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "margin-desktop": "48px",
+                        "xs": "4px",
+                        "touch-target-min": "48px",
+                        "xl": "32px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #FFF9EF; /* Fallback tactile background */
+        }
+        /* Mobile container constraint */
+        .mobile-container {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Tactical Pattern */
+        .tactile-pattern {
+            background-image: radial-gradient(#d9e3f1 1px, transparent 1px);
+            background-size: 8px 8px;
+            background-color: #f7f9ff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background tactile-pattern">
+<div class="mobile-container bg-surface shadow-md border-x border-outline-variant/30 mx-auto">
+<!-- TopNavBar (Shared Component styling logic applied manually as requested for intent suppression, but layout used) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile py-base max-w-[360px] mx-auto bg-surface shadow-sm" style="transform: translateX(-50%); left: 50%;">
+<div class="flex items-center gap-sm">
+<button aria-label="Go back" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-on-surface">KarigarSaathi</h1>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="Language" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[72px] pb-xl px-margin-mobile flex flex-col gap-lg">
+<!-- Header Text -->
+<div class="mt-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-xs">Review Price Details</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">The entered selling price is lower than the calculated cost. Please review to avoid unintended losses.</p>
+</div>
+<!-- Price Comparison Card (Glassmorphism hint with tactile shadow) -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-outline-variant flex flex-col gap-md">
+<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
+<span class="font-label-lg text-label-lg text-on-surface-variant">Entered Cost</span>
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">₹500</span>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
+<span class="font-label-lg text-label-lg text-on-surface-variant">Entered Price</span>
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">₹450</span>
+</div>
+<div class="flex justify-between items-center pt-xs">
+<div class="flex items-center gap-xs text-error"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">trending_down</span><span class="font-label-lg text-label-lg font-bold">Projected Loss (Below Cost)</span></div>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-error font-bold">-₹50</span>
+</div>
+</div>
+<!-- Informational / Warning Panel -->
+<div class="bg-error-container/30 rounded-lg p-md border-l-4 border-error flex gap-sm items-start">
+<span class="material-symbols-outlined text-error mt-xs" data-icon="info">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Selling below cost might be intentional for a promotion. If this was a mistake, you can adjust the price now.
+            </p>
+</div>
+<!-- Spacer to push actions to bottom -->
+<div class="flex-grow"></div>
+<!-- Action Buttons (Vertically Stacked) -->
+<div class="flex flex-col gap-md mt-lg">
+<!-- Primary Action -->
+<button class="bg-secondary text-on-secondary font-label-lg text-label-lg font-bold rounded-lg h-touch-target-min w-full flex items-center justify-center shadow-sm hover:opacity-90 transition-opacity">
+                Review price
+            </button>
+<!-- Secondary Action -->
+<button class="border-2 border-primary text-primary font-label-lg text-label-lg font-bold rounded-lg h-touch-target-min w-full flex items-center justify-center hover:bg-primary/5 transition-colors">
+                Use this price anyway
+            </button>
+</div>
+</main>
+</div>
+
+
+</body></html>

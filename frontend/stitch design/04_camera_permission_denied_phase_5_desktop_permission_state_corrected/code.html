@@ -1,0 +1,191 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Add Photographs (Camera Denied)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d94b38",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffdad5",
+                        "on-primary-container": "#410001",
+                        "secondary": "#775652",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#ffdad5",
+                        "on-secondary-container": "#2c1512",
+                        "tertiary": "#705c2e",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#fbdffa",
+                        "on-tertiary-container": "#251a00",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#410002",
+                        "background": "#f7f9ff",
+                        "on-background": "#17324d",
+                        "surface": "#f7f9ff",
+                        "on-surface": "#17324d",
+                        "surface-variant": "#f5dedb",
+                        "on-surface-variant": "#534341",
+                        "outline": "#857371",
+                        "outline-variant": "#d8c2bf",
+                        "shadow": "#000000",
+                        "scrim": "#000000",
+                        "inverse-surface": "#2c4763",
+                        "inverse-on-surface": "#edf4ff",
+                        "inverse-primary": "#ffb4a9",
+                        "surface-dim": "#d1dbe9",
+                        "surface-bright": "#f7f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#edf4ff",
+                        "surface-container": "#e8effc",
+                        "surface-container-high": "#e2eaf7",
+                        "surface-container-highest": "#dce4f1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "8px",
+                        "none": "0",
+                        "sm": "4px",
+                        "md": "8px",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "2xl": "24px",
+                        "3xl": "32px",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "unit": "8px",
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "touch-target-min": "48px"
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans", "sans-serif"],
+                        "body-md": ["Noto Sans", "sans-serif"],
+                        "body-lg": ["Noto Sans", "sans-serif"],
+                        "label-lg": ["Noto Sans", "sans-serif"],
+                        "title-lg": ["Noto Sans", "sans-serif"],
+                        "headline-md": ["Noto Sans", "sans-serif"],
+                        "display-sm": ["Noto Sans", "sans-serif"]
+                    },
+                    fontSize: {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "title-lg": ["22px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "400" }],
+                        "display-sm": ["36px", { "lineHeight": "44px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex selection:bg-primary selection:text-on-primary font-sans" style="font-family: &quot;Noto Sans&quot;, sans-serif;">
+<!-- Top App Bar (Desktop Shell Phase 5 Style) -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface border-b border-outline-variant flex items-center justify-between px-4 z-50">
+<div class="flex items-center gap-4">
+<button class="w-12 h-12 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors lg:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-title-lg text-title-lg font-bold text-on-surface">KarigarSaathi</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-2 bg-surface-container py-1 px-3 rounded-full">
+<span class="material-symbols-outlined text-[18px] text-secondary" style="color: rgb(176, 74, 33);">cloud_done</span>
+<span class="font-label-lg text-label-lg text-secondary">Saved</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+                KS
+            </button>
+</div>
+</header>
+<div class="flex flex-1 pt-16 h-[calc(100vh)]">
+<!-- Side Navigation (Phase 5) -->
+<nav class="hidden lg:flex flex-col w-72 bg-surface-container-low border-r border-outline-variant h-full overflow-y-auto">
+<div class="p-4 flex flex-col gap-2">
+<a class="text-on-surface hover:bg-surface-container-high flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-lg text-label-lg">Home</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container font-bold flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-lg text-label-lg">My Tasks</span>
+</a>
+<a class="text-on-surface hover:bg-surface-container-high flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-lg text-label-lg">Inventory</span>
+</a>
+<a class="text-on-surface hover:bg-surface-container-high flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-lg text-label-lg">Profile</span>
+</a>
+</div>
+<div class="mt-auto p-4 flex flex-col gap-2">
+<a class="text-on-surface hover:bg-surface-container-high flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+<a class="text-on-surface hover:bg-surface-container-high flex items-center gap-3 px-4 py-3 rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto w-full bg-background flex flex-col">
+<div class="max-w-4xl mx-auto w-full px-4 md:px-8 py-8 flex flex-col min-h-full">
+<!-- Header Section -->
+<div class="mb-8">
+<p class="font-label-lg text-label-lg text-secondary mb-2 uppercase tracking-wide">Step 04 / Add Photographs</p>
+<div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 border-b border-outline-variant pb-6">
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-on-background">Sample Product</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Draft saved • Missing photos</p>
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<section class="flex-1 flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm mb-8">
+<div class="w-20 h-20 bg-surface-container flex items-center justify-center rounded-full mb-6">
+<span class="material-symbols-outlined text-[40px] text-secondary" style="font-variation-settings: 'FILL' 1;">camera_off</span>
+</div>
+<h3 class="font-title-lg text-title-lg font-bold text-on-background mb-3 text-center">Camera Access Required</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center max-w-md mb-8">
+                        The camera is used to quickly capture high-quality product photographs. KarigarSaathi cannot open the camera because permission was not allowed.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-6">
+<button class="bg-primary text-on-primary min-h-touch-target-min px-8 font-label-lg text-label-lg rounded-full hover:bg-primary/90 focus:ring-4 focus:ring-primary/20 transition-all flex items-center justify-center gap-2" style="background-color: rgb(176, 74, 33); min-height: 48px;">
+<span class="material-symbols-outlined text-[20px]" data-icon="refresh">refresh</span>
+                            Try Again
+                        </button>
+<button class="bg-surface-container-lowest text-primary border border-primary min-h-touch-target-min px-8 font-label-lg text-label-lg rounded-full hover:bg-primary/5 focus:ring-4 focus:ring-primary/20 transition-all flex items-center justify-center gap-2" style="color: rgb(176, 74, 33); border-color: rgb(176, 74, 33); min-height: 48px;">
+<span class="material-symbols-outlined text-[20px]" data-icon="photo_library">photo_library</span>
+                            Choose from Device
+                        </button>
+</div>
+<button class="text-secondary font-label-lg text-label-lg hover:text-primary underline hover:bg-surface-container-low px-4 py-2 rounded-DEFAULT transition-colors min-h-touch-target-min">
+                        Open Settings
+                    </button>
+</section>
+<!-- Footer Actions -->
+<footer class="mt-auto py-4 flex justify-between items-center border-t border-outline-variant">
+<button class="text-on-surface font-label-lg text-label-lg min-h-touch-target-min px-6 rounded-full hover:bg-surface-container-low transition-all flex items-center gap-2 border border-outline-variant h-12">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+                        Back
+                    </button>
+</footer>
+</div>
+</main>
+</div>
+
+
+</body></html>

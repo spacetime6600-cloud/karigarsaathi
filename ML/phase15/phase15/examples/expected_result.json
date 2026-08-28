@@ -1,0 +1,177 @@
+{
+  "formula_version": "fair-price-rules-v1",
+  "currency": "INR",
+  "locale": "en",
+  "calculation_date": "2025-01-15",
+  "materials": [
+    {
+      "name": "Teak Wood",
+      "quantity": "10",
+      "unit": "kg",
+      "cost_per_unit": "500",
+      "line_total": "5000",
+      "source_note": "Local supplier",
+      "value_status": "exact"
+    },
+    {
+      "name": "Natural Oil Finish",
+      "quantity": "2",
+      "unit": "L",
+      "cost_per_unit": "800",
+      "line_total": "1600",
+      "source_note": "Online store",
+      "value_status": "exact"
+    }
+  ],
+  "total_material_cost": "6600",
+  "labour": [
+    {
+      "task_name": "Design & Carving",
+      "hours": "8",
+      "hourly_rate": "300",
+      "line_total": "2400",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact",
+      "note": "Complex relief carving"
+    },
+    {
+      "task_name": "Sanding & Finishing",
+      "hours": "4",
+      "hourly_rate": "200",
+      "line_total": "800",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact",
+      "note": null
+    }
+  ],
+  "total_labour_cost": "3200",
+  "overhead": [
+    {
+      "name": "Workshop Rent",
+      "amount": "2000",
+      "explanation": "Monthly rent allocation for this product",
+      "value_status": "exact"
+    },
+    {
+      "name": "Electricity & Tools",
+      "amount": "500",
+      "explanation": "Power and tool depreciation",
+      "value_status": "estimated"
+    }
+  ],
+  "total_overhead": "2500",
+  "production_cost": "12300",
+  "margin_mode": "percentage_markup",
+  "margin_input": "25",
+  "margin_amount": "3075",
+  "cost_based_base_price": "15375",
+  "comparable_adjustment": {
+    "eligible_comparables": [
+      {
+        "id": "comp-001",
+        "product_title": "Carved Teak Bowl",
+        "category": "Home Decor",
+        "craft_type": "Wood Carving",
+        "material": "Teak",
+        "dimensions": "30cm diameter",
+        "listed_price": "4500",
+        "source_name": "Craft Marketplace A",
+        "source_reference": "listing-12345",
+        "capture_date": "2024-12-01",
+        "status": "verified",
+        "verification_date": "2024-12-10",
+        "verified_by": "curator-01",
+        "verification_note": "Price verified against seller invoice",
+        "geographic_context": "South India",
+        "similarity_note": "Similar size, material, and craftsmanship level",
+        "evidence_reference": "invoice-12345.pdf",
+        "selected": true
+      },
+      {
+        "id": "comp-002",
+        "product_title": "Hand-carved Teak Plate",
+        "category": "Home Decor",
+        "craft_type": "Wood Carving",
+        "material": "Teak",
+        "dimensions": "25cm diameter",
+        "listed_price": "3800",
+        "source_name": "Craft Marketplace B",
+        "source_reference": "listing-67890",
+        "capture_date": "2024-11-15",
+        "status": "verified",
+        "verification_date": "2024-11-20",
+        "verified_by": "curator-02",
+        "verification_note": "Confirmed with artisan",
+        "geographic_context": "South India",
+        "similarity_note": "Same material, similar technique",
+        "evidence_reference": "artisan-confirmation-67890.pdf",
+        "selected": true
+      },
+      {
+        "id": "comp-003",
+        "product_title": "Teak Wall Art Panel",
+        "category": "Wall Art",
+        "craft_type": "Wood Carving",
+        "material": "Teak",
+        "dimensions": "40x30cm",
+        "listed_price": "5200",
+        "source_name": "Craft Marketplace A",
+        "source_reference": "listing-54321",
+        "capture_date": "2024-10-01",
+        "status": "verified",
+        "verification_date": "2024-10-05",
+        "verified_by": "curator-01",
+        "verification_note": "Verified via platform transaction record",
+        "geographic_context": "South India",
+        "similarity_note": "Same material and craft type",
+        "evidence_reference": "transaction-54321.pdf",
+        "selected": true
+      }
+    ],
+    "comparable_median": "4500",
+    "raw_gap": "-10875",
+    "influence_percentage": "20",
+    "uncapped_adjustment": "-2175",
+    "adjustment_cap": "1537.5",
+    "cap_applied": true,
+    "final_adjustment": "-1537.5",
+    "production_cost_floor": "12300"
+  },
+  "suggested_base_price": "13837.5",
+  "suggested_range": {
+    "suggested_low_unrounded": "13145.625",
+    "suggested_base_unrounded": "13837.5",
+    "suggested_high_unrounded": "15221.25",
+    "suggested_low_rounded": "13146",
+    "suggested_base_rounded": "13838",
+    "suggested_high_rounded": "15221",
+    "low_buffer": "5",
+    "high_buffer": "10",
+    "rounding_differences": [
+      "0.375",
+      "0.5",
+      "-0.25"
+    ]
+  },
+  "assumptions": [
+    "Overhead 'Electricity & Tools' amount is estimated",
+    "Artisan margin: 25% markup on production cost (not net profit margin)",
+    "Comparable median: ₹4500; raw gap: ₹-10875; influence: 20%; uncapped adjustment: ₹-2175; cap: ±₹1537.5; final adjustment: ₹-1537.5"
+  ],
+  "warnings": [
+    "Comparable adjustment capped at ±10% of cost-based base price"
+  ],
+  "confidence_level": "HIGH",
+  "confidence_reasons": [
+    "All cost inputs are exact",
+    "All labour rates have sources",
+    "All overhead items have explanations",
+    "Margin mode explicitly selected",
+    "3 fresh verified comparables selected"
+  ],
+  "artisan_final_price": null,
+  "artisan_selection_type": null,
+  "artisan_override_reason": null
+}

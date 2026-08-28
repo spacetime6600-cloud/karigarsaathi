@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Passport Created</title>
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#e8f2ff",
+                        "inverse-surface": "#27313c",
+                        "outline": "#74777e",
+                        "inverse-primary": "#afc9ea",
+                        "on-surface-variant": "#43474d",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "secondary-container": "#fd835b",
+                        "background": "#f7f9ff",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d1dbe9",
+                        "on-secondary-container": "#701f00",
+                        "error": "#ba1a1a",
+                        "secondary": "#a13f1c",
+                        "on-background": "#121c26",
+                        "surface-variant": "#d9e3f1",
+                        "surface-tint": "#47607e",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-secondary-fixed": "#390b00",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#d1e4ff",
+                        "on-tertiary-container": "#cc8c28",
+                        "surface-container-highest": "#d9e3f1",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001d36",
+                        "surface-container": "#e4effd",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "surface-container-low": "#edf4ff",
+                        "primary-container": "#17324d",
+                        "primary": "#001d36",
+                        "tertiary-container": "#462b00",
+                        "primary-fixed-dim": "#afc9ea",
+                        "surface-container-high": "#dfe9f7",
+                        "surface-bright": "#f7f9ff",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#819aba",
+                        "surface": "#f7f9ff",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "on-secondary-fixed-variant": "#812805",
+                        "on-tertiary-fixed": "#2a1800",
+                        "outline-variant": "#c3c6ce",
+                        "tertiary": "#2a1800",
+                        "on-surface": "#121c26",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "touch-target-min": "48px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "48px",
+                        "xl": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "title-md": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden font-body-lg text-body-lg antialiased">
+<!-- TopAppBar -->
+<header class="fixed w-full top-0 z-50 bg-background flex justify-between items-center px-margin-mobile h-[64px]">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tight">KarigarSaathi</div>
+<div class="flex gap-2">
+<button class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary rounded-full hover:bg-surface-variant/50 active:scale-95 transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary rounded-full hover:bg-surface-variant/50 active:scale-95 transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas (Constrained to 360px for mobile emulation as requested) -->
+<main class="pt-[80px] pb-[100px] px-margin-mobile flex flex-col items-center max-w-[360px] mx-auto w-full">
+<!-- Success Indicator (Avoids green-only, relies on icon and primary brand color) -->
+<div class="flex flex-col items-center mt-4 mb-xl w-full">
+<div class="w-[80px] h-[80px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-md shadow-[0_4px_16px_rgba(23,50,77,0.1)]">
+<span class="material-symbols-outlined" style="font-size: 40px; font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary text-center">Passport Created!</h1>
+</div>
+<!-- QR Code Card (Tactile, elevated) -->
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-[0_2px_8px_rgba(0,29,54,0.06)] flex flex-col items-center mb-xl w-full border border-surface-variant">
+<div class="w-[200px] h-[200px] bg-surface-variant rounded-lg flex items-center justify-center mb-md relative overflow-hidden p-xs">
+<img class="w-full h-full object-contain bg-white rounded-md" data-alt="A close up, high-contrast black and white digital QR code centered on a pristine white background. The QR code represents a secure digital artisan passport. The style is modern, crisp, and functional, with soft warm ambient lighting reflecting off the digital surface, emphasizing the tactile feel of a premium, trustworthy digital tool. Designed for absolute clarity and immediate scannability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgvxxE27hcGLn3LZVJmTRjKEWl1eSm0tFGr6IUs3yfXHCv3WrkYjVuMyLu1KVZXEPbweaJvxkzBQOnJX8VI-ik3t5JfJR53NfkSG-Rt7-5V-hl7Uc8BVpn-NywTQ846wCpfVrCXghOulbjKAYTEyYZbeJQ5-JVy8rR4oO9tEXsOmNcr5RRPmXuL7_zYJjNt4o8UBwiUMZjy2nnH4KCLpTZcc4tZmJOHbT-Ykvalf-NcoappECUswLJ">
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center">Your unique digital identity is ready to be shared with customers.</p>
+</div>
+<!-- Actions (Vertically Stacked, Accessible Targets, 18px text via body-lg) -->
+<div class="w-full flex flex-col gap-md">
+<!-- Primary Action -->
+<button class="w-full h-touch-target-min bg-secondary text-on-secondary font-body-lg text-body-lg font-bold rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(161,63,28,0.2)] hover:opacity-90 active:scale-95 transition-all">
+                Continue to Share or Export
+            </button>
+<!-- Secondary Action -->
+<button class="w-full h-touch-target-min border-[2px] border-primary text-primary font-body-lg text-body-lg font-bold rounded-full flex items-center justify-center hover:bg-surface-variant/30 active:scale-95 transition-all">
+                View Passport
+            </button>
+<!-- Tertiary Actions -->
+<div class="flex justify-center gap-lg mt-sm">
+<button class="h-touch-target-min text-primary font-body-lg text-body-lg flex items-center justify-center gap-sm active:opacity-70 transition-opacity group">
+<span class="material-symbols-outlined">link</span>
+<span class="underline group-hover:no-underline underline-offset-4">Copy Link</span>
+</button>
+<button class="h-touch-target-min text-primary font-body-lg text-body-lg flex items-center justify-center gap-sm active:opacity-70 transition-opacity group">
+<span class="material-symbols-outlined">download</span>
+<span class="underline group-hover:no-underline underline-offset-4">Download QR</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Semantic Shell, Active: My Passport) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-[0_-2px_8px_rgba(0,0,0,0.06)] rounded-t-xl md:hidden">
+<!-- Home (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-16 hover:bg-surface-container-high transition-colors rounded-lg">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</button>
+<!-- My Passport (Active) -->
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 h-touch-target-min min-w-[80px] active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">qr_code_2</span>
+<span class="font-label-sm text-label-sm mt-1">My Passport</span>
+</button>
+<!-- Orders (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-16 hover:bg-surface-container-high transition-colors rounded-lg">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-label-sm text-label-sm mt-1">Orders</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-16 hover:bg-surface-container-high transition-colors rounded-lg">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</button>
+</nav>
+
+
+</body></html>

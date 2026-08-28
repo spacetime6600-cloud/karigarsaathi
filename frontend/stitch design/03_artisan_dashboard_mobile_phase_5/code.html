@@ -1,0 +1,239 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>KarigarSaathi - Artisan Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#43474d",
+                        "tertiary": "#2a1800",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#2a1800",
+                        "surface-dim": "#d1dbe9",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffdbd0",
+                        "primary-fixed-dim": "#afc9ea",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#390b00",
+                        "primary": "#001d36",
+                        "secondary": "#a13f1c",
+                        "inverse-surface": "#27313c",
+                        "surface-tint": "#47607e",
+                        "inverse-primary": "#afc9ea",
+                        "tertiary-container": "#462b00",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "on-tertiary-container": "#cc8c28",
+                        "outline": "#74777e",
+                        "surface-container-highest": "#d9e3f1",
+                        "surface-container": "#e4effd",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#FFF9EF", // Custom background as per prompt, mapped to surface
+                        "surface-container-low": "#edf4ff",
+                        "on-background": "#121c26",
+                        "on-secondary-container": "#701f00",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#d1e4ff",
+                        "on-surface": "#121c26",
+                        "surface-variant": "#d9e3f1",
+                        "surface-container-high": "#dfe9f7",
+                        "secondary-container": "#fd835b",
+                        "primary-container": "#17324d",
+                        "tertiary-fixed": "#ffddb5",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "on-primary": "#ffffff",
+                        "background": "#FFF9EF", // Custom background as per prompt
+                        "on-primary-container": "#819aba",
+                        "on-secondary-fixed-variant": "#812805",
+                        "inverse-on-surface": "#e8f2ff",
+                        "surface-bright": "#f7f9ff",
+                        "on-primary-fixed": "#001d36",
+                        "outline-variant": "#c3c6ce",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "on-tertiary-fixed-variant": "#633f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "touch-target-min": "48px",
+                        "margin-desktop": "48px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], // Standardizing to 18px per prompt request where applicable
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    },
+                    "boxShadow": {
+                        "level-1": "0 2px 8px -2px rgba(0, 29, 54, 0.06)",
+                        "level-2": "0 4px 16px -2px rgba(0, 29, 54, 0.10)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #FFF9EF;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pattern-overlay {
+            background-image: radial-gradient(#d1dbe9 1px, transparent 1px);
+            background-size: 16px 16px;
+            opacity: 0.3;
+        }
+        .touch-target {
+            min-height: 48px;
+            min-width: 48px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-24">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-touch-target-min bg-surface-container shadow-sm">
+<div class="flex items-center gap-sm">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">KarigarSaathi</h1>
+</div>
+<div class="flex items-center gap-xs">
+<button aria-label="Language" class="touch-target flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">language</span>
+</button>
+<button aria-label="Voice Input" class="touch-target flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">record_voice_over</span>
+</button>
+</div>
+</header>
+<main class="px-margin-mobile pt-24 pb-lg max-w-[1200px] mx-auto flex flex-col gap-lg relative">
+<div class="absolute inset-0 pattern-overlay pointer-events-none -z-10"></div>
+<!-- Header Section -->
+<section class="flex flex-col gap-sm">
+<h2 class="font-display-lg text-display-lg text-primary">Namaste, Ram</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Here is your workshop overview today.</p>
+</section>
+<!-- Primary Actions -->
+<section class="flex flex-col gap-md">
+<button class="touch-target w-full bg-primary-container text-on-primary font-title-md text-title-md rounded-xl flex items-center justify-center gap-sm shadow-level-1 hover:shadow-level-2 transition-all active:scale-95 border-2 border-transparent focus:border-tertiary-fixed-dim focus:outline-none">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                Add a New Product
+            </button>
+<button class="touch-target w-full bg-transparent text-primary font-title-md text-title-md rounded-xl flex items-center justify-center gap-sm border-2 border-primary hover:bg-surface-container-low transition-all active:scale-95 focus:border-tertiary-fixed-dim focus:outline-none">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">draft</span>
+                Resume Draft
+            </button>
+</section>
+<!-- Inventory Status Panel -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-surface-variant relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed opacity-20 rounded-bl-full -z-10"></div>
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-title-md text-title-md text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">inventory_2</span>
+                    Inventory Status
+                </h3>
+<button class="text-secondary font-label-lg text-label-lg underline touch-target flex items-center justify-end px-xs min-w-[48px]">View All</button>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface p-md rounded-lg flex flex-col gap-xs border border-surface-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Low Stock</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-error">4</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Items need reorder</span>
+</div>
+<div class="bg-surface p-md rounded-lg flex flex-col gap-xs border border-surface-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Active</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-primary">28</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Products listed</span>
+</div>
+</div>
+</section>
+<!-- New Enquiries Panel -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-surface-variant">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-title-md text-title-md text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">forum</span>
+                    New Enquiries
+                </h3>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">notifications</span>
+                    2 New</span>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Enquiry Item 1 -->
+<button class="w-full text-left bg-surface p-sm rounded-lg flex items-center justify-between border border-surface-variant touch-target hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-md">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-dim" data-alt="A close up, high quality photo of a handcrafted terracotta vase, warm lighting, earthy tones, artisan craft style, professional product photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC42Da0QS2VMYKKtPLVhkJPqQHgzk3a6M-4wde4FSxYMPReYVP9RknCftP3SuM4IzGDvVhRomaiAISuJDvc6sOazwOYKfyGJSUN9bAJcvN9aXZLEmOP6eJ5z7znaPDuTIC7XxbdxS8awWIkJJDOhPOVTeP8-H-qi9rLyki5HPxm05WMBfjdBGCUPO1nzlfKsA-MSPayiNWXx9F6pknlyRCRuiPaXewlDIGBx3w78hpsAGOHbTzIrrbY">
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-primary truncate">Terracotta Vase</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">From: Ananya D.</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">chevron_right</span>
+</button>
+<!-- Enquiry Item 2 -->
+<button class="w-full text-left bg-surface p-sm rounded-lg flex items-center justify-between border border-surface-variant touch-target hover:bg-surface-container-low transition-colors group">
+<div class="flex flex-col w-full">
+<div class="flex items-center gap-md">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-dim" data-alt="A close up, high quality photo of a handwoven silk saree, intricate jamdani patterns, warm natural light, soft textures, artisan craft style, professional product photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGxvl8p1fzwrO2yA2XKf0vTkueNNxhubFvbC_q8-8kma5dSQxFnyAnk143CzBV7kyjyD-rHbuwU6hdQ8eECLjkDqg_LApP0BhkxhhUKP4c8hReiuFMtLz5cbBGYF7VvmAdnN_tGhqozgY2tD00oQqL9cqQMhRRE5_5QeIYnC2g89CHFem5r9S4aBqmzxqnvhpbaJQ35wxdfYk4RqpAamm2SN-vFWqTIxyHKj59GwBDVSvAXjAZ0k1F">
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-primary truncate">Silk Saree</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">From: Rajesh K.</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">chevron_right</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface-container-lowest md:hidden rounded-t-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+<button class="touch-target flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs active:scale-90 duration-150 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-xs">Home</span>
+</button>
+<button class="touch-target flex flex-col items-center justify-center text-on-surface-variant px-lg py-xs active:bg-surface-variant transition-all rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assignment</span>
+<span class="font-label-sm text-label-sm mt-xs">Tasks</span>
+</button>
+<button class="touch-target flex flex-col items-center justify-center text-on-surface-variant px-lg py-xs active:bg-surface-variant transition-all rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">inventory_2</span>
+<span class="font-label-sm text-label-sm mt-xs">Inventory</span>
+</button>
+<button class="touch-target flex flex-col items-center justify-center text-on-surface-variant px-lg py-xs active:bg-surface-variant transition-all rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm mt-xs">Profile</span>
+</button>
+</nav>
+
+
+</body></html>

@@ -1,0 +1,124 @@
+{
+  "materials": [
+    {
+      "name": "Teak Wood",
+      "quantity": "10",
+      "unit": "kg",
+      "cost_per_unit": "500",
+      "source_note": "Local supplier",
+      "value_status": "exact"
+    },
+    {
+      "name": "Natural Oil Finish",
+      "quantity": "2",
+      "unit": "L",
+      "cost_per_unit": "800",
+      "source_note": "Online store",
+      "value_status": "exact"
+    }
+  ],
+  "labour": [
+    {
+      "task_name": "Design & Carving",
+      "hours": "8",
+      "hourly_rate": "300",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact",
+      "note": "Complex relief carving"
+    },
+    {
+      "task_name": "Sanding & Finishing",
+      "hours": "4",
+      "hourly_rate": "200",
+      "rate_source": "Artisan guild rate card 2024",
+      "rate_type": "preset",
+      "hours_status": "exact"
+    }
+  ],
+  "overhead": [
+    {
+      "name": "Workshop Rent",
+      "amount": "2000",
+      "explanation": "Monthly rent allocation for this product",
+      "value_status": "exact"
+    },
+    {
+      "name": "Electricity & Tools",
+      "amount": "500",
+      "explanation": "Power and tool depreciation",
+      "value_status": "estimated"
+    }
+  ],
+  "margin_mode": "percentage_markup",
+  "margin_value": "25",
+  "comparables": [
+    {
+      "id": "comp-001",
+      "product_title": "Carved Teak Bowl",
+      "category": "Home Decor",
+      "craft_type": "Wood Carving",
+      "material": "Teak",
+      "dimensions": "30cm diameter",
+      "listed_price": "4500",
+      "source_name": "Craft Marketplace A",
+      "source_reference": "listing-12345",
+      "capture_date": "2024-12-01",
+      "status": "verified",
+      "verification_date": "2024-12-10",
+      "verified_by": "curator-01",
+      "verification_note": "Price verified against seller invoice",
+      "geographic_context": "South India",
+      "similarity_note": "Similar size, material, and craftsmanship level",
+      "evidence_reference": "invoice-12345.pdf",
+      "selected": true
+    },
+    {
+      "id": "comp-002",
+      "product_title": "Hand-carved Teak Plate",
+      "category": "Home Decor",
+      "craft_type": "Wood Carving",
+      "material": "Teak",
+      "dimensions": "25cm diameter",
+      "listed_price": "3800",
+      "source_name": "Craft Marketplace B",
+      "source_reference": "listing-67890",
+      "capture_date": "2024-11-15",
+      "status": "verified",
+      "verification_date": "2024-11-20",
+      "verified_by": "curator-02",
+      "verification_note": "Confirmed with artisan",
+      "geographic_context": "South India",
+      "similarity_note": "Same material, similar technique",
+      "evidence_reference": "artisan-confirmation-67890.pdf",
+      "selected": true
+    },
+    {
+      "id": "comp-003",
+      "product_title": "Teak Wall Art Panel",
+      "category": "Wall Art",
+      "craft_type": "Wood Carving",
+      "material": "Teak",
+      "dimensions": "40x30cm",
+      "listed_price": "5200",
+      "source_name": "Craft Marketplace A",
+      "source_reference": "listing-54321",
+      "capture_date": "2024-10-01",
+      "status": "verified",
+      "verification_date": "2024-10-05",
+      "verified_by": "curator-01",
+      "verification_note": "Verified via platform transaction record",
+      "geographic_context": "South India",
+      "similarity_note": "Same material and craft type",
+      "evidence_reference": "transaction-54321.pdf",
+      "selected": true
+    }
+  ],
+  "comparable_influence": "20",
+  "max_adjustment": "10",
+  "low_buffer": "5",
+  "high_buffer": "10",
+  "calculation_date": "2025-01-15",
+  "currency": "INR",
+  "locale": "en"
+}

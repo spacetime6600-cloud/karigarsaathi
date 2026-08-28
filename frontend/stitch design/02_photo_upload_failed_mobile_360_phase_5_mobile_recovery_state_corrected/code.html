@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Add Photographs</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#e4effd",
+                    "inverse-primary": "#afc9ea",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#afc9ea",
+                    "secondary-container": "#fd835b",
+                    "inverse-surface": "#27313c",
+                    "on-secondary-container": "#701f00",
+                    "on-secondary-fixed": "#390b00",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ffb59d",
+                    "on-primary": "#ffffff",
+                    "outline": "#74777e",
+                    "on-surface-variant": "#43474d",
+                    "surface": "#f7f9ff",
+                    "surface-variant": "#d9e3f1",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#cc8c28",
+                    "surface-tint": "#47607e",
+                    "inverse-on-surface": "#e8f2ff",
+                    "surface-container-highest": "#d9e3f1",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-secondary-fixed-variant": "#812805",
+                    "on-tertiary-fixed": "#2a1800",
+                    "outline-variant": "#c3c6ce",
+                    "primary": "#001d36",
+                    "on-tertiary-fixed-variant": "#633f00",
+                    "surface-container-high": "#dfe9f7",
+                    "secondary": "#a13f1c",
+                    "on-surface": "#121c26",
+                    "tertiary": "#2a1800",
+                    "tertiary-fixed-dim": "#ffb955",
+                    "surface-dim": "#d1dbe9",
+                    "primary-fixed": "#d1e4ff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#001d36",
+                    "surface-container-low": "#edf4ff",
+                    "on-background": "#121c26",
+                    "primary-container": "#17324d",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#f7f9ff",
+                    "tertiary-container": "#462b00",
+                    "background": "#f7f9ff",
+                    "secondary-fixed": "#ffdbd0",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#2f4865",
+                    "on-primary-container": "#819aba"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "margin-desktop": "48px",
+                    "base": "8px",
+                    "touch-target-min": "48px",
+                    "margin-mobile": "16px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "title-md": ["Noto Sans", "sans-serif"],
+                    "body-md": ["Noto Sans", "sans-serif"],
+                    "label-sm": ["Noto Sans", "sans-serif"],
+                    "display-lg": ["Noto Sans", "sans-serif"],
+                    "label-lg": ["Noto Sans", "sans-serif"],
+                    "headline-lg-mobile": ["Noto Sans", "sans-serif"],
+                    "body-lg": ["Noto Sans", "sans-serif"],
+                    "headline-lg": ["Noto Sans", "sans-serif"]
+            },
+            "fontSize": {
+                    "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<!-- Applying #FFF9EF equivalent via background token, setting up pb for fixed footer -->
+<body class="bg-background text-on-background font-body-lg antialiased pb-48 w-full max-w-md mx-auto relative min-h-screen">
+<!-- Header (Transactional Context: Suppress main navs, use custom top bar) -->
+<header class="flex justify-between items-center px-margin-mobile h-touch-target-min bg-surface-container-lowest sticky top-0 z-40 shadow-sm rounded-b-xl mb-lg">
+<button aria-label="Go Back" class="flex items-center justify-center w-touch-target-min h-touch-target-min text-primary rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="font-title-md text-title-md text-primary tracking-tight">KarigarSaathi</div>
+<button aria-label="Listen to Audio Help" class="flex items-center justify-center w-touch-target-min h-touch-target-min text-primary rounded-full hover:bg-surface-variant transition-colors bg-surface-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="px-margin-mobile flex flex-col gap-xl">
+<!-- Header Text & Status -->
+<div class="flex flex-col gap-sm">
+<span class="font-title-md text-title-md text-secondary flex items-center gap-sm">
+<span class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-title-md text-[14px]">4</span>
+                Step 4 of 6
+            </span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Add Photographs</h1>
+<div class="inline-flex items-center gap-sm bg-error-container text-on-error-container px-md py-sm rounded-lg w-fit mt-xs border border-error shadow-sm" role="alert"><span class="material-symbols-outlined text-[20px]">error</span><span class="font-title-md text-title-md">Upload failed, saved locally</span></div>
+</div>
+<!-- Primary Upload Actions -->
+<div class="flex flex-col gap-md"><button class="w-full h-touch-target-min bg-primary-container text-on-primary-container font-title-md text-title-md rounded-xl flex items-center justify-center gap-md active:scale-95 transition-transform shadow-md p-sm"><span class="material-symbols-outlined text-[24px]">refresh</span>Retry All Failed</button><button class="w-full min-h-touch-target-min border-2 border-primary text-primary font-title-md text-title-md rounded-xl flex items-center justify-center gap-md active:bg-surface-variant transition-colors bg-surface-container-lowest p-sm h-touch-target-min"><span class="material-symbols-outlined text-[24px]">add_photo_alternate</span>Choose another photo</button></div>
+<!-- Photo Grid (Bento-style layout) -->
+<div class="grid grid-cols-2 gap-md mt-sm">
+<!-- Slot 1: Uploaded (Filled State) -->
+<div class="relative rounded-xl overflow-hidden aspect-square border-2 border-surface-container-highest shadow-sm bg-surface-container-lowest group"><img class="w-full h-full object-cover opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyoj9c9VI4qKMe9GcrRrMVBdPdGF-2Eh-tVU0n2-C2YIATiojlMANo9dQ3rcQqEqHFVZtHcMrxZdIYmu0_rACAKqzbEXMkvc6ijhy_EW-DOZGK-B6MZYn35JajYSWBbMFGgBc073hliNfWVawFnUs_fHnZAxiYM6xFDkJY2okD4qWg7dapEx-HPuvEO0SXZKUXsKZfp_RkC1kfFmNWeWxa-Lh-GLu9lBOdGvc9UOIDUELIrI7d2TPx"><div class="absolute inset-0 flex flex-col items-center justify-center bg-error/20 p-sm"><button class="bg-primary-container text-on-primary-container px-md py-xs rounded-full font-title-md text-[14px] flex items-center gap-xs shadow-md active:scale-95 transition-transform h-touch-target-min"><span class="material-symbols-outlined text-[18px]">refresh</span>Retry</button></div><button aria-label="Remove photo" class="absolute top-sm right-sm bg-surface-container-lowest text-error rounded-full w-10 h-10 shadow-md flex items-center justify-center active:bg-error-container transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button></div>
+<!-- Slots 2-5: Empty States -->
+<button class="rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center aspect-square gap-sm hover:bg-surface-variant hover:border-primary active:scale-95 transition-all text-on-surface-variant shadow-sm relative overflow-hidden">
+<span class="material-symbols-outlined text-[32px] text-primary">add_a_photo</span>
+<span class="font-title-md text-title-md text-center px-sm text-primary">Add Photo</span>
+</button>
+<button class="rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center aspect-square gap-sm hover:bg-surface-variant hover:border-primary active:scale-95 transition-all text-on-surface-variant shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-outline">add_a_photo</span>
+<span class="font-title-md text-title-md text-center px-sm text-outline">Add Photo</span>
+</button>
+<button class="rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center aspect-square gap-sm hover:bg-surface-variant hover:border-primary active:scale-95 transition-all text-on-surface-variant shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-outline">add_a_photo</span>
+<span class="font-title-md text-title-md text-center px-sm text-outline">Add Photo</span>
+</button>
+</div>
+<!-- Guidance / Tips Card (Tactile elevation) -->
+<section class="bg-surface-container-lowest rounded-xl p-lg shadow-sm border border-surface-container-highest relative overflow-hidden mt-sm">
+<!-- Subtle decorative motif -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(circle,rgba(253,131,91,0.1)_0%,transparent_70%)] rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+<div class="flex items-center gap-md mb-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<h3 class="font-title-md text-title-md text-primary">Tips for good photos</h3>
+</div>
+<ul class="font-body-lg text-body-lg text-on-surface-variant space-y-md flex flex-col">
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-[24px] text-secondary mt-xs" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+<span>Use bright, natural daylight. Avoid harsh shadows.</span>
+</li>
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-[24px] text-secondary mt-xs" style="font-variation-settings: 'FILL' 1;">center_focus_strong</span>
+<span>Keep your craft item centered in the frame.</span>
+</li>
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-[24px] text-secondary mt-xs" style="font-variation-settings: 'FILL' 1;">crop_free</span>
+<span>Show different angles to highlight details.</span>
+</li>
+</ul>
+</section>
+</main>
+<!-- Fixed Bottom Actions -->
+<footer class="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-surface-container-lowest shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)] px-margin-mobile py-lg z-50 flex flex-col gap-md border-t border-surface-container-highest safe-area-bottom" style="padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));">
+<button class="w-full h-touch-target-min bg-primary-container text-on-primary-container font-title-md text-title-md rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-transform p-sm">Next Step</button>
+<button class="w-full min-h-touch-target-min text-primary font-title-md text-title-md underline flex items-center justify-center bg-transparent active:bg-surface-variant rounded-xl transition-colors p-sm h-touch-target-min">
+            Continue as Draft
+        </button>
+</footer>
+<!-- Safe area support script for mobile embedded browsers -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const footer = document.querySelector('footer');
+            if (CSS.supports('padding-bottom: env(safe-area-inset-bottom)')) {
+                footer.style.paddingBottom = 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))';
+            }
+        });
+    </script>
+
+
+</body></html>

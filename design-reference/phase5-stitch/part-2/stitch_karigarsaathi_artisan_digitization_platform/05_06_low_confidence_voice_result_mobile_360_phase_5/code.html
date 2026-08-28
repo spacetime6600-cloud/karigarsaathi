@@ -1,0 +1,189 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Voice Result - Needs Attention</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f7f9ff",
+                    "secondary-fixed": "#ffdbd0",
+                    "inverse-on-surface": "#e8f2ff",
+                    "tertiary": "#2a1800",
+                    "on-primary-fixed-variant": "#2f4865",
+                    "on-error-container": "#93000a",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#e4effd",
+                    "outline": "#74777e",
+                    "surface-tint": "#47607e",
+                    "on-secondary-container": "#701f00",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#afc9ea",
+                    "surface": "#f7f9ff",
+                    "on-tertiary-container": "#cc8c28",
+                    "primary-container": "#17324d",
+                    "primary-fixed-dim": "#afc9ea",
+                    "on-tertiary-fixed-variant": "#633f00",
+                    "tertiary-container": "#462b00",
+                    "on-surface-variant": "#43474d",
+                    "surface-container-highest": "#d9e3f1",
+                    "on-background": "#121c26",
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#d1e4ff",
+                    "secondary-fixed-dim": "#ffb59d",
+                    "surface-variant": "#d9e3f1",
+                    "on-primary-container": "#819aba",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-surface": "#121c26",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#27313c",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d1dbe9",
+                    "background": "#f7f9ff",
+                    "on-secondary-fixed-variant": "#812805",
+                    "tertiary-fixed-dim": "#ffb955",
+                    "on-primary-fixed": "#001d36",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#fd835b",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#a13f1c",
+                    "on-secondary-fixed": "#390b00",
+                    "on-tertiary-fixed": "#2a1800",
+                    "outline-variant": "#c3c6ce",
+                    "primary": "#001d36",
+                    "surface-container-low": "#edf4ff",
+                    "surface-container-high": "#dfe9f7"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "touch-target-min": "48px",
+                    "margin-mobile": "16px",
+                    "md": "16px",
+                    "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Noto Sans"],
+                    "headline-lg": ["Noto Sans"],
+                    "label-lg": ["Noto Sans"],
+                    "display-lg": ["Noto Sans"],
+                    "headline-lg-mobile": ["Noto Sans"],
+                    "title-md": ["Noto Sans"],
+                    "body-lg": ["Noto Sans"],
+                    "body-md": ["Noto Sans"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Noto Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#FFF9EF] text-primary min-h-screen flex flex-col pb-24">
+<!-- Top App Bar (Destination: Hidden for transactional flow, but keeping a simple back header for context) -->
+<header class="w-full top-0 sticky bg-[#FFF9EF] border-b-2 border-primary z-10">
+<div class="flex justify-between items-center px-margin-mobile h-touch-target-min w-full max-w-container-max mx-auto">
+<button class="text-primary hover:bg-surface-container-highest transition-colors rounded-full p-2 focus:outline-dashed focus:outline-4 focus:outline-offset-4 flex items-center justify-center min-h-[48px] min-w-[48px]">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Review Input</h1>
+<div class="min-w-[48px]"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="flex-grow px-margin-mobile pt-lg max-w-[1200px] mx-auto w-full flex flex-col gap-lg">
+<!-- Explanation Banner -->
+<div class="bg-error-container text-on-error-container p-md rounded-lg flex gap-md items-start shadow-sm" style="box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);">
+<span class="material-symbols-outlined mt-xs" data-icon="warning">warning</span>
+<div>
+<h2 class="font-title-md text-title-md mb-xs">We couldn't catch everything clearly.</h2>
+<p class="font-body-md text-body-md">Please review the details below to ensure we recorded your work correctly.</p>
+</div>
+</div>
+<!-- Transcript Display -->
+<section class="bg-white p-md rounded-xl shadow-sm" style="box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);">
+<div class="flex justify-between items-center mb-md border-b-2 border-outline-variant pb-sm">
+<h3 class="font-title-md text-title-md text-primary">Recorded Details</h3>
+<button class="text-secondary font-label-lg text-label-lg flex items-center gap-xs hover:bg-surface-container-high px-sm py-2 rounded-md transition-colors min-h-[48px] min-w-[48px]">
+<span class="material-symbols-outlined" data-icon="volume_up">volume_up</span>
+                    Listen
+                </button>
+</div>
+<div class="flex flex-col gap-md">
+<p class="font-body-lg text-body-lg italic text-on-surface-variant bg-surface-container-lowest p-sm rounded border border-outline-variant break-words">
+                    "Completed weaving 5 meters of silk saree in blue pattern... need 2 more spools of thread for tomorrow."
+                </p>
+<!-- Extracted Fields with Uncertainty -->
+<div class="flex flex-col gap-sm">
+<!-- Confident Field -->
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-xs">Task Type</span>
+<div class="font-body-md text-body-md bg-surface-container-low px-sm py-2 rounded">Weaving</div>
+</div>
+<!-- Uncertain Field 1 -->
+<div class="flex flex-col relative">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-xs flex items-center gap-xs">
+                            Quantity
+                            <span class="material-symbols-outlined text-secondary text-[16px]" data-icon="help">help</span>
+</span>
+<div class="font-body-md text-body-md bg-secondary-fixed-dim border-2 border-secondary px-sm py-2 rounded flex justify-between items-center">
+<span>5 meters</span>
+<span class="font-label-sm text-label-sm text-secondary bg-white px-2 py-1 rounded font-bold">Needs checking</span>
+</div>
+</div>
+<!-- Uncertain Field 2 -->
+<div class="flex flex-col relative">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-xs flex items-center gap-xs">
+                            Material Needed
+                            <span class="material-symbols-outlined text-secondary text-[16px]" data-icon="error">error</span>
+</span>
+<div class="font-body-md text-body-md bg-secondary-fixed-dim border-2 border-secondary px-sm py-2 rounded flex justify-between items-center">
+<span>2 spools thread</span>
+<span class="font-label-sm text-label-sm text-secondary bg-white px-2 py-1 rounded font-bold">Needs checking</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recovery Actions (Pinned near bottom on mobile but flows naturally here) -->
+<section class="mt-auto pt-lg flex flex-col gap-md pb-margin-mobile">
+<button class="bg-[#b04a21] text-white font-label-lg text-label-lg font-bold w-full rounded-full min-h-[48px] flex items-center justify-center shadow-md hover:bg-[#802f10] transition-colors focus:outline-dashed focus:outline-4 focus:outline-offset-2 focus:outline-primary">
+                Check and Correct
+            </button>
+<button class="bg-transparent border-2 border-primary text-primary font-label-lg text-label-lg font-bold w-full rounded-full min-h-[48px] flex items-center justify-center hover:bg-surface-container-high transition-colors focus:outline-dashed focus:outline-4 focus:outline-offset-2 focus:outline-primary gap-sm">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+                Re-record
+            </button>
+<button class="bg-transparent text-primary font-label-lg text-label-lg underline w-full min-h-[48px] flex items-center justify-center hover:bg-surface-container-high rounded transition-colors focus:outline-dashed focus:outline-4 focus:outline-offset-2 focus:outline-primary h-touch-target-min">
+                Edit Manually
+            </button>
+</section>
+</main>
+
+
+</body></html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Craft Passport Created</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#e8f2ff",
+                        "inverse-surface": "#27313c",
+                        "outline": "#74777e",
+                        "inverse-primary": "#afc9ea",
+                        "on-surface-variant": "#43474d",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "secondary-container": "#fd835b",
+                        "background": "#f7f9ff",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d1dbe9",
+                        "on-secondary-container": "#701f00",
+                        "error": "#ba1a1a",
+                        "secondary": "#a13f1c",
+                        "on-background": "#121c26",
+                        "surface-variant": "#d9e3f1",
+                        "surface-tint": "#47607e",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-secondary-fixed": "#390b00",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#d1e4ff",
+                        "on-tertiary-container": "#cc8c28",
+                        "surface-container-highest": "#d9e3f1",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001d36",
+                        "surface-container": "#e4effd",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "surface-container-low": "#edf4ff",
+                        "primary-container": "#17324d",
+                        "primary": "#001d36",
+                        "tertiary-container": "#462b00",
+                        "primary-fixed-dim": "#afc9ea",
+                        "surface-container-high": "#dfe9f7",
+                        "surface-bright": "#f7f9ff",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#819aba",
+                        "surface": "#f7f9ff",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "on-secondary-fixed-variant": "#812805",
+                        "on-tertiary-fixed": "#2a1800",
+                        "outline-variant": "#c3c6ce",
+                        "tertiary": "#2a1800",
+                        "on-surface": "#121c26",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "touch-target-min": "48px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "48px",
+                        "xl": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"],
+                        "body-md": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "title-md": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background flex justify-between items-center w-full px-margin-mobile h-touch-target-min flat no shadows bg-background sticky top-0 z-50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed md:hidden cursor-pointer" data-icon="menu">menu</span>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">KarigarSaathi</h1>
+</div>
+<div class="hidden search_bar"></div>
+<div class="flex items-center gap-sm">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform text-on-surface-variant dark:text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform text-on-surface-variant dark:text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant ml-sm cursor-pointer hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform">
+<img alt="Artisan profile" class="w-full h-full object-cover" data-alt="A close up portrait of an Indian artisan smiling warmly, illuminated by soft natural light. The background is slightly blurred showing colorful textiles. The mood is authentic, professional, and welcoming, fitting for a modern craft portal profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAus4_zc4MPOfOtaYCHwqF30spyqK_wYNXBF6Bv1CCsZ13blZ2iSV73OlGTPHE36iq0TNbzVquFQ9YO1NFy1rkQSGqPdFUaYbFR9mGxgY07-U6yBX7uXlDjn81gzF4SjbD3Z5SOShqqHR9jE0I4sZUM4SQd3_UsYKJImPHq0jts3lGOiu2N6_P-pJWhcUIT9IkylM1TXv-pnRdHkFoS-JaT1vjavkAd4_tGTZ7HbhEu-obA1SE5TS8e">
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Side Navigation (Desktop) -->
+<nav class="hidden md:flex flex-col w-64 bg-surface-container-low border-r border-outline-variant/30 h-[calc(100vh-48px)] sticky top-[48px] py-md">
+<ul class="flex flex-col gap-xs px-sm">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-full text-on-surface-variant hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-lg text-label-lg">Home</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-full text-on-surface-variant hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-lg text-label-lg">Tasks</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-full text-on-surface-variant hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-lg text-label-lg">Inventory</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-full text-primary font-bold bg-secondary-container text-on-secondary-container hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined fill" data-icon="person">person</span>
+<span class="font-label-lg text-label-lg">Profile</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-xl">
+<div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+<!-- Success Header -->
+<div class="mb-xl flex flex-col items-center">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="check_circle">check_circle</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary">Craft Passport Created!</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm max-w-2xl">
+                        Anyone who scans this code will see your verified product story and craft history.
+                    </p>
+</div>
+<!-- Bento Grid Layout for Passport Info -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md w-full mb-xl">
+<!-- QR Code Card (Hero) -->
+<div class="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_rgba(0,29,54,0.06)] p-xl flex flex-col items-center justify-center relative overflow-hidden group">
+<!-- Subtle Background Motif -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" data-alt="A subtle, repeating geometric pattern inspired by traditional Indian Ikat weaving. The pattern is low contrast, monochrome, and acts as a delicate watermark texture on a white background, adding a tactile feel without distracting from foreground elements." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDUL1D9VXJPDuIazcZm6d_8t-qJ59VJyCB6pIx_qFDKZi6pLACWUvkMiB6NYSnjPG6Vzr52EY_AO8igOklTZQguAn2kdbEdQYRTy6UXqkOoCjMi2oRv2kqKEHWc1lVLIiWxmGNzhS2vOVL4zsF3JBYd7ChR2IkIJLOdc7dCnN0PK4iz4c0PDqKRfTymOuRiwitUWTD5PSgXZxRBGPc3udYlg0NZw5Je3qo-l1BoDIRMOIGJKai8JkTC')"></div>
+<div class="flex items-center gap-xs mb-lg self-start z-10">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Your Unique QR Code</span>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant/20 shadow-sm z-10 mb-md transition-transform duration-300 group-hover:scale-105">
+<img alt="QR Code" class="w-48 h-48 md:w-64 md:h-64 object-contain" data-alt="A clean, high-contrast black and white QR code centered on a stark white background with ample quiet space around it. The QR code appears crisp and scan-ready, representing a digital bridge to artisan craft details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqrcl48Eb81Sr1upo_1JN594jH7ZgDBceI_KIIhbAIqFhi7nBKjHNLQCCCmkBxg8dodhTFrvJqr9Y__jrCCKkgkdjSDoUadgGNbE9k8qmsQmXKLgk0X-45_EzdiJn9qf6ExZBXxnEywCIJ0LdTJmxgaXg8nOaTcaKUhoBFgHMHYR2Uj8gcNST98hRH54Uho53oGxBfAqVMvZ5PzrvqE84i4vLcbH8TtE1M9at5FNJ4imAYHQqh-AeW">
+</div>
+<div class="flex gap-sm z-10">
+<span class="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span> Active
+                            </span>
+<span class="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="public">public</span> Public
+                            </span>
+</div>
+</div>
+<!-- Actions & Details Column -->
+<div class="md:col-span-4 flex flex-col gap-md">
+<!-- Primary Action Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(0,29,54,0.06)] p-md flex flex-col justify-center h-full">
+<button class="w-full bg-secondary text-on-secondary font-title-md text-title-md py-md px-lg rounded-full hover:bg-secondary/90 transition-colors shadow-md flex items-center justify-center gap-sm min-h-touch-target-min">
+<span>Continue to Share</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Secondary Actions Bento -->
+<div class="grid grid-cols-2 gap-sm h-full">
+<button class="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(0,29,54,0.06)] p-md flex flex-col items-center justify-center gap-sm hover:border-secondary border border-transparent transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:text-secondary transition-colors" data-icon="visibility">visibility</span>
+<span class="font-label-lg text-label-lg text-primary text-center">View Passport</span>
+</button>
+<button class="bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(0,29,54,0.06)] p-md flex flex-col items-center justify-center gap-sm hover:border-secondary border border-transparent transition-colors group relative overflow-hidden" id="copyLinkBtn">
+<span class="material-symbols-outlined text-primary group-hover:text-secondary transition-colors" data-icon="content_copy">content_copy</span>
+<span class="font-label-lg text-label-lg text-primary text-center" id="copyLinkText">Copy Link</span>
+</button>
+<button class="col-span-2 bg-surface-container-lowest rounded-xl shadow-[0_2px_8px_rgba(0,29,54,0.06)] p-md flex items-center justify-center gap-sm hover:border-secondary border border-transparent transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:text-secondary transition-colors" data-icon="download">download</span>
+<span class="font-label-lg text-label-lg text-primary">Download QR Code</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface dark:bg-inverse-surface shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex justify-around items-center px-4 py-2">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-transform p-xs min-h-touch-target-min min-w-touch-target-min">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-transform p-xs min-h-touch-target-min min-w-touch-target-min">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+<span class="font-label-sm text-label-sm">My Passport</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-transform p-xs min-h-touch-target-min min-w-touch-target-min">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-90 transition-transform min-h-touch-target-min min-w-touch-target-min">
+<span class="material-symbols-outlined fill" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<script>
+        document.getElementById('copyLinkBtn').addEventListener('click', function() {
+            const btnText = document.getElementById('copyLinkText');
+            const icon = this.querySelector('.material-symbols-outlined');
+            
+            // Simulating copy action
+            const originalText = btnText.innerText;
+            const originalIcon = icon.innerText;
+            
+            btnText.innerText = 'Link Copied!';
+            icon.innerText = 'check';
+            icon.classList.add('text-secondary');
+            
+            setTimeout(() => {
+                btnText.innerText = originalText;
+                icon.innerText = originalIcon;
+                icon.classList.remove('text-secondary');
+            }, 2000);
+        });
+    </script>
+</body></html>

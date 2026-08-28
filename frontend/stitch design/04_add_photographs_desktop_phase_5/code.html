@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KarigarSaathi - Add Photographs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#e4effd",
+                      "inverse-primary": "#afc9ea",
+                      "on-error-container": "#93000a",
+                      "primary-fixed-dim": "#afc9ea",
+                      "secondary-container": "#fd835b",
+                      "inverse-surface": "#27313c",
+                      "on-secondary-container": "#701f00",
+                      "on-secondary-fixed": "#390b00",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#ffb59d",
+                      "on-primary": "#ffffff",
+                      "outline": "#74777e",
+                      "on-surface-variant": "#43474d",
+                      "surface": "#f7f9ff",
+                      "surface-variant": "#d9e3f1",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#cc8c28",
+                      "surface-tint": "#47607e",
+                      "inverse-on-surface": "#e8f2ff",
+                      "surface-container-highest": "#d9e3f1",
+                      "tertiary-fixed": "#ffddb5",
+                      "on-secondary-fixed-variant": "#812805",
+                      "on-tertiary-fixed": "#2a1800",
+                      "outline-variant": "#c3c6ce",
+                      "primary": "#001d36",
+                      "on-tertiary-fixed-variant": "#633f00",
+                      "surface-container-high": "#dfe9f7",
+                      "secondary": "#a13f1c",
+                      "on-surface": "#121c26",
+                      "tertiary": "#2a1800",
+                      "tertiary-fixed-dim": "#ffb955",
+                      "surface-dim": "#d1dbe9",
+                      "primary-fixed": "#d1e4ff",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#001d36",
+                      "surface-container-low": "#edf4ff",
+                      "on-background": "#121c26",
+                      "primary-container": "#17324d",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-bright": "#f7f9ff",
+                      "tertiary-container": "#462b00",
+                      "background": "#f7f9ff",
+                      "secondary-fixed": "#ffdbd0",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed-variant": "#2f4865",
+                      "on-primary-container": "#819aba"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "margin-desktop": "48px",
+                      "base": "8px",
+                      "touch-target-min": "48px",
+                      "margin-mobile": "16px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "title-md": ["Noto Sans"],
+                      "body-md": ["Noto Sans"],
+                      "label-sm": ["Noto Sans"],
+                      "display-lg": ["Noto Sans"],
+                      "label-lg": ["Noto Sans"],
+                      "headline-lg-mobile": ["Noto Sans"],
+                      "body-lg": ["Noto Sans"],
+                      "headline-lg": ["Noto Sans"]
+              },
+              "fontSize": {
+                      "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Custom spinner animation utilizing design system colors */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 2s linear infinite;
+        }
+        
+        /* Focus styles for accessibility */
+        .focus-ring {
+            @apply focus:outline-none focus:ring-2 focus:ring-on-tertiary-container focus:ring-offset-2 focus:ring-offset-surface;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- Transactional Header (Global Nav Suppressed) -->
+<header class="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-surface-variant shadow-sm px-margin-desktop h-[72px] flex items-center justify-between">
+<div class="flex items-center gap-md">
+<button aria-label="Go back" class="flex items-center justify-center min-w-[48px] min-h-[48px] text-on-surface-variant hover:text-primary transition-colors focus-ring rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+</div>
+<div class="flex-1 text-center">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">KarigarSaathi</h1>
+</div>
+<div class="flex items-center gap-md">
+<button aria-label="Listen to audio instructions" class="flex items-center gap-sm px-md min-h-[48px] text-primary hover:bg-surface-container rounded-full transition-colors focus-ring">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+<span class="font-label-lg text-label-lg hidden lg:block">Listen</span>
+</button>
+</div>
+</header>
+<!-- Main Content Layout (Asymmetric Desktop Focus) -->
+<main class="flex-1 max-w-[1440px] w-full mx-auto px-margin-desktop py-xl flex flex-col lg:flex-row gap-[64px]">
+<!-- Left Column: Context, Progress, Guidance -->
+<aside class="w-full lg:w-[400px] flex flex-col gap-xl shrink-0">
+<!-- Progress Section -->
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Step 4 of 6</span>
+<span class="font-label-sm text-label-sm text-primary">66%</span>
+</div>
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="66" class="h-2 w-full bg-surface-variant rounded-full overflow-hidden" role="progressbar">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 66%; background-color: rgb(23, 50, 77);"></div>
+</div>
+</div>
+<!-- Title & Status -->
+<div class="flex flex-col gap-md">
+<h2 class="font-display-lg text-display-lg text-primary">Add Photographs</h2>
+<div class="inline-flex items-center gap-sm bg-surface-container-high px-md py-sm rounded-full w-fit">
+<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Saved on this device</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm">
+                    Showcase your craftsmanship. High-quality images help customers appreciate the fine details of your work.
+                </p>
+</div>
+<!-- Guidance Panel (Tactile UI) -->
+<div class="bg-surface-container rounded-xl p-lg border border-surface-variant shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] mt-lg">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<h3 class="font-title-md text-title-md text-primary">Photography Tips</h3>
+</div>
+<ul class="flex flex-col gap-md">
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-outline mt-1" style="font-variation-settings: 'FILL' 0;">wb_sunny</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Natural Lighting</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Photograph near a window during daylight. Avoid harsh camera flashes.</span>
+</div>
+</li>
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-outline mt-1" style="font-variation-settings: 'FILL' 0;">crop_free</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Clear Framing</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Keep the craft centered. Show the whole item in at least one photo.</span>
+</div>
+</li>
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-outline mt-1" style="font-variation-settings: 'FILL' 0;">wallpaper</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Simple Background</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Use a plain cloth or clean table to make the item stand out.</span>
+</div>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Right Column: Interactive Grid & Actions -->
+<section class="flex-1 flex flex-col gap-xl">
+<!-- Dominant Actions -->
+<div class="flex flex-col sm:flex-row gap-md">
+<button aria-label="Take a new photo with camera" class="flex-1 sm:flex-none flex items-center justify-center gap-sm min-h-[48px] px-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg rounded-xl shadow-md transition-all focus-ring active:scale-95" style="background-color: rgb(176, 74, 33);">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+                    Take Photo
+                </button>
+<button aria-label="Choose photo from device storage" class="flex-1 sm:flex-none flex items-center justify-center gap-sm min-h-[48px] px-xl border-2 border-primary text-primary hover:bg-surface-container-low font-label-lg text-label-lg rounded-xl transition-all focus-ring active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">folder_open</span>
+                    Choose from device
+                </button>
+</div>
+<!-- Bento Grid for Photos -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-md">
+<!-- State 1: Uploaded (Existing Craft Photo) -->
+<div class="relative group aspect-square rounded-xl overflow-hidden shadow-sm border border-surface-variant bg-surface-container-highest focus-within:ring-2 focus-within:ring-on-tertiary-container">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A beautifully crafted traditional Indian terracotta pot resting on a rustic wooden table. The pot features intricate geometric patterns carved into its surface. The lighting is soft and natural, coming from a nearby window, casting gentle shadows that highlight the tactile texture of the clay. The background is slightly blurred, maintaining a warm, earthy color palette of deep reds, browns, and off-whites, perfectly aligning with a modern artisan aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDI8_pPsNVxf_udNY22DQ_9qzptLKawnA1iVm6xNWBs8X3WLAC0SnBMaBY49S1Fe6jqIloRpLRGw3507SpOQbAZ1MHOjd-sTU3tS8g1D4bQtc6emxyyX2AbC_cazq2vejtE03Q0Pb7ek4qrFdBY_Wj5gtI98nNgvz113uU2s-4ldWZF4GQf1FZkPNXkqJE1sl8zWGXDr3p8AKlu5BkJp1iNUGhJLgLLpF6srwYj6z23GW_05Tk-B573')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-sm">
+<div class="flex justify-between items-center w-full">
+<span class="font-label-sm text-label-sm text-on-primary bg-primary/50 px-sm py-xs rounded-full backdrop-blur-sm">Main Image</span>
+<button aria-label="Delete photo" class="min-w-[48px] min-h-[48px] flex items-center justify-center text-error hover:bg-error/20 rounded-full transition-colors focus-ring">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- State 2: Uploading (Loading State) -->
+<div class="relative aspect-square rounded-xl border-2 border-surface-variant bg-surface-container flex flex-col items-center justify-center gap-md p-md">
+<div class="relative flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container text-[40px] animate-spin-slow" style="font-variation-settings: 'FILL' 0;">sync</span>
+</div>
+<div class="w-full max-w-[120px]">
+<span class="font-label-sm text-label-sm text-outline block text-center mb-xs">Uploading... Please wait</span>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full w-[45%] animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- State 3: Failed (Error State) -->
+<div aria-label="Retry upload for failed image" class="relative aspect-square rounded-xl border-2 border-error bg-error-container flex flex-col items-center justify-center gap-sm p-md text-center transition-colors hover:bg-error-container/80 cursor-pointer focus-ring" role="button" tabindex="0">
+<span class="material-symbols-outlined text-error text-[32px]" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-label-sm text-label-sm text-on-error-container">Upload failed</span>
+<span class="font-label-lg text-label-lg text-error underline mt-xs flex items-center gap-xs min-h-[48px]">
+<span class="material-symbols-outlined text-[16px]">refresh</span> Retry
+                    </span>
+</div>
+<!-- State 4: Empty (Placeholder) -->
+<button aria-label="Add another photo" class="relative aspect-square rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-lowest hover:bg-surface-container hover:border-primary transition-all flex flex-col items-center justify-center gap-sm focus-ring group">
+<div class="w-[48px] h-[48px] rounded-full bg-surface-variant group-hover:bg-primary-container flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">add</span>
+</div>
+<span class="font-label-lg text-label-lg text-outline group-hover:text-primary transition-colors">Add Photo</span>
+</button>
+<!-- State 5: Empty (Placeholder) -->
+<button aria-label="Add another photo" class="relative aspect-square rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-lowest hover:bg-surface-container hover:border-primary transition-all flex flex-col items-center justify-center gap-sm focus-ring group">
+<div class="w-[48px] h-[48px] rounded-full bg-surface-variant group-hover:bg-primary-container flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" style="font-variation-settings: 'FILL' 0;">add</span>
+</div>
+<span class="font-label-lg text-label-lg text-outline group-hover:text-primary transition-colors">Add Photo</span>
+</button>
+</div>
+<!-- Footer Actions -->
+<div class="mt-auto pt-xl border-t border-surface-variant flex flex-col-reverse sm:flex-row justify-between items-center gap-md">
+<button aria-label="Save current progress and continue later" class="w-full sm:w-auto min-h-[48px] px-lg font-label-lg text-label-lg text-primary hover:bg-surface-container rounded-xl transition-colors flex items-center justify-center focus-ring underline decoration-1 underline-offset-4 font-body-md">
+                    Continue as Draft
+                </button>
+<button aria-label="Proceed to the next step" class="w-full sm:w-auto min-h-[48px] px-xl bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-sm focus-ring active:scale-95" style="background-color: rgb(23, 50, 77);">
+                    Next Step
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+
+
+</body></html>

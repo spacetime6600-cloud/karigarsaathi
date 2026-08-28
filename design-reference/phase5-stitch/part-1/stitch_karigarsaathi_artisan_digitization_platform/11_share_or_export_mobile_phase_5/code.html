@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Share or Export - KarigarSaathi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#d1e4ff",
+                    "primary": "#001d36",
+                    "on-tertiary-container": "#cc8c28",
+                    "outline": "#74777e",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#121c26",
+                    "inverse-on-surface": "#e8f2ff",
+                    "on-primary-container": "#819aba",
+                    "tertiary": "#2a1800",
+                    "surface-bright": "#f7f9ff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d1dbe9",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-tertiary-fixed": "#2a1800",
+                    "on-secondary-fixed-variant": "#812805",
+                    "surface-variant": "#d9e3f1",
+                    "on-surface-variant": "#43474d",
+                    "on-primary-fixed-variant": "#2f4865",
+                    "on-secondary-container": "#701f00",
+                    "surface-container-low": "#edf4ff",
+                    "surface-container-highest": "#d9e3f1",
+                    "secondary-fixed-dim": "#ffb59d",
+                    "tertiary-container": "#462b00",
+                    "on-secondary-fixed": "#390b00",
+                    "secondary": "#a13f1c",
+                    "secondary-fixed": "#ffdbd0",
+                    "primary-container": "#17324d",
+                    "surface-container": "#e4effd",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#27313c",
+                    "surface": "#f7f9ff",
+                    "outline-variant": "#c3c6ce",
+                    "secondary-container": "#fd835b",
+                    "on-background": "#121c26",
+                    "surface-container-high": "#dfe9f7",
+                    "inverse-primary": "#afc9ea",
+                    "on-primary": "#ffffff",
+                    "background": "#f7f9ff",
+                    "on-tertiary-fixed-variant": "#633f00",
+                    "on-primary-fixed": "#001d36",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#47607e",
+                    "tertiary-fixed-dim": "#ffb955",
+                    "primary-fixed-dim": "#afc9ea",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "48px",
+                    "base": "8px",
+                    "touch-target-min": "48px",
+                    "xs": "4px",
+                    "margin-mobile": "16px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "title-md": ["Noto Sans"],
+                    "label-sm": ["Noto Sans"],
+                    "body-md": ["Noto Sans"],
+                    "display-lg": ["Noto Sans"],
+                    "label-lg": ["Noto Sans"],
+                    "headline-lg": ["Noto Sans"],
+                    "body-lg": ["Noto Sans"],
+                    "headline-lg-mobile": ["Noto Sans"]
+            },
+            "fontSize": {
+                    "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Noto Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Soft, tactile card shadow */
+        .tactile-shadow {
+            box-shadow: 0 2px 8px rgba(0, 29, 54, 0.06);
+        }
+        /* Background subtle texture/watermark concept (CSS only for weight saving) */
+        .bg-craft-motif {
+            background-image: radial-gradient(circle at 100% 0%, rgba(209, 228, 255, 0.3) 0%, transparent 40%),
+                              radial-gradient(circle at 0% 100%, rgba(253, 131, 91, 0.1) 0%, transparent 40%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col bg-craft-motif">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface shadow-sm z-40">
+<div class="flex items-center px-margin-mobile h-touch-target-min w-full max-w-7xl mx-auto">
+<span class="material-symbols-outlined text-primary mr-3 cursor-pointer active:scale-95 transition-transform w-touch-target-min h-touch-target-min flex items-center justify-center" data-icon="arrow_back">arrow_back</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">KarigarSaathi</h1>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-md mx-auto px-margin-mobile py-lg pb-32 flex flex-col gap-lg">
+<!-- Success Banner -->
+<div class="bg-surface-container-high rounded-xl p-md flex items-center gap-sm border-l-4 border-secondary tactile-shadow min-h-[48px] flex-wrap">
+<span class="material-symbols-outlined text-secondary icon-fill text-[24px]">check_circle</span>
+<p class="font-title-md text-title-md text-on-surface">Ready to Share</p>
+</div>
+<!-- Action Cards Container -->
+<div class="flex flex-col gap-md">
+<!-- WhatsApp Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md tactile-shadow flex flex-col gap-md border border-surface-variant">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant">forum</span>
+</div>
+<div class="flex flex-col gap-xs pt-1">
+<h2 class="font-title-md text-title-md text-on-surface">Share on WhatsApp</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Send a direct link to your catalog to buyers instantly.</p>
+</div>
+</div>
+<button class="w-full h-touch-target-min bg-primary-container text-on-primary font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-sm active:scale-95 transition-transform min-h-[48px]">
+<span class="material-symbols-outlined text-[20px]">send</span>
+                    Share on WhatsApp
+                </button>
+</div>
+<!-- Buyer PDF Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md tactile-shadow flex flex-col gap-md border border-surface-variant">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+</div>
+<div class="flex flex-col gap-xs pt-1">
+<h2 class="font-title-md text-title-md text-on-surface">Download Buyer PDF</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Generate a polished PDF document of your portfolio.</p>
+</div>
+</div>
+<button class="w-full h-touch-target-min border-[1.5px] border-primary-container text-primary bg-transparent font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-sm active:scale-95 transition-transform hover:bg-surface-container-low min-h-[48px]">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                    Download Buyer PDF
+                </button>
+</div>
+<!-- Copy Link Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md tactile-shadow flex flex-col gap-md border border-surface-variant">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">link</span>
+</div>
+<div class="flex flex-col gap-xs pt-1">
+<h2 class="font-title-md text-title-md text-on-surface">Copy Passport Link</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Copy the unique web link to share via email or SMS.</p>
+</div>
+</div>
+<button class="w-full h-touch-target-min border-[1.5px] border-primary-container text-primary bg-transparent font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-sm active:scale-95 transition-transform hover:bg-surface-container-low min-h-[48px]">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+                    Copy Passport Link
+                </button>
+</div>
+<!-- Marketplace Export Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md tactile-shadow flex flex-col gap-md border border-surface-variant">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">ios_share</span>
+</div>
+<div class="flex flex-col gap-xs pt-1">
+<h2 class="font-title-md text-title-md text-on-surface">Prepare Marketplace File</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Download a CSV file for marketplaces. Does not publish automatically.</p>
+</div>
+</div>
+<button class="w-full h-touch-target-min border-[1.5px] border-primary-container text-primary bg-transparent font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-sm active:scale-95 transition-transform hover:bg-surface-container-low min-h-[48px]">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                    Prepare Marketplace File
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
+<div class="flex justify-around items-center h-16 w-full px-2 max-w-md mx-auto">
+<!-- Home: Inactive -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full cursor-pointer hover:bg-surface-container-high transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<!-- My Passport: Active -->
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 h-12 cursor-pointer transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined icon-fill mb-1">import_contacts</span>
+<span class="font-label-sm text-label-sm font-semibold">My Passport</span>
+</div>
+<!-- Orders: Inactive -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full cursor-pointer hover:bg-surface-container-high transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">shopping_bag</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</div>
+<!-- Profile: Inactive -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full cursor-pointer hover:bg-surface-container-high transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</div>
+</div>
+</nav>
+
+
+</body></html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Voice Result - Needs Review</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Noto Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f7f9ff",
+                        "secondary-fixed": "#ffdbd0",
+                        "inverse-on-surface": "#e8f2ff",
+                        "tertiary": "#2a1800",
+                        "on-primary-fixed-variant": "#2f4865",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#e4effd",
+                        "outline": "#74777e",
+                        "surface-tint": "#47607e",
+                        "on-secondary-container": "#701f00",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#afc9ea",
+                        "surface": "#f7f9ff",
+                        "on-tertiary-container": "#cc8c28",
+                        "primary-container": "#17324d",
+                        "primary-fixed-dim": "#afc9ea",
+                        "on-tertiary-fixed-variant": "#633f00",
+                        "tertiary-container": "#462b00",
+                        "on-surface-variant": "#43474d",
+                        "surface-container-highest": "#d9e3f1",
+                        "on-background": "#121c26",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d1e4ff",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "surface-variant": "#d9e3f1",
+                        "on-primary-container": "#819aba",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface": "#121c26",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#27313c",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d1dbe9",
+                        "background": "#f7f9ff",
+                        "on-secondary-fixed-variant": "#812805",
+                        "tertiary-fixed-dim": "#ffb955",
+                        "on-primary-fixed": "#001d36",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#fd835b",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#a13f1c",
+                        "on-secondary-fixed": "#390b00",
+                        "on-tertiary-fixed": "#2a1800",
+                        "outline-variant": "#c3c6ce",
+                        "primary": "#001d36",
+                        "surface-container-low": "#edf4ff",
+                        "surface-container-high": "#dfe9f7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "touch-target-min": "48px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "margin-desktop": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Noto Sans"],
+                        "headline-lg": ["Noto Sans"],
+                        "label-lg": ["Noto Sans"],
+                        "display-lg": ["Noto Sans"],
+                        "headline-lg-mobile": ["Noto Sans"],
+                        "title-md": ["Noto Sans"],
+                        "body-lg": ["Noto Sans"],
+                        "body-md": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom Shadows */
+        .shadow-level-1 {
+            box-shadow: 0px 2px 8px rgba(0, 29, 54, 0.06);
+        }
+        .shadow-level-2 {
+            box-shadow: 0px 4px 16px rgba(0, 29, 54, 0.10);
+        }
+        /* Custom Focus */
+        .focus-ring:focus-visible {
+            outline: 2px solid #fd835b; /* Marigold highlight approximation */
+            outline-offset: 2px;
+        }
+        
+        /* Ikat Subtle Pattern Overlay */
+        .bg-ikat-pattern {
+            background-image: 
+                radial-gradient(circle at 10px 10px, rgba(0, 29, 54, 0.03) 2px, transparent 0),
+                radial-gradient(circle at 20px 20px, rgba(0, 29, 54, 0.03) 2px, transparent 0);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md bg-ikat-pattern">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface w-full top-0 sticky z-40 border-b-2 border-primary dark:border-outline flat no shadows">
+<div class="flex justify-between items-center px-margin-mobile h-touch-target-min w-full max-w-[1200px] mx-auto">
+<button aria-label="Back" class="flex items-center justify-center h-touch-target-min w-touch-target-min text-primary dark:text-on-surface hover:bg-surface-container-highest transition-colors rounded-full focus:outline-dashed focus:outline-4 focus:outline-offset-4 focus-ring min-h-[48px]">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-on-surface">ARTISAN PORTAL</h1>
+<button class="flex items-center justify-center px-md h-touch-target-min text-primary dark:text-on-surface font-label-lg text-label-lg hover:bg-surface-container-highest transition-colors rounded-lg focus:outline-dashed focus:outline-4 focus:outline-offset-4 focus-ring min-h-[48px]">
+                HINDI
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1200px] mx-auto px-margin-desktop py-xl">
+<!-- Header Section -->
+<div class="mb-lg max-w-2xl">
+<h2 class="font-display-lg text-display-lg text-primary mb-sm">Let's check those details</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">We understood most of your description, but a few parts were a bit hard to hear clearly. Please review the highlighted fields below to make sure we got them right.</p>
+</div>
+<!-- Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Left Column: Audio & Transcript -->
+<div class="lg:col-span-5 flex flex-col gap-lg">
+<!-- Audio Player Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-surface-container">
+<h3 class="font-title-md text-title-md text-primary mb-md">Listen to Recording</h3>
+<div class="flex items-center gap-md bg-surface-container-low p-sm rounded-lg">
+<button aria-label="Play Recording" class="flex items-center justify-center h-touch-target-min w-touch-target-min rounded-full bg-primary text-on-primary hover:bg-surface-tint transition-colors focus-ring">
+<span class="material-symbols-outlined" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="flex-grow h-2 bg-surface-dim rounded-full overflow-hidden relative">
+<!-- Faux waveform -->
+<div class="absolute inset-0 w-1/3 bg-secondary rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">0:14 / 0:42</span>
+</div>
+</div>
+<!-- Transcript Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-level-1 border border-surface-container flex-grow">
+<h3 class="font-title-md text-title-md text-primary mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline" data-icon="notes">notes</span>
+                        Captured Voice
+                    </h3>
+<div class="p-md bg-surface-bright rounded-lg border border-surface-variant">
+<p class="font-body-md text-body-md text-on-surface italic leading-relaxed">
+                            "I have finished making the blue vase. The height is <span class="bg-error-container text-on-error-container px-1 rounded">12 inches</span>, and the width is about 6 inches. I used <span class="bg-error-container text-on-error-container px-1 rounded">terracotta clay</span> mixed with some... uh... special sand. The price should be around <span class="bg-error-container text-on-error-container px-1 rounded">500 rupees</span> I think, but maybe slightly higher depending on the firing cost."
+                        </p>
+</div>
+</div>
+</div>
+<!-- Right Column: Extracted Fields Review -->
+<div class="lg:col-span-7 flex flex-col gap-lg">
+<div class="bg-surface-container-lowest rounded-xl p-xl shadow-level-2 border border-surface-container relative overflow-hidden">
+<!-- Subtle top accent -->
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+<div class="flex justify-between items-center mb-lg border-b border-surface-variant pb-md">
+<h3 class="font-headline-lg text-headline-lg text-primary">Extracted Details</h3>
+<span class="inline-flex items-center gap-sm px-md py-sm bg-error-container text-on-error-container font-label-sm text-label-sm rounded-full">
+<span class="material-symbols-outlined text-[16px]" data-icon="info">info</span>
+                            3 fields need review
+                        </span>
+</div>
+<div class="flex flex-col gap-md">
+<!-- Confirmed Field: Item Name -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-sm sm:gap-lg p-md rounded-lg bg-surface-bright border border-surface-variant">
+<div class="sm:w-1/3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-surface-tint" data-icon="check_circle">check_circle</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Item Name</span>
+</div>
+<div class="sm:w-2/3">
+<span class="font-title-md text-title-md text-on-background">Blue Vase</span>
+</div>
+</div>
+<!-- Uncertain Field: Dimensions -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-sm sm:gap-lg p-md rounded-lg bg-[#fff8f6] border-2 border-secondary-container relative">
+
+<div class="sm:w-1/3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Dimensions</span>
+</div>
+<div class="sm:w-2/3 flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-background">12" H x 6" W</span>
+<button class="text-secondary font-label-lg text-label-lg hover:underline focus-ring p-1 rounded min-h-[48px] min-w-[48px]">Edit</button>
+</div>
+</div>
+<!-- Uncertain Field: Material -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-sm sm:gap-lg p-md rounded-lg bg-[#fff8f6] border-2 border-secondary-container relative">
+
+<div class="sm:w-1/3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Material</span>
+</div>
+<div class="sm:w-2/3 flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-background">Terracotta Clay</span>
+<button class="text-secondary font-label-lg text-label-lg hover:underline focus-ring p-1 rounded min-h-[48px] min-w-[48px]">Edit</button>
+</div>
+</div>
+<!-- Uncertain Field: Price -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-sm sm:gap-lg p-md rounded-lg bg-[#fff8f6] border-2 border-secondary-container relative">
+
+<div class="sm:w-1/3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Expected Price</span>
+</div>
+<div class="sm:w-2/3 flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-background">₹500.00</span>
+<button class="text-secondary font-label-lg text-label-lg hover:underline focus-ring p-1 rounded min-h-[48px] min-w-[48px]">Edit</button>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="mt-xl pt-lg border-t border-surface-variant flex flex-col sm:flex-row justify-end items-center gap-md">
+<button class="w-full sm:w-auto h-touch-target-min px-lg bg-surface-container-lowest border-2 border-primary text-primary font-label-lg text-label-lg font-bold rounded-lg shadow-level-1 hover:bg-surface-container-low transition-colors focus-ring flex items-center justify-center gap-sm min-h-[48px]">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+                            Re-record
+                        </button>
+<button class="w-full sm:w-auto h-touch-target-min px-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg rounded-lg hover:bg-surface-container-low transition-colors focus-ring underline flex items-center justify-center min-h-[48px]">
+                            Edit Manually
+                        </button>
+<button class="w-full sm:w-auto h-touch-target-min px-xl bg-primary-container text-on-primary font-label-lg text-label-lg font-bold rounded-lg shadow-level-2 hover:bg-primary transition-colors focus-ring flex items-center justify-center gap-sm ml-auto min-h-[48px]">
+                            Check and Correct
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+
+</body></html>

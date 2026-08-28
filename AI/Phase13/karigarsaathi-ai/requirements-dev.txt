@@ -1,0 +1,17 @@
+# Development dependencies for KarigarSaathi AI Image Studio
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=2024.2.0
+httpx>=0.27.0
+
+# Code formatting
+black>=23.0.0
+ruff>=0.0.0
+
+# Debugging
+ipdb>=0.13.0
+
+# Additional dev tools
+coverage>=7.0.0
+pytest-mock>=3.10.0
