@@ -277,8 +277,8 @@ export const ReviewFactsPage: React.FC = () => {
 
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {draft.photos.map((p, idx) => (
-                  <div key={p.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-surface-variant shrink-0">
-                    <img src={p.url} alt={p.name} className="w-full h-full object-cover" />
+                  <div key={p.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-surface-variant shrink-0 bg-slate-900 flex items-center justify-center p-0.5">
+                    <img src={p.url} alt={p.name} className="max-w-full max-h-full w-auto h-auto object-contain object-center" />
                     {idx === draft.coverPhotoIndex && (
                       <span className="absolute bottom-0 inset-x-0 bg-secondary text-white text-[8px] font-bold text-center py-0.5">
                         Cover

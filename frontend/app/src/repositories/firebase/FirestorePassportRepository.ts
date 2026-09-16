@@ -27,6 +27,7 @@ import {
 } from '@/types';
 import { logger } from '@/services/logging/logger';
 import { removeUndefinedDeep } from '@/utils/firestore';
+import { DEMO_PUBLIC_PASSPORTS as DEMO_PASSPORTS } from '@/services/demo/demoDataService';
 
 export class FirestorePassportRepository implements IPassportRepository {
   // Private Passport operations
@@ -141,12 +142,18 @@ export class FirestorePassportRepository implements IPassportRepository {
     try {
       const docRef = doc(db, 'publicCraftPassports', slug);
       const snapshot = await getDoc(docRef);
-      if (!snapshot.exists()) return null;
+      if (!snapshot.exists()) {
+        const demo = DEMO_PASSPORTS.find((p) => p.slug === slug || p.passportId === slug);
+        if (demo) return demo;
+        return null;
+      }
       return snapshot.data() as PublicCraftPassport;
     } catch (err) {
       logger.error('INVENTORY', 'Failed to fetch public Craft Passport by slug', {
         error: err instanceof Error ? err.message : String(err),
       });
+      const demo = DEMO_PASSPORTS.find((p) => p.slug === slug || p.passportId === slug);
+      if (demo) return demo;
       return null;
     }
   }

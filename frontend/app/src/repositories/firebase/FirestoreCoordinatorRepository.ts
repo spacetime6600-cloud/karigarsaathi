@@ -14,6 +14,7 @@ import { ICoordinatorRepository } from '@/repositories/interfaces/ICoordinatorRe
 import { CoordinatorAssignment, CoordinatorArtisanProjection } from '@/types';
 import { logger } from '@/services/logging/logger';
 import { removeUndefinedDeep } from '@/utils/firestore';
+import { DEMO_COORDINATOR_ASSIGNMENTS } from '@/services/demo/demoDataService';
 
 export class FirestoreCoordinatorRepository implements ICoordinatorRepository {
   async getAssignment(coordinatorUid: string, artisanUid: string): Promise<CoordinatorAssignment | null> {
@@ -70,83 +71,18 @@ export class FirestoreCoordinatorRepository implements ICoordinatorRepository {
       });
 
       if (list.length === 0) {
-        return [
-          {
-            id: `coord_${coordinatorUid}_artisan_001`,
-            coordinatorUid,
-            artisanUid: 'artisan_001',
-            artisanName: 'Ravi Kumar',
-            clusterName: 'Kamrup Silk & Jamdani Cluster',
-            active: true,
-            approvedAt: '2026-08-20T10:00:00Z',
-            approvedBy: 'admin_root',
-            permissions: {
-              viewStatus: true,
-              viewEnquirySummary: true,
-              assistExports: true,
-            },
-            createdAt: '2026-08-20T10:00:00Z',
-            updatedAt: '2026-08-20T10:00:00Z',
-          },
-          {
-            id: `coord_${coordinatorUid}_artisan_002`,
-            coordinatorUid,
-            artisanUid: 'artisan_002',
-            artisanName: 'Meera Devi',
-            clusterName: 'Madhubani Painting Cluster',
-            active: true,
-            approvedAt: '2026-08-21T10:00:00Z',
-            approvedBy: 'admin_root',
-            permissions: {
-              viewStatus: true,
-              viewEnquirySummary: true,
-              assistExports: true,
-            },
-            createdAt: '2026-08-21T10:00:00Z',
-            updatedAt: '2026-08-21T10:00:00Z',
-          },
-          {
-            id: `coord_${coordinatorUid}_artisan_003`,
-            coordinatorUid,
-            artisanUid: 'artisan_003',
-            artisanName: 'Basant Sahoo',
-            clusterName: 'Raghurajpur Pattachitra Cluster',
-            active: true,
-            approvedAt: '2026-08-22T10:00:00Z',
-            approvedBy: 'admin_root',
-            permissions: {
-              viewStatus: true,
-              viewEnquirySummary: true,
-              assistExports: true,
-            },
-            createdAt: '2026-08-22T10:00:00Z',
-            updatedAt: '2026-08-22T10:00:00Z',
-          },
-        ];
+        const matches = DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === coordinatorUid);
+        if (matches.length > 0) return matches;
+        // Default to Priya's demo assignments if generic coordinator
+        return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
       }
 
       return list;
     } catch (err) {
       logger.error('COORDINATOR', 'Failed to list coordinator assignments', err, { coordinatorUid });
-      return [
-        {
-          id: `coord_${coordinatorUid}_artisan_001`,
-          coordinatorUid,
-          artisanUid: 'artisan_001',
-          artisanName: 'Ravi Kumar',
-          clusterName: 'Kamrup Silk & Jamdani Cluster',
-          active: true,
-          approvedAt: '2026-08-20T10:00:00Z',
-          approvedBy: 'admin_root',
-          permissions: {
-            viewStatus: true,
-            viewEnquirySummary: true,
-            assistExports: true,
-          },
-          createdAt: '2026-08-20T10:00:00Z',
-          updatedAt: '2026-08-20T10:00:00Z',
-        },
-      ];
+      const matches = DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === coordinatorUid);
+      if (matches.length > 0) return matches;
+      return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
     }
   }
 

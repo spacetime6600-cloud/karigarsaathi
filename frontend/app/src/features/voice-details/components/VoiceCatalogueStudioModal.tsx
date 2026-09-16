@@ -581,7 +581,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
       title="AI Voice & Multilingual Catalogue Studio"
       maxWidth="5xl"
     >
-      <div className="flex flex-col gap-5 max-h-[82vh] overflow-y-auto pr-1">
+      <div className="flex flex-col gap-5">
         {/* Top AI Engine Status Banner */}
         <div className="p-3.5 bg-surface-container-low rounded-2xl border border-surface-variant/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-on-surface-variant">
           <div className="flex items-center gap-3">
@@ -600,30 +600,59 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                 {diagnostics.isSecureContext ? 'Secure Context' : 'Insecure Origin'}
               </span>
             )}
-            {serviceHealth?.status === 'ok' ? (
+            {serviceHealth?.status === 'ok' || serviceHealth?.status === 'ready' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-[11px] font-bold">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                 Engine Online
               </span>
+            ) : serviceHealth?.status === 'starting' ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 text-[11px] font-bold">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                Engine Starting
+              </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high border border-surface-variant text-on-surface-variant text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 text-[11px] font-semibold">
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
-                Local Mode
+                Voice Service Unavailable
               </span>
             )}
           </div>
         </div>
 
-        {/* Global Error Banner */}
+        {/* Global Error Banner with Actionable Recovery */}
         {errorMessage && (
           <div
             role="alert"
-            className="p-4 bg-error-container text-on-error-container rounded-2xl border border-error/30 flex items-start gap-3 text-sm animate-in fade-in"
+            className="p-4 bg-error-container text-on-error-container rounded-2xl border border-error/30 flex items-start justify-between gap-3 text-sm animate-in fade-in"
           >
-            <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="font-bold">Error Notice</p>
-              <p>{errorMessage}</p>
+            <div className="flex items-start gap-3 flex-1">
+              <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
+              <div className="flex-1 flex flex-col gap-1.5">
+                <p className="font-bold text-xs">Error Notice</p>
+                <p className="text-xs leading-relaxed">{errorMessage}</p>
+                {audioBlob && (
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleSubmitAudioForTranscription}
+                      leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+                      className="text-xs"
+                    >
+                      Retry Transcription
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setInputMode('typed')}
+                      leftIcon={<FileText className="w-3.5 h-3.5" />}
+                      className="text-xs"
+                    >
+                      Type Description Instead
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             <button
               onClick={() => setErrorMessage(null)}
@@ -1446,7 +1475,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
             </div>
 
             {/* Bottom Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-surface-variant/60">
+            <div className="sticky -bottom-4 sm:-bottom-5 -mx-5 sm:-mx-6 px-5 sm:px-6 py-3.5 bg-surface-container-lowest/95 backdrop-blur-xs border-t border-surface-variant/60 mt-2 z-10 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
               <Button
                 variant="tertiary"
                 size="sm"

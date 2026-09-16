@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { coordinatorService } from '@/services/coordinator/coordinatorService';
 import { validateProductForReadiness } from '@/domain/products/validation';
@@ -17,12 +17,15 @@ import {
   AlertTriangle,
   Image,
   X,
+  ExternalLink,
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ROUTES } from '@/routes';
 
 export const CoordinatorReviewsPage: React.FC = () => {
   const { user, userAccount } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -381,6 +384,25 @@ export const CoordinatorReviewsPage: React.FC = () => {
                 </div>
               );
             })()}
+
+            {/* Live Passport Link if available */}
+            {(inspectingProduct.passportSlug || inspectingProduct.passportId) && (
+              <div className="p-3 bg-secondary/10 border border-secondary/20 rounded-xl flex items-center justify-between text-xs">
+                <span className="font-bold text-primary">Digitized Craft Passport Active</span>
+                <Link
+                  to={ROUTES.publicPassport(inspectingProduct.passportSlug || inspectingProduct.passportId)}
+                  state={{
+                    from: `/coordinator/reviews${location.search}`,
+                    fromLabel: 'Reviews Queue',
+                    sourceRole: 'coordinator',
+                  }}
+                  className="font-bold text-secondary hover:underline flex items-center gap-1"
+                >
+                  <span>View Craft Passport</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
 
             {/* Coordinator Review Notes */}
             <div className="flex flex-col gap-1.5">

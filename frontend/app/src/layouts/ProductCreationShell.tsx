@@ -50,6 +50,13 @@ export const ProductCreationShell: React.FC = () => {
   const currentStep = getStepNumber(location.pathname);
   const currentStepDef = STEP_DEFINITIONS.find((s) => s.step === currentStep) || STEP_DEFINITIONS[0];
 
+  const prevStepRef = React.useRef(currentStep);
+  const direction = currentStep >= prevStepRef.current ? 'forward' : 'backward';
+
+  React.useEffect(() => {
+    prevStepRef.current = currentStep;
+  }, [currentStep]);
+
   const handleSaveDraft = async () => {
     setLocalErrorMessage(null);
     clearSaveError();
@@ -91,14 +98,14 @@ export const ProductCreationShell: React.FC = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex flex-col">
+          <div className="flex flex-col justify-center">
             <Link
               to="/artisan/dashboard"
-              className="font-display text-lg sm:text-xl font-bold text-primary hover:text-secondary transition-colors"
+              className="font-display text-lg sm:text-xl font-bold text-primary hover:text-secondary transition-colors min-h-0 leading-none"
             >
               KarigarSaathi
             </Link>
-            <span className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">
+            <span className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider mt-1 leading-none whitespace-nowrap">
               Add New Product Listing
             </span>
           </div>
@@ -234,8 +241,16 @@ export const ProductCreationShell: React.FC = () => {
       </section>
 
       {/* Main Content Area (Max width 1140px) */}
-      <main id="main-content" tabIndex={-1} className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1140px] w-full mx-auto pb-16 focus:outline-none">
-        <Outlet />
+      <main id="main-content" tabIndex={-1} className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1140px] w-full mx-auto pb-16 focus:outline-none overflow-x-clip">
+        <div
+          key={currentStep}
+          className={clsx(
+            direction === 'forward' ? 'step-forward-enter' : 'step-backward-enter',
+            'w-full'
+          )}
+        >
+          <Outlet />
+        </div>
       </main>
     </PageAtmosphere>
   );

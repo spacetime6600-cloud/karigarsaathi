@@ -133,37 +133,59 @@ export const AddPhotographsPage: React.FC = () => {
         img.onerror = () => reject(new Error('Failed to load image for cropping.'));
       });
 
-      let targetWidth = img.naturalWidth;
-      let targetHeight = img.naturalHeight;
+      const nw = img.naturalWidth;
+      const nh = img.naturalHeight;
+
+      let cropWidth = nw / cropZoom;
+      let cropHeight = nh / cropZoom;
 
       if (selectedAspectRatio === '1:1') {
-        const minDim = Math.min(targetWidth, targetHeight);
-        targetWidth = minDim;
-        targetHeight = minDim;
+        const minDim = Math.min(nw, nh) / cropZoom;
+        cropWidth = minDim;
+        cropHeight = minDim;
       } else if (selectedAspectRatio === '4:3') {
-        targetHeight = Math.round(targetWidth * (3 / 4));
+        cropWidth = Math.min(nw, (nh * 4) / 3) / cropZoom;
+        cropHeight = (cropWidth * 3) / 4;
       } else if (selectedAspectRatio === '3:4') {
-        targetWidth = Math.round(targetHeight * (3 / 4));
+        cropHeight = Math.min(nh, (nw * 4) / 3) / cropZoom;
+        cropWidth = (cropHeight * 3) / 4;
+      } else if (selectedAspectRatio === 'original') {
+        cropWidth = nw / cropZoom;
+        cropHeight = nh / cropZoom;
       }
 
+      // Centre the crop box on the natural image
+      const cropX = Math.max(0, (nw - cropWidth) / 2);
+      const cropY = Math.max(0, (nh - cropHeight) / 2);
+
+      const outWidth = Math.min(1600, Math.round(cropWidth));
+      const outHeight = Math.max(1, Math.round(outWidth * (cropHeight / cropWidth)));
+
       const canvas = document.createElement('canvas');
-      canvas.width = Math.min(1600, targetWidth);
-      canvas.height = Math.round(canvas.width * (targetHeight / targetWidth));
+      canvas.width = outWidth;
+      canvas.height = outHeight;
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight, 0, 0, canvas.width, canvas.height);
-        const croppedDataUrl = canvas.toDataURL('image/webp', 0.85);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
+        const croppedDataUrl = canvas.toDataURL('image/webp', 0.90);
 
-        // Update photo URL in state
+        // Update photo URL in state while preserving uncropped rawOriginalUrl
         const updatedPhotos = [...draft.photos];
         updatedPhotos[croppingPhotoIndex] = {
           ...targetPhoto,
           url: croppedDataUrl,
+          rawOriginalUrl: targetPhoto.rawOriginalUrl || targetPhoto.url,
         };
 
         updateDraft({ photos: updatedPhotos });
-        logger.info('STORAGE', 'Applied crop to photo', { index: croppingPhotoIndex, ratio: selectedAspectRatio });
+        logger.info('STORAGE', 'Applied crop to photo', {
+          index: croppingPhotoIndex,
+          ratio: selectedAspectRatio,
+          zoom: cropZoom,
+        });
       }
 
       setCroppingPhotoIndex(null);
@@ -252,14 +274,16 @@ export const AddPhotographsPage: React.FC = () => {
             {/* Primary Large Image Preview */}
             {draft.photos.length > 0 ? (
               <div className="flex flex-col gap-3">
-                <div className="relative w-full h-64 sm:h-80 rounded-xl overflow-hidden bg-surface-container border border-surface-variant">
+                <div className="relative w-full min-h-[300px] sm:min-h-[380px] max-h-[460px] h-[55vw] sm:h-[420px] rounded-2xl overflow-hidden bg-radial from-slate-900 via-slate-900 to-slate-950 border border-surface-variant/80 flex items-center justify-center p-3 sm:p-4 shadow-inner">
                   <img
+                    key={activeCoverPhoto.url}
                     src={activeCoverPhoto.url}
                     alt={activeCoverPhoto.name || 'Product photo preview'}
-                    className="w-full h-full object-cover"
+                    className="max-w-full max-h-full w-auto h-auto object-contain object-center rounded-lg shadow-sm motion-fade-enter select-none"
                   />
-                  {/* Cover Photo Badges & Actions */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
+
+                  {/* Cover Photo Badges */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap z-10">
                     <div className="bg-white/95 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-surface-variant/70 shadow-xs flex items-center gap-1">
                       <Star className="w-3 h-3 text-secondary fill-secondary" />
                       <span>Cover Photo (Passport Primary)</span>
@@ -273,8 +297,39 @@ export const AddPhotographsPage: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Quick Variant Switcher (when enhanced asset is available) */}
+                  {activeCoverPhoto?.enhancedUrl && activeCoverPhoto?.approvalStatus === 'approved' && (
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-0.5 rounded-lg border border-white/20 flex items-center gap-1 shadow-xs z-10">
+                      <button
+                        type="button"
+                        onClick={() => updateImageEnhancement(activeCoverPhoto.id, { selectedVariant: 'original' })}
+                        className={clsx(
+                          'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1',
+                          activeCoverPhoto.selectedVariant !== 'enhanced'
+                            ? 'bg-white text-primary shadow-xs'
+                            : 'text-white/80 hover:text-white hover:bg-white/10'
+                        )}
+                      >
+                        Original
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateImageEnhancement(activeCoverPhoto.id, { selectedVariant: 'enhanced', approvalStatus: 'approved' })}
+                        className={clsx(
+                          'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1',
+                          activeCoverPhoto.selectedVariant === 'enhanced'
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'text-white/80 hover:text-white hover:bg-white/10'
+                        )}
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        Enhanced
+                      </button>
+                    </div>
+                  )}
+
                   {/* Actions: AI Enhance and Crop & Adjust */}
-                  <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                  <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10">
                     <button
                       type="button"
                       onClick={() => setAiEnhancingPhotoIndex(draft.coverPhotoIndex || 0)}
@@ -306,14 +361,14 @@ export const AddPhotographsPage: React.FC = () => {
                         key={photo.id}
                         onClick={() => setCoverPhoto(index)}
                         className={clsx(
-                          'relative w-20 h-20 rounded-lg overflow-hidden border-2 cursor-pointer transition-all shrink-0 group',
+                          'relative w-20 h-20 rounded-xl overflow-hidden border-2 cursor-pointer transition-all shrink-0 group bg-slate-900 flex items-center justify-center p-1',
                           isCover ? 'border-secondary ring-2 ring-secondary/30' : 'border-surface-variant hover:border-primary'
                         )}
                       >
                         <img
                           src={photo.url}
                           alt={photo.name}
-                          className="w-full h-full object-cover"
+                          className="max-w-full max-h-full w-auto h-auto object-contain object-center select-none"
                         />
                         {isCover && (
                           <div className="absolute top-1 left-1 bg-secondary text-white rounded-full p-0.5 shadow-xs">

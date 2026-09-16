@@ -6,7 +6,6 @@
  */
 
 import { auth } from '@/config/firebase';
-import { logger } from '@/services/logging/logger';
 import {
   VoiceSupportedLanguage,
   VoiceTranscriptionResult,
@@ -98,6 +97,25 @@ class VoiceCatalogueService {
   }
 
   /**
+   * Safe fetch wrapper that handles network disconnects and connection refused cleanly.
+   */
+  private async safeFetch(url: string, init?: RequestInit): Promise<Response> {
+    try {
+      return await fetch(url, init);
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw err;
+      }
+      throw new VoiceCatalogueError({
+        errorCode: 'SERVICE_UNAVAILABLE',
+        message: 'Voice service unavailable. Please check that the local AI Voice microservice is running on port 8001.',
+        retryable: true,
+        details: { url, error: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  /**
    * Obtains an authorization token for the microservice.
    */
   private async getAuthToken(): Promise<string> {
@@ -141,8 +159,6 @@ class VoiceCatalogueService {
       return await res.json();
     } catch (err) {
       clearTimeout(timer);
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.warn('SYSTEM', `Voice service health check unreachable at ${healthUrl}`, { error: msg });
       return {
         status: 'unreachable',
         service: 'KarigarSaathi Voice Studio',
@@ -162,7 +178,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -203,7 +219,7 @@ class VoiceCatalogueService {
     const formData = new FormData();
     formData.append('audio_file', audioBlob, filename);
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/audio`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/audio`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -243,7 +259,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/process`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/process`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -282,7 +298,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/transcript`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/transcript`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -316,7 +332,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/generate`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/generate`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -359,7 +375,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/approve`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/approve`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -390,7 +406,7 @@ class VoiceCatalogueService {
     const baseUrl = this.getServiceBaseUrl();
     const token = await this.getAuthToken();
 
-    const response = await fetch(`${baseUrl}/catalogue-sessions/${sessionId}/source-data`, {
+    const response = await this.safeFetch(`${baseUrl}/catalogue-sessions/${sessionId}/source-data`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -426,7 +442,7 @@ class VoiceCatalogueService {
       formData.append('language_hint', languageHint);
     }
 
-    const response = await fetch(`${baseUrl}/transcribe`, {
+    const response = await this.safeFetch(`${baseUrl}/transcribe`, {
       method: 'POST',
       body: formData,
       signal,
@@ -456,7 +472,7 @@ class VoiceCatalogueService {
     const { text, sourceLanguage = 'en', targetLanguage = 'hi', existingFields, signal } = params;
     const baseUrl = this.getServiceBaseUrl();
 
-    const response = await fetch(`${baseUrl}/generate`, {
+    const response = await this.safeFetch(`${baseUrl}/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -505,7 +521,7 @@ class VoiceCatalogueService {
     const { correctedTranscript, sourceLanguage, signal } = params;
     const baseUrl = this.getServiceBaseUrl();
 
-    const response = await fetch(`${baseUrl}/pipeline/translate-only`, {
+    const response = await this.safeFetch(`${baseUrl}/pipeline/translate-only`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -542,7 +558,7 @@ class VoiceCatalogueService {
     const { text, sourceLanguage = 'hi', targetLanguage = 'en', signal } = params;
     const baseUrl = this.getServiceBaseUrl();
 
-    const response = await fetch(`${baseUrl}/translate`, {
+    const response = await this.safeFetch(`${baseUrl}/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

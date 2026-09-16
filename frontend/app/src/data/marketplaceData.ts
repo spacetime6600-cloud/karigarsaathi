@@ -39,7 +39,7 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     price: 14243,
     availability: 'in_stock',
     hasCraftPassport: true,
-    passportId: 'passport_assam_jamdani_01',
+    passportId: 'assam-muga-silk-saree-kamrup-7701',
     photos: [
       craftStoryLoomJpg,
       '/craft-thumbnails/as-craft.svg',

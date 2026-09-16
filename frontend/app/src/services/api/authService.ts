@@ -1,42 +1,31 @@
 import { ArtisanProfile } from '@/types';
 import { storage } from '../storage/localStorage';
 
-const DEFAULT_ARTISAN: ArtisanProfile = {
-  id: 'artisan_001',
-  name: 'Ravi Kumar',
-  phone: '9876543210',
-  role: 'artisan',
-  craftType: 'Handloom Silk Weaving & Jamdani',
-  location: 'Assam & Pochampally, India',
-  avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-  workshopName: 'Ravi Handlooms & Heritage Crafts',
-  bio: 'Master weaver with 24 years of experience preserving traditional mulberry silk and natural terracotta-dyed Jamdani motifs.',
-  joinedYear: 2021,
-};
+import { DEMO_ARTISANS, DEMO_COORDINATORS } from '@/services/demo/demoDataService';
 
-const DEFAULT_COORDINATOR: ArtisanProfile = {
-  id: 'coord_001',
-  name: 'Priya Sharma',
-  phone: '9123456780',
-  role: 'coordinator',
-  craftType: 'Regional Craft Documentation & Export Coordinator',
-  location: 'Guwahati Cluster, Assam',
-  avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-  workshopName: 'Assam State Craft Linkage Mission',
-  bio: 'Field coordinator facilitating digitization, fair pricing certification, and export logistics for over 45 handloom clusters.',
-  joinedYear: 2020,
-};
+const DEFAULT_ARTISAN: ArtisanProfile = DEMO_ARTISANS[0];
+const DEFAULT_COORDINATOR: ArtisanProfile = DEMO_COORDINATORS[0];
 
 export const authService = {
   getCurrentUser(): ArtisanProfile | null {
-    const raw = storage.get<ArtisanProfile | null | undefined>('currentUser', DEFAULT_ARTISAN);
+    const raw = storage.get<ArtisanProfile | null>('currentUser', null);
     return raw ?? null;
   },
 
   signIn(phone: string, _otp: string, asRole: 'artisan' | 'coordinator' = 'artisan'): Promise<ArtisanProfile> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const user = asRole === 'coordinator' ? { ...DEFAULT_COORDINATOR, phone } : { ...DEFAULT_ARTISAN, phone };
+        // Check if phone matches any known demo artisan or coordinator
+        const matchedArtisan = DEMO_ARTISANS.find((a) => a.phone === phone);
+        const matchedCoord = DEMO_COORDINATORS.find((c) => c.phone === phone);
+
+        let user: ArtisanProfile;
+        if (asRole === 'coordinator') {
+          user = matchedCoord || { ...DEFAULT_COORDINATOR, phone };
+        } else {
+          user = matchedArtisan || { ...DEFAULT_ARTISAN, phone };
+        }
+
         storage.set('currentUser', user);
         resolve(user);
       }, 300);
@@ -45,13 +34,24 @@ export const authService = {
 
   signOut(): Promise<void> {
     return new Promise((resolve) => {
+      storage.remove('currentUser');
       storage.set('currentUser', null);
       resolve();
     });
   },
 
-  switchRole(role: 'artisan' | 'coordinator'): ArtisanProfile {
-    const user = role === 'coordinator' ? DEFAULT_COORDINATOR : DEFAULT_ARTISAN;
+  switchRole(role: 'artisan' | 'coordinator', currentUid?: string): ArtisanProfile | null {
+    const current = this.getCurrentUser();
+    if (!current && !currentUid) return null;
+
+    let user: ArtisanProfile;
+    if (role === 'coordinator') {
+      const match = DEMO_COORDINATORS.find((c) => c.id === currentUid || c.phone === current?.phone);
+      user = match || DEFAULT_COORDINATOR;
+    } else {
+      const match = DEMO_ARTISANS.find((a) => a.id === currentUid || a.phone === current?.phone);
+      user = match || DEFAULT_ARTISAN;
+    }
     storage.set('currentUser', user);
     return user;
   },

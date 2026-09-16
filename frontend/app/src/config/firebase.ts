@@ -73,10 +73,10 @@ function initializeFirebase() {
 
   storage = getStorage(firebaseApp);
 
-  const useEmulators =
-    import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true' ||
-    fallbackConfig.projectId.startsWith('demo-') ||
-    import.meta.env.DEV;
+  const explicitlyDisabled = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'false';
+  const explicitlyEnabled = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true';
+  const isDemoProject = fallbackConfig.projectId.startsWith('demo-');
+  const useEmulators = !explicitlyDisabled && (explicitlyEnabled || (Boolean(import.meta.env.DEV) && isDemoProject));
 
   if (useEmulators && !globalThis.__FIREBASE_EMULATORS_CONNECTED__) {
     const authHost = '127.0.0.1:9099';

@@ -4,9 +4,11 @@ import { Volume2, VolumeX, LogOut, Shield, Globe, MessageSquare, Menu, X, Home, 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
-import { enquiryService } from '@/services/api/enquiryService';
+import { enquiryRepository } from '@/repositories';
+import { BuyerEnquiry } from '@/types';
 import { SyncStatusIndicator } from '@/components/navigation/SyncStatusIndicator';
 import { BuyerEnquiryPopover } from '@/components/navigation/BuyerEnquiryPopover';
+import { ROUTES } from '@/routes';
 import { clsx } from 'clsx';
 
 interface AccountDropdownMenuProps {
@@ -17,7 +19,7 @@ interface AccountDropdownMenuProps {
   currentLanguageMeta: { name: string; [key: string]: any };
   switchRole: (role: 'artisan' | 'coordinator') => void;
   signOut: () => Promise<void> | void;
-  navigate: (path: string) => void;
+  navigate: (path: string, options?: { replace?: boolean }) => void;
 }
 
 const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
@@ -106,20 +108,24 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
 
   const handleCoordinatorClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    switchRole('coordinator');
     onClose();
-    navigate('/coordinator');
+    if (user?.role === 'coordinator') {
+      switchRole('coordinator');
+      navigate(ROUTES.COORDINATOR_DASHBOARD);
+    } else {
+      navigate(ROUTES.COORDINATOR_LOGIN);
+    }
   };
 
   const handleSignOutClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    onClose();
     try {
       await signOut();
+      navigate(ROUTES.SIGN_IN, { replace: true });
     } catch {
-      // ignore
+      // error captured in AuthProvider
     }
-    onClose();
-    navigate('/');
   };
 
   if (!isOpen) return null;
@@ -131,7 +137,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
       aria-label="Artisan Account Menu"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
-      className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none motion-reduce:transition-none flex flex-col gap-3"
+      className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3"
     >
       {/* User Profile Summary */}
       <div className="flex items-center gap-3 pb-3 border-b border-surface-variant/80">
@@ -191,7 +197,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
 };
 
 export const ArtisanTopNavigation: React.FC = () => {
-  const { user, signOut, switchRole } = useAuth();
+  const { user, userAccount, signOut, switchRole } = useAuth();
   const { isPlaying, toggleHelp } = useAudioHelp();
   const { currentLanguageMeta } = useLanguage();
   const navigate = useNavigate();
@@ -200,6 +206,7 @@ export const ArtisanTopNavigation: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isEnquiriesOpen, setIsEnquiriesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [enquiries, setEnquiries] = useState<BuyerEnquiry[]>([]);
 
   const desktopProfileButtonRef = useRef<HTMLButtonElement>(null);
   const mobileProfileButtonRef = useRef<HTMLButtonElement>(null);
@@ -208,8 +215,32 @@ export const ArtisanTopNavigation: React.FC = () => {
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Get unread enquiries count
-  const enquiries = enquiryService.listEnquiries();
+  const currentArtisanId = userAccount?.uid || user?.id || 'demo_artisan_ravi';
+
+  // Subscribe to authoritative enquiries for signed-in artisan
+  useEffect(() => {
+    if (!currentArtisanId) {
+      setEnquiries([]);
+      return;
+    }
+
+    if (enquiryRepository.subscribeArtisanEnquiries) {
+      const unsub = enquiryRepository.subscribeArtisanEnquiries(currentArtisanId, (list) => {
+        setEnquiries(list || []);
+      });
+      return unsub;
+    } else {
+      enquiryRepository
+        .listArtisanEnquiries(currentArtisanId)
+        .then((list) => {
+          setEnquiries(list || []);
+        })
+        .catch(() => {
+          setEnquiries([]);
+        });
+    }
+  }, [currentArtisanId]);
+
   const unreadEnquiriesCount = enquiries.filter((e) => e.status === 'new').length;
 
   // Close menus on route change
@@ -383,6 +414,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                 isOpen={isEnquiriesOpen}
                 onClose={() => setIsEnquiriesOpen(false)}
                 triggerRef={enquiryButtonRef}
+                enquiries={enquiries}
               />
             </div>
 
@@ -474,6 +506,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                 isOpen={isEnquiriesOpen}
                 onClose={() => setIsEnquiriesOpen(false)}
                 triggerRef={mobileEnquiryButtonRef}
+                enquiries={enquiries}
               />
             </div>
 
@@ -594,10 +627,14 @@ export const ArtisanTopNavigation: React.FC = () => {
             {/* Sign Out */}
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 setIsMobileMenuOpen(false);
-                signOut();
-                navigate('/');
+                try {
+                  await signOut();
+                  navigate(ROUTES.SIGN_IN, { replace: true });
+                } catch {
+                  // error captured in AuthProvider
+                }
               }}
               className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-error-container/60 text-error font-bold text-xs touch-target active:scale-[0.98]"
             >

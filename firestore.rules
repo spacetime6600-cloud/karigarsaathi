@@ -295,6 +295,7 @@ service cloud.firestore {
         && (resource == null || resource.data.artisanId == request.auth.uid);
 
       allow list: if isAuthenticated()
+        && (resource == null || resource.data.artisanId == request.auth.uid)
         && (request.query.limit == null || request.query.limit <= 100);
 
       // Authenticated artisan can update only status and workflow fields (cannot forge IDs, timestamps, or recipient)

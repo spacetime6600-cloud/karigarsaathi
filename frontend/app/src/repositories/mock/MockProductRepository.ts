@@ -1,10 +1,18 @@
 import { IProductRepository } from '@/repositories/interfaces/IProductRepository';
 import { ProductRecord, CreateProductInput, UpdateProductInput } from '@/domain/products';
 import { storage } from '@/services/storage/localStorage';
+import { DEMO_PRODUCTS } from '@/services/demo/demoDataService';
 
 export class MockProductRepository implements IProductRepository {
   private getAll(ownerId: string): ProductRecord[] {
-    return storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+    const list = storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+    if (list.length > 0) return list;
+    const demoMatches = DEMO_PRODUCTS.filter((p) => p.ownerId === ownerId);
+    if (demoMatches.length > 0) return demoMatches;
+    if (ownerId === 'artisan_default' || ownerId === 'artisan_001') {
+      return DEMO_PRODUCTS.filter((p) => p.ownerId === 'demo_artisan_ravi');
+    }
+    return [];
   }
 
   private saveAll(ownerId: string, list: ProductRecord[]): void {

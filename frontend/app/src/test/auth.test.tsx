@@ -7,11 +7,9 @@ describe('Auth Service & Role Permissions', () => {
     storage.clearAll();
   });
 
-  it('provides default artisan session for offline resilience', () => {
+  it('returns null when user is unauthenticated', () => {
     const user = authService.getCurrentUser();
-    expect(user).not.toBeNull();
-    expect(user?.role).toBe('artisan');
-    expect(user?.name).toBe('Ravi Kumar');
+    expect(user).toBeNull();
   });
 
   it('authenticates user and persists profile in local storage', async () => {
@@ -20,9 +18,18 @@ describe('Auth Service & Role Permissions', () => {
     expect(authService.getCurrentUser()?.phone).toBe('9876543210');
   });
 
-  it('switches to coordinator profile with distinct role attributes', () => {
+  it('switches to coordinator profile when user is signed in', async () => {
+    await authService.signIn('9876543210', '123456', 'artisan');
     const coord = authService.switchRole('coordinator');
-    expect(coord.role).toBe('coordinator');
-    expect(coord.name).toBe('Priya Sharma');
+    expect(coord).not.toBeNull();
+    expect(coord?.role).toBe('coordinator');
+    expect(coord?.name).toBe('Priya Sharma');
+  });
+
+  it('clears session on signOut', async () => {
+    await authService.signIn('9876543210', '123456', 'artisan');
+    expect(authService.getCurrentUser()).not.toBeNull();
+    await authService.signOut();
+    expect(authService.getCurrentUser()).toBeNull();
   });
 });

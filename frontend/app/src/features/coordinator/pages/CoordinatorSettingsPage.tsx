@@ -173,8 +173,12 @@ export const CoordinatorSettingsPage: React.FC = () => {
           <Button
             variant="ghost"
             onClick={async () => {
-              await signOut();
-              navigate(ROUTES.HOME);
+              try {
+                await signOut();
+                navigate(ROUTES.SIGN_IN, { replace: true });
+              } catch {
+                // error is captured in AuthProvider
+              }
             }}
             leftIcon={<LogOut className="w-4 h-4" />}
             className="w-full sm:w-auto text-xs font-bold text-error hover:bg-error-container/40"

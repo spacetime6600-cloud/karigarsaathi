@@ -92,11 +92,11 @@ export const ProductDetailPage: React.FC = () => {
           {/* Left Column: Image Gallery */}
           <div className="lg:col-span-7 flex flex-col gap-3">
             {/* Main Photo */}
-            <div className="relative w-full aspect-[4/3] bg-[#FFF4E8] rounded-3xl overflow-hidden border border-[#001D36]/10 shadow-sm">
+            <div className="relative w-full aspect-[4/3] bg-slate-900 rounded-3xl overflow-hidden border border-[#001D36]/10 shadow-sm flex items-center justify-center p-3">
               <img
                 src={product.photos[selectedPhotoIdx] || product.photos[0]}
                 alt={product.title}
-                className="w-full h-full object-cover"
+                className="max-w-full max-h-full w-auto h-auto object-contain object-center"
               />
               {product.hasCraftPassport && (
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-white/80 text-xs font-bold text-primary flex items-center gap-1.5 shadow-2xs">
@@ -114,11 +114,11 @@ export const ProductDetailPage: React.FC = () => {
                     key={idx}
                     type="button"
                     onClick={() => setSelectedPhotoIdx(idx)}
-                    className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                      selectedPhotoIdx === idx ? 'border-secondary shadow-xs scale-105' : 'border-transparent opacity-75 hover:opacity-100'
+                    className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-slate-900 flex items-center justify-center p-1 ${
+                      selectedPhotoIdx === idx ? 'border-secondary shadow-xs scale-105' : 'border-surface-variant opacity-75 hover:opacity-100'
                     }`}
                   >
-                    <img src={photo} alt="" className="w-full h-full object-cover" />
+                    <img src={photo} alt="" className="max-w-full max-h-full w-auto h-auto object-contain object-center" />
                   </button>
                 ))}
               </div>
@@ -187,6 +187,11 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
                 <Link
                   to={ROUTES.publicPassport(product.passportId || product.id)}
+                  state={{
+                    from: `/marketplace/products/${product.id}`,
+                    fromLabel: product.title,
+                    sourceRole: 'public',
+                  }}
                   className="text-secondary font-bold hover:underline"
                 >
                   View Passport

@@ -1,23 +1,31 @@
 import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
-import { ROUTES } from '@/routes';
+import { useAuth } from '@/app/providers/AuthProvider';
+import { ROUTES, getValidatedPassportReturnRoute, PassportNavigationState } from '@/routes';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 
 export const PublicPassportShell: React.FC = () => {
   const { isPlaying, toggleHelp } = useAudioHelp();
   const { currentLanguageMeta } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, userAccount } = useAuth();
+
+  const navState = (location.state || {}) as PassportNavigationState;
+  const returnContext = getValidatedPassportReturnRoute(
+    navState.from,
+    userAccount || user,
+    userAccount?.role || user?.role,
+    navState.fromLabel
+  );
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate(ROUTES.MARKETPLACE);
-    }
+    navigate(returnContext.path);
   };
 
   return (
@@ -31,7 +39,8 @@ export const PublicPassportShell: React.FC = () => {
           <button
             type="button"
             onClick={handleBack}
-            aria-label="Return to marketplace or previous page"
+            aria-label={returnContext.label}
+            title={returnContext.label}
             className="flex items-center justify-center min-w-[44px] min-h-[44px] text-primary hover:bg-surface-container rounded-full transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -66,7 +75,9 @@ export const PublicPassportShell: React.FC = () => {
 
       {/* Main Content Area */}
       <main id="main-content" tabIndex={-1} className="flex-1 p-4 md:p-10 max-w-5xl w-full mx-auto pb-16 focus:outline-none">
-        <Outlet />
+        <PageTransitionContainer>
+          <Outlet />
+        </PageTransitionContainer>
       </main>
 
       {/* Public Footer */}

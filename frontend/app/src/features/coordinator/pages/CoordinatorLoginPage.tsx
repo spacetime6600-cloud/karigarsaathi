@@ -21,7 +21,6 @@ import {
 } from 'lucide-react';
 import { auth } from '@/config/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { authService } from '@/services/api/authService';
 
 export const CoordinatorLoginPage: React.FC = () => {
   const { signInWithEmail, isAuthenticated, isLoading: authLoading, user, userAccount, signOut } = useAuth();
@@ -64,7 +63,6 @@ export const CoordinatorLoginPage: React.FC = () => {
 
     try {
       await signInWithEmail({ email: email.trim(), password });
-      authService.switchRole('coordinator');
 
       const currentRole = userAccount?.role || user?.role || 'coordinator';
       if (currentRole && currentRole !== 'coordinator') {

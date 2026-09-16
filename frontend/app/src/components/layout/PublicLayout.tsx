@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PublicLandingHeader } from '@/components/navigation/PublicLandingHeader';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 
 export interface PublicLayoutProps {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
       {/* Main Landmark Container */}
       <main id="main-content" className="flex-1 flex flex-col w-full relative z-10">
-        {children}
+        <PageTransitionContainer>
+          {children}
+        </PageTransitionContainer>
       </main>
 
       {/* Shared Public Footer */}

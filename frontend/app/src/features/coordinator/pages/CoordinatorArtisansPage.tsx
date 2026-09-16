@@ -16,8 +16,10 @@ import {
   Loader2,
   AlertTriangle,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
+import { demoDataService } from '@/services/demo/demoDataService';
 
 export const CoordinatorArtisansPage: React.FC = () => {
   const { user, userAccount } = useAuth();
@@ -92,9 +94,17 @@ export const CoordinatorArtisansPage: React.FC = () => {
               {projections.length} Active Grants
             </Badge>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight mt-1">
-            Assigned Artisans
-          </h2>
+          <div className="flex items-center gap-2.5 flex-wrap mt-1">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight">
+              Assigned Artisans
+            </h2>
+            {(demoDataService.isSeeded() || coordinatorUid.startsWith('demo_')) && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
+                <Sparkles className="w-3 h-3" />
+                Demo Data Active
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
             Privacy-safe roster of verified artisans and craft clusters within your assigned jurisdiction.
           </p>

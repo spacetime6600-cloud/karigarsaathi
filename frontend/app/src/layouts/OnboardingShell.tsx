@@ -5,6 +5,7 @@ import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { PageAtmosphere } from '@/components/layout/PageAtmosphere';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 
 export const OnboardingShell: React.FC = () => {
   return (
@@ -18,7 +19,9 @@ export const OnboardingShell: React.FC = () => {
 
       {/* Centered Main Canvas */}
       <main id="main-content" tabIndex={-1} className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-[1200px] mx-auto z-10 relative focus:outline-none">
-        <Outlet />
+        <PageTransitionContainer className="flex flex-col items-center justify-center">
+          <Outlet />
+        </PageTransitionContainer>
       </main>
 
       {/* Footer */}

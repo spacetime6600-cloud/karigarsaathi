@@ -21,10 +21,10 @@ import {
   calculateDateRange,
   getPreviousPeriodRange,
 } from '@/services/api/salesService';
-import { priceHistoryService } from '@/services/api/priceHistoryService';
+import { demoDataService } from '@/services/demo/demoDataService';
+import { storage } from '@/services/storage/localStorage';
 
 // Dashboard UI Components
-import { DashboardDateSelector } from './components/DashboardDateSelector';
 import { DashboardSummaryCards } from './components/DashboardSummaryCards';
 import { SalesOverviewChart } from './components/SalesOverviewChart';
 import { SalesByRegionMap } from './components/SalesByRegionMap';
@@ -33,7 +33,6 @@ import { CategorySectorBreakdownChart } from './components/CategorySectorBreakdo
 import { ArtisanEmptySalesState } from './components/ArtisanEmptySalesState';
 
 import {
-  Plus,
   Search,
   ArrowUpRight,
   Package,
@@ -45,9 +44,11 @@ import {
   X,
   Loader2,
   Sparkles,
+  QrCode,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
+import { ROUTES } from '@/routes';
 
 const LOW_STOCK_THRESHOLD = 2;
 
@@ -109,8 +110,8 @@ export const ArtisanDashboardPage: React.FC = () => {
   const { syncState, failedCount, retryFailed } = useSync();
   const navigate = useNavigate();
 
-  const ownerId = user?.id || 'artisan_001';
-  const [dateRange, setDateRange] = useState<DateRange>(() => calculateDateRange('30d'));
+  const ownerId = user?.id || 'demo_artisan_ravi';
+  const dateRange: DateRange = useMemo(() => calculateDateRange('30d'), []);
 
   // Products & Analytics State
   const [products, setProducts] = useState<ProductRecord[]>(() => {
@@ -136,27 +137,39 @@ export const ArtisanDashboardPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<DashboardFilter>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isRetryingUpload, setIsRetryingUpload] = useState<boolean>(false);
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(() => demoDataService.isSeeded() || ownerId.startsWith('demo_'));
 
   // Fetch all artisan products & enquiries
   const fetchData = useCallback(async () => {
     if (isAuthLoading) return;
     setIsLoading(true);
+    setIsDemoMode(demoDataService.isSeeded() || ownerId.startsWith('demo_'));
+
     // 1. Products
     try {
       const records = await productRepository.listAllArtisanProducts(ownerId);
       if (records && records.length > 0) {
         setProducts(records);
       } else {
+        const mockList = storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+        if (mockList && mockList.length > 0) {
+          setProducts(mockList);
+        } else {
+          const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
+          if (fallback.length > 0) {
+            setProducts(fallback);
+          }
+        }
+      }
+    } catch (err) {
+      const mockList = storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+      if (mockList && mockList.length > 0) {
+        setProducts(mockList);
+      } else {
         const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
         if (fallback.length > 0) {
           setProducts(fallback);
         }
-      }
-    } catch (err) {
-      const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
-      if (fallback.length > 0) {
-        setProducts(fallback);
       }
       logger.warn('FIRESTORE', 'Using fallback data for dashboard', {
         ownerId,
@@ -199,15 +212,13 @@ export const ArtisanDashboardPage: React.FC = () => {
   }, [fetchData]);
 
   // Handle Demo Mode Toggle (Strictly isolated demonstration fixture)
-  const handleToggleDemoMode = () => {
+  const handleToggleDemoMode = async () => {
     if (isDemoMode) {
+      await demoDataService.resetPresentationDemoData();
       setIsDemoMode(false);
       fetchData();
     } else {
-      salesService.seedDemoSales(ownerId);
-      if (products.length > 0) {
-        priceHistoryService.seedDemoPriceHistory(products[0]);
-      }
+      await demoDataService.seedPresentationDemoData();
       setIsDemoMode(true);
       fetchData();
     }
@@ -349,55 +360,26 @@ export const ArtisanDashboardPage: React.FC = () => {
   const hasSalesData = sales.length > 0;
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto flex flex-col gap-6 sm:gap-7 animate-in fade-in duration-200">
-      {/* 1. Welcome Header, Date Selector & Primary Action Area */}
+    <div className="w-full max-w-[1240px] mx-auto flex flex-col gap-5 sm:gap-6 animate-in fade-in duration-200">
+      {/* 1. Workshop Welcome Header */}
       <section
         aria-label="Workshop Welcome Header"
-        className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1"
+        className="flex flex-col gap-1 pb-1"
       >
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="font-sans text-2xl sm:text-3xl font-bold text-primary tracking-tight">
-              Namaste, {greetingName}
-            </h1>
-            {isDemoMode && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
-                <Sparkles className="w-3 h-3" />
-                Demonstration Fixture Data
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-on-surface-variant mt-0.5 font-normal">
-            Your craft, your customers, your progress. Manage your products, stock and enquiries.
-          </p>
-        </div>
-
-        {/* Date Selector & Primary Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 self-start lg:self-auto flex-wrap">
-          <DashboardDateSelector
-            currentRange={dateRange}
-            onRangeChange={(newRange) => setDateRange(newRange)}
-          />
-
-          {latestDraft && (
-            <button
-              type="button"
-              onClick={() => handleResumeDraft(latestDraft)}
-              className="text-sm font-semibold text-secondary hover:text-secondary-hover hover:underline px-2 py-1.5 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-lg"
-            >
-              Continue draft
-            </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <h1 className="font-sans text-2xl sm:text-3xl font-bold text-primary tracking-tight">
+            Namaste, {greetingName}
+          </h1>
+          {isDemoMode && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
+              <Sparkles className="w-3 h-3" />
+              Demonstration Fixture Data
+            </span>
           )}
-
-          <button
-            type="button"
-            onClick={handleStartNewProduct}
-            className="h-11 sm:h-12 px-5 sm:px-6 bg-secondary hover:bg-secondary-hover text-white font-bold text-sm sm:text-base rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] shrink-0"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
-            <span>Add product</span>
-          </button>
         </div>
+        <p className="text-sm sm:text-base text-on-surface-variant font-normal">
+          Your craft, your customers, your progress. Manage your products, stock and enquiries.
+        </p>
       </section>
 
       {/* 2. Four Compact Summary Metric Cards */}
@@ -862,6 +844,21 @@ export const ArtisanDashboardPage: React.FC = () => {
                     </div>
 
                     <div className="hidden md:flex col-span-1 justify-end items-center gap-2">
+                      {(product.passportStatus === 'active' || product.passportId) && (
+                        <Link
+                          to={ROUTES.publicPassport(product.passportSlug || product.passportId || product.id)}
+                          state={{
+                            from: ROUTES.ARTISAN_DASHBOARD,
+                            fromLabel: 'Artisan Dashboard',
+                            sourceRole: 'artisan',
+                          }}
+                          title="View public Craft Passport"
+                          aria-label={`View Passport for ${product.title}`}
+                          className="p-1.5 text-secondary hover:bg-secondary/10 border border-secondary/30 rounded-lg transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+                        >
+                          <QrCode className="w-4 h-4" />
+                        </Link>
+                      )}
                       <button
                         type="button"
                         onClick={() => handleEditProduct(product)}

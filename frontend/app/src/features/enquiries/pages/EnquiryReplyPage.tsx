@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/app/providers/AuthProvider';
+import { enquiryRepository } from '@/repositories';
 import { enquiryService } from '@/services/api/enquiryService';
-import { syncService } from '@/services/storage/syncService';
+import { BuyerEnquiry } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { TextArea } from '@/components/ui/TextArea';
@@ -18,27 +20,58 @@ import {
   AlertCircle,
   MessageSquare,
   ShieldCheck,
+  Loader2,
+  ExternalLink,
 } from 'lucide-react';
 
 export const EnquiryReplyPage: React.FC = () => {
   const { enquiryId } = useParams<{ enquiryId: string }>();
   const navigate = useNavigate();
+  const { user, userAccount } = useAuth();
+  const currentArtisanId = userAccount?.uid || user?.id || 'demo_artisan_ravi';
 
-  const [enquiry, setEnquiry] = useState(() => (enquiryId ? enquiryService.getEnquiryById(enquiryId) : null));
+  const [enquiry, setEnquiry] = useState<BuyerEnquiry | null>(() =>
+    enquiryId ? enquiryService.getEnquiryById(enquiryId) : null
+  );
+  const [loading, setLoading] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [quotePrice, setQuotePrice] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
   useEffect(() => {
-    if (enquiryId) {
-      const data = enquiryService.getEnquiryById(enquiryId);
-      setEnquiry(data);
-      setReplyText('');
-      setQuotePrice('');
-      setSentSuccess(false);
+    if (!enquiryId || !currentArtisanId) {
+      setLoading(false);
+      return;
     }
-  }, [enquiryId]);
+
+    enquiryRepository
+      .getEnquiryById(enquiryId, currentArtisanId)
+      .then((data) => {
+        setEnquiry(data);
+        if (data && data.status === 'new') {
+          enquiryRepository
+            .updateEnquiryStatus(data.id, currentArtisanId, 'acknowledged', 'Opened by artisan')
+            .then((upd) => setEnquiry(upd))
+            .catch(() => {});
+        }
+      })
+      .catch(() => {
+        setEnquiry(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [enquiryId, currentArtisanId]);
+
+  if (loading) {
+    return (
+      <div className="py-24 flex flex-col items-center justify-center gap-3 text-on-surface-variant">
+        <Loader2 className="w-8 h-8 text-secondary animate-spin" />
+        <p className="text-xs font-semibold">Loading enquiry conversation...</p>
+      </div>
+    );
+  }
 
   // Safe Not-Found Error State
   if (!enquiry) {
@@ -54,7 +87,7 @@ export const EnquiryReplyPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3 mt-4">
-          <Button variant="secondary" onClick={() => navigate('/enquiries')}>
+          <Button variant="secondary" onClick={() => navigate('/artisan/enquiries')}>
             Back to Enquiries
           </Button>
           <Button variant="ghost" onClick={() => navigate('/artisan/dashboard')}>
@@ -65,44 +98,51 @@ export const EnquiryReplyPage: React.FC = () => {
     );
   }
 
-  const handleSendReply = (e: React.FormEvent) => {
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!replyText.trim() || isSending) return;
+    if (!replyText.trim() || isSending || !currentArtisanId) return;
 
     setIsSending(true);
+    try {
+      const price = quotePrice ? Number(quotePrice) : undefined;
+      const updated = await enquiryRepository.addEnquiryReply(
+        enquiry.id,
+        currentArtisanId,
+        {
+          id: `rep_${Date.now()}`,
+          sender: 'artisan',
+          text: replyText.trim(),
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          priceQuote: price,
+        }
+      );
 
-    if (localStorage.getItem('simulate_enquiry_waiting') === 'true' || syncService.getForceOffline()) {
-      syncService.addToQueue('enquiry_reply', { enquiryId: enquiry.id, replyText, quotePrice });
-      setIsSending(false);
-      setSentSuccess(true);
+      setEnquiry(updated);
       setReplyText('');
       setQuotePrice('');
+      setSentSuccess(true);
       setTimeout(() => setSentSuccess(false), 3000);
-      return;
-    }
-
-    const price = quotePrice ? Number(quotePrice) : undefined;
-    const updated = enquiryService.addReply(enquiry.id, replyText.trim(), price);
-
-    setIsSending(false);
-    if (updated) {
-      setEnquiry({ ...updated });
-    }
-    setReplyText('');
-    setQuotePrice('');
-    setSentSuccess(true);
-    setTimeout(() => setSentSuccess(false), 3000);
-  };
-
-  const handleConfirmOrder = () => {
-    const updated = enquiryService.confirmOrder(enquiry.id);
-    if (updated) {
-      setEnquiry({ ...updated });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to send reply.');
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const isReplyEmpty = !replyText.trim();
-  const characterCount = replyText.length;
+  const handleConfirmOrder = async () => {
+    if (!currentArtisanId) return;
+    try {
+      const updated = await enquiryRepository.updateEnquiryStatus(
+        enquiry.id,
+        currentArtisanId,
+        'order_confirmed',
+        'Order confirmed by artisan'
+      );
+      setEnquiry(updated);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to confirm order.');
+    }
+  };
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 animate-in fade-in duration-200">
@@ -110,7 +150,7 @@ export const EnquiryReplyPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-variant pb-4">
         <div className="flex items-center gap-3">
           <Link
-            to="/enquiries"
+            to="/artisan/enquiries"
             aria-label="Back to Enquiries"
             className="p-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container transition-colors touch-target"
           >
@@ -128,8 +168,8 @@ export const EnquiryReplyPage: React.FC = () => {
                   Order Confirmed
                 </span>
               ) : (
-                <span className="text-[11px] font-medium text-on-surface-variant bg-surface-container px-2.5 py-0.5 rounded-full">
-                  Replied
+                <span className="text-[11px] font-medium text-on-surface-variant bg-surface-container px-2.5 py-0.5 rounded-full capitalize">
+                  {enquiry.status === 'acknowledged' ? 'Read' : enquiry.status}
                 </span>
               )}
             </div>
@@ -141,7 +181,7 @@ export const EnquiryReplyPage: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <Link
-            to="/enquiries"
+            to="/artisan/enquiries"
             className="text-xs font-bold text-secondary hover:underline flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-surface-container transition-colors"
           >
             <span>Back to Enquiries</span>
@@ -153,47 +193,58 @@ export const EnquiryReplyPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Buyer Profile & Order Request Summary (4 cols) */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          {/* Buyer Profile Card (no unnecessary truncation) */}
-          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-4">
+          {/* Buyer Profile Card */}
+          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-4 rounded-2xl">
             <div className="flex items-start gap-3.5">
-              <img
-                src={enquiry.buyerAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120'}
-                alt={enquiry.buyerName}
-                className="w-12 h-12 rounded-full object-cover border-2 border-primary shrink-0"
-              />
+              <div className="w-12 h-12 rounded-full bg-secondary-fixed text-primary font-bold flex items-center justify-center shrink-0 text-base">
+                {enquiry.buyerName[0]?.toUpperCase() || 'B'}
+              </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <h2 className="font-bold text-base text-primary break-words leading-snug">
                   {enquiry.buyerName}
                 </h2>
-                <span className="text-xs text-on-surface-variant flex items-center gap-1 mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-secondary shrink-0" /> {enquiry.buyerLocation}
-                </span>
-                <span className="text-xs text-secondary font-mono flex items-center gap-1 mt-1 font-medium">
-                  <Phone className="w-3.5 h-3.5 shrink-0" /> {enquiry.buyerPhone}
-                </span>
+                {(enquiry.buyerLocation || enquiry.destinationCity) && (
+                  <span className="text-xs text-on-surface-variant flex items-center gap-1 mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-secondary shrink-0" /> {enquiry.buyerLocation || enquiry.destinationCity}
+                  </span>
+                )}
+                {enquiry.consentToBeContacted && (enquiry.buyerPhone || enquiry.buyerContact) && (
+                  <span className="text-xs text-secondary font-mono flex items-center gap-1 mt-1 font-medium">
+                    <Phone className="w-3.5 h-3.5 shrink-0" /> {enquiry.buyerPhone || enquiry.buyerContact}
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="pt-3 border-t border-surface-variant flex items-center justify-between text-xs text-on-surface-variant">
               <span>Received:</span>
               <span className="font-mono flex items-center gap-1 font-medium text-primary">
-                <Clock className="w-3 h-3" /> {enquiry.receivedAt}
+                <Clock className="w-3 h-3" />
+                {enquiry.receivedAt && isNaN(Date.parse(enquiry.receivedAt))
+                  ? enquiry.receivedAt
+                  : new Date(enquiry.receivedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           </Card>
 
           {/* Order Request Summary Card */}
-          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-3.5">
+          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-3.5 rounded-2xl">
             <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
               Order Request Summary
             </span>
 
             <div className="flex items-center gap-3 p-3 bg-surface-container rounded-xl border border-surface-variant/70">
-              <img
-                src={enquiry.productImage}
-                alt={enquiry.productTitle}
-                className="w-14 h-14 rounded-lg object-cover border border-surface-variant shrink-0"
-              />
+              {enquiry.productImage ? (
+                <img
+                  src={enquiry.productImage}
+                  alt={enquiry.productTitle}
+                  className="w-14 h-14 rounded-lg object-cover border border-surface-variant shrink-0"
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+                  <Package className="w-6 h-6" />
+                </div>
+              )}
               <div className="flex flex-col min-w-0">
                 <span className="font-bold text-sm text-primary leading-tight line-clamp-2">
                   {enquiry.productTitle}
@@ -202,6 +253,16 @@ export const EnquiryReplyPage: React.FC = () => {
                   <Package className="w-3.5 h-3.5" />
                   Quantity: {enquiry.quantityRequested} units
                 </span>
+                {enquiry.publicSlug && (
+                  <Link
+                    to={`/passport/${enquiry.publicSlug}`}
+                    state={{ from: `/artisan/enquiries/${enquiry.id}`, fromLabel: 'Enquiry Reply', sourceRole: 'artisan' }}
+                    className="text-[11px] font-bold text-secondary hover:underline flex items-center gap-1 mt-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>View Craft Passport</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -237,63 +298,48 @@ export const EnquiryReplyPage: React.FC = () => {
 
         {/* Right Column: Full Conversation Thread & Reply Composer (8 cols) */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          {/* Conversation History Card with 20-24px message spacing and 70-75% bubble widths */}
-          <Card className="p-6 bg-white border border-surface-variant card-shadow flex flex-col gap-6 min-h-[340px]">
+          {/* Conversation History Card */}
+          <Card className="p-6 bg-white border border-surface-variant card-shadow flex flex-col gap-6 min-h-[340px] rounded-2xl">
             <div className="flex items-center justify-between border-b border-surface-variant pb-3">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-primary" />
                 <h3 className="font-bold text-sm text-primary">Conversation History</h3>
               </div>
               <span className="text-xs text-on-surface-variant">
-                {enquiry.replies.length + 1} {enquiry.replies.length === 0 ? 'Message' : 'Messages'}
+                {(enquiry.replies?.length || 0) + 1} {enquiry.replies?.length === 0 ? 'Message' : 'Messages'}
               </span>
             </div>
 
-            {/* Conversation Flow with 20-24px vertical separation */}
-            <div className="flex flex-col gap-6">
-              {/* Original Buyer Message (Left-Aligned, 70-75% max width, comfortable internal padding) */}
+            <div className="flex flex-col gap-5">
+              {/* Buyer Initial Message */}
               <div className="flex items-start gap-3">
-                <img
-                  src={enquiry.buyerAvatar}
-                  alt={enquiry.buyerName}
-                  className="w-9 h-9 rounded-full object-cover shrink-0 mt-1"
-                />
-                <div className="flex flex-col gap-1.5 max-w-[75%]">
-                  <div className="p-4 sm:p-5 rounded-2xl rounded-tl-none bg-surface-container-high text-on-surface text-sm leading-relaxed shadow-sm">
-                    <p className="whitespace-pre-line">{enquiry.initialMessage}</p>
+                <div className="w-8 h-8 rounded-full bg-secondary-fixed text-primary font-bold flex items-center justify-center shrink-0 mt-1 text-xs">
+                  {enquiry.buyerName[0]?.toUpperCase() || 'B'}
+                </div>
+                <div className="flex flex-col gap-1 max-w-[85%]">
+                  <div className="p-4 rounded-2xl rounded-tl-none bg-surface-container-high text-on-surface text-sm leading-relaxed">
+                    <p>{enquiry.message || enquiry.initialMessage}</p>
                   </div>
-                  <span className="text-[11px] text-on-surface-variant ml-1 flex items-center gap-1 font-mono">
-                    <Clock className="w-3 h-3" />
-                    {enquiry.buyerName} • {enquiry.receivedAt}
+                  <span className="text-[10px] text-on-surface-variant ml-1 flex items-center gap-1 font-mono">
+                    <Clock className="w-2.5 h-2.5" /> {enquiry.buyerName} • {new Date(enquiry.receivedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
 
-              {/* Artisan Replies Thread (Right-Aligned, 70-75% max width) */}
-              {enquiry.replies.map((rep) => (
-                <div
-                  key={rep.id}
-                  className={`flex items-start gap-3 ${
-                    rep.sender === 'artisan' ? 'flex-row-reverse self-end' : ''
-                  }`}
-                >
-                  <div className="flex flex-col gap-1.5 max-w-[75%] items-end">
-                    <div
-                      className={`p-4 sm:p-5 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                        rep.sender === 'artisan'
-                          ? 'rounded-tr-none bg-secondary-container text-on-secondary-container font-medium'
-                          : 'rounded-tl-none bg-surface-container-high text-on-surface'
-                      }`}
-                    >
-                      <p className="whitespace-pre-line">{rep.text}</p>
+              {/* Threaded Artisan Replies */}
+              {enquiry.replies?.map((rep) => (
+                <div key={rep.id} className="flex items-start gap-3 justify-end">
+                  <div className="flex flex-col gap-1 max-w-[85%] items-end">
+                    <div className="p-4 rounded-2xl rounded-tr-none bg-primary text-white text-sm leading-relaxed shadow-sm">
+                      <p>{rep.text}</p>
                       {rep.priceQuote && (
-                        <div className="mt-2.5 pt-2.5 border-t border-on-secondary-container/20 font-bold text-xs">
-                          Quoted Price: ₹{rep.priceQuote.toLocaleString('en-IN')} / unit
+                        <div className="mt-2 pt-2 border-t border-white/20 text-xs font-bold text-amber-200">
+                          Formal Quote: ₹{rep.priceQuote.toLocaleString('en-IN')}
                         </div>
                       )}
                     </div>
-                    <span className="text-[11px] text-on-surface-variant mr-1 font-mono">
-                      {rep.sender === 'artisan' ? 'You' : enquiry.buyerName} • {rep.timestamp}
+                    <span className="text-[10px] text-on-surface-variant mr-1 flex items-center gap-1 font-mono">
+                      <Clock className="w-2.5 h-2.5" /> You • {rep.timestamp}
                     </span>
                   </div>
                 </div>
@@ -301,66 +347,43 @@ export const EnquiryReplyPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Reply Composer Card (Visually Separated Below) */}
-          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-3.5">
-            <div className="flex items-center justify-between">
-              <label htmlFor="reply-textarea" className="font-bold text-sm text-primary">
-                Write your reply
-              </label>
-              <span className="text-xs text-on-surface-variant font-mono">{characterCount} characters</span>
-            </div>
-
-            {/* Sent Confirmation Toast */}
-            {sentSuccess && (
-              <div className="p-3 bg-success-container text-on-success-container rounded-xl flex items-center gap-2 text-xs font-bold border border-green-300 animate-in fade-in">
-                <Check className="w-4 h-4 text-success" />
-                <span>Reply sent successfully to {enquiry.buyerName}!</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSendReply} className="flex flex-col gap-3.5">
+          {/* Reply Composer Form */}
+          <Card className="p-5 bg-white border border-surface-variant card-shadow flex flex-col gap-4 rounded-2xl">
+            <h4 className="font-bold text-sm text-primary">Send Response</h4>
+            <form onSubmit={handleSendReply} className="flex flex-col gap-4">
               <TextArea
-                id="reply-textarea"
-                rows={3}
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                placeholder={`Type your response to ${enquiry.buyerName} (e.g. custom dimensions, dispatch timelines, bulk terms)...`}
-                required
+                placeholder={`Type your reply to ${enquiry.buyerName}... Provide craft timeline or pricing notes.`}
+                rows={4}
               />
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-                <div className="w-full sm:w-64">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-on-surface-variant">Price Quote (₹):</span>
                   <Input
                     type="number"
+                    min="0"
                     value={quotePrice}
                     onChange={(e) => setQuotePrice(e.target.value)}
-                    placeholder="Quoted Price (₹ per unit optional)"
-                    className="py-1 text-xs"
+                    placeholder="e.g. 14500"
+                    className="w-32 text-xs"
                   />
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setReplyText('');
-                      setQuotePrice('');
-                    }}
-                    className="text-xs min-h-0 h-10 px-4 flex-1 sm:flex-initial"
-                  >
-                    Clear
-                  </Button>
-
+                <div className="flex items-center gap-3">
+                  {sentSuccess && (
+                    <span className="text-xs font-bold text-success flex items-center gap-1">
+                      <Check className="w-4 h-4" /> Reply sent successfully!
+                    </span>
+                  )}
                   <Button
                     type="submit"
-                    size="md"
-                    isLoading={isSending}
-                    disabled={isReplyEmpty || isSending}
-                    rightIcon={<Send className="w-4 h-4" />}
-                    className="text-xs font-bold px-6 min-h-0 h-10 flex-1 sm:flex-initial"
+                    disabled={isSending || !replyText.trim()}
+                    leftIcon={isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    className="text-xs font-bold"
                   >
-                    Send Reply
+                    {isSending ? 'Sending...' : 'Send Message'}
                   </Button>
                 </div>
               </div>

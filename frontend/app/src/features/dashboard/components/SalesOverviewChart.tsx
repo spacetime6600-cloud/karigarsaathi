@@ -111,7 +111,7 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
             Sales overview
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
-            Confirmed sales performance over time
+            Confirmed sales performance (Last 30 days)
           </p>
         </div>
 
@@ -321,7 +321,7 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
       {/* Summary Narrative Footer */}
       <div className="pt-2 border-t border-surface-variant/40 flex items-center justify-between text-xs text-on-surface-variant">
         <p>
-          <strong className="text-primary font-bold">{totalUnits}</strong> {totalUnits === 1 ? 'unit' : 'units'} sold during this period totaling <strong className="text-primary font-bold">{currencySymbol}{formatINR(totalValue)}</strong>.
+          <strong className="text-primary font-bold">{totalUnits}</strong> {totalUnits === 1 ? 'unit' : 'units'} sold over the last 30 days totaling <strong className="text-primary font-bold">{currencySymbol}{formatINR(totalValue)}</strong>.
         </p>
       </div>
     </div>

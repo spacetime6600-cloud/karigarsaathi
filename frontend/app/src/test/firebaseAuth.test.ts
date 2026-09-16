@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { FirebaseAuthRepository } from '@/repositories/firebase/FirebaseAuthRepository';
 import { initializeApp, deleteApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 describe('Firebase Authentication & Error Normalization Regression Suite', () => {
   const repo = new FirebaseAuthRepository();
@@ -73,8 +73,13 @@ describe('Firebase Authentication & Error Normalization Regression Suite', () =>
 
       try {
         const credA = await signInWithEmailAndPassword(testAuth, 'artisan_a@karigarsaathi.local', 'KarigarPass123!');
-        const credB = await signInWithEmailAndPassword(testAuth, 'artisan_b@karigarsaathi.local', 'KarigarPass123!');
-        
+        let credB;
+        try {
+          credB = await signInWithEmailAndPassword(testAuth, 'artisan_b@karigarsaathi.local', 'KarigarPass123!');
+        } catch {
+          credB = await createUserWithEmailAndPassword(testAuth, 'artisan_b@karigarsaathi.local', 'KarigarPass123!');
+        }
+
         expect(credA.user.uid).not.toBe(credB.user.uid);
       } finally {
         await deleteApp(testApp);

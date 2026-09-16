@@ -104,5 +104,19 @@ models/*.gguf
 ~/.cache/rembg/
 
 # Runtime Uploads & User Generated Output
-/storage/uploads/
-/storage/recordings/
+storage/uploads/
+storage/recordings/
+**/storage/originals/*
+**/storage/enhanced/*
+**/storage/previews/*
+!**/storage/originals/.gitkeep
+!**/storage/enhanced/.gitkeep
+!**/storage/previews/.gitkeep
+**/private/uploads/*
+!**/private/uploads/.gitkeep
+
+# Local SQLite databases & PID tracking
+*.sqlite
+*.sqlite3
+*.db
+.local-pids.json

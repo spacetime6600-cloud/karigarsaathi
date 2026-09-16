@@ -16,4 +16,8 @@ export interface IEnquiryRepository {
     reply: EnquiryReply
   ): Promise<BuyerEnquiry>;
   countNewEnquiries(artisanId: string): Promise<number>;
+  subscribeArtisanEnquiries?(
+    artisanId: string,
+    callback: (enquiries: BuyerEnquiry[]) => void
+  ): () => void;
 }

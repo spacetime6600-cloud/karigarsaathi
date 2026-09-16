@@ -61,6 +61,13 @@ export const enquiryService = {
     return storage.get<BuyerEnquiry[]>('buyerEnquiries', SEED_ENQUIRIES);
   },
 
+  createEnquiry(enquiry: BuyerEnquiry): BuyerEnquiry {
+    const list = this.listEnquiries();
+    const updated = [enquiry, ...list.filter((e) => e.id !== enquiry.id)];
+    storage.set('buyerEnquiries', updated);
+    return enquiry;
+  },
+
   getEnquiryById(id: string): BuyerEnquiry | null {
     const list = this.listEnquiries();
     return list.find((e) => e.id === id) || null;

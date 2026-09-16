@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { productRepository } from '@/repositories';
@@ -25,10 +25,13 @@ import {
   CheckCircle,
   QrCode,
   ShieldAlert,
+  ExternalLink,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
 import { passportManager } from '@/services/passport/passportManager';
+import { storage } from '@/services/storage/localStorage';
+import { ROUTES } from '@/routes';
 
 type InventoryTab = 'all' | 'draft' | 'ready' | 'published' | 'archived';
 
@@ -36,6 +39,7 @@ export const InventoryManagementPage: React.FC = () => {
   const { user } = useAuth();
   const { loadDraft, resetDraft } = useProductDraft();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [products, setProducts] = useState<ProductRecord[]>(() => {
     return legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, user?.id || 'artisan_default'));
@@ -55,7 +59,7 @@ export const InventoryManagementPage: React.FC = () => {
   const [feedbackToast, setFeedbackToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchInventory = React.useCallback(async () => {
-    const ownerId = user?.id || 'artisan_default';
+    const ownerId = user?.id || 'demo_artisan_ravi';
     setIsLoading(true);
     setError(null);
 
@@ -64,13 +68,23 @@ export const InventoryManagementPage: React.FC = () => {
       if (allRecords && allRecords.length > 0) {
         setProducts(allRecords);
       } else {
+        const mockList = storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+        if (mockList && mockList.length > 0) {
+          setProducts(mockList);
+        } else {
+          const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
+          setProducts(fallback);
+        }
+      }
+      logger.info('INVENTORY', 'Loaded artisan inventory', { ownerId, count: allRecords?.length || 0 });
+    } catch (err) {
+      const mockList = storage.get<ProductRecord[]>(`mock_products_${ownerId}`, []);
+      if (mockList && mockList.length > 0) {
+        setProducts(mockList);
+      } else {
         const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
         setProducts(fallback);
       }
-      logger.info('INVENTORY', 'Loaded artisan inventory', { ownerId, count: allRecords.length });
-    } catch (err) {
-      const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, ownerId));
-      setProducts(fallback);
       logger.warn('INVENTORY', 'Using local fallback products for inventory', {
         ownerId,
         error: err instanceof Error ? err.message : String(err),
@@ -563,19 +577,35 @@ export const InventoryManagementPage: React.FC = () => {
                             </Button>
 
                             {product.passportStatus === 'active' && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTargetProduct(product);
-                                  setIsRevokeModalOpen(true);
-                                }}
-                                disabled={isActionProcessing}
-                                title="Revoke public Craft Passport"
-                                aria-label={`Revoke Passport for ${product.title}`}
-                                className="w-8 h-8 rounded-lg flex items-center justify-center text-amber-700 hover:bg-amber-100 border border-amber-300 touch-target transition-colors shrink-0"
-                              >
-                                <ShieldAlert className="w-3.5 h-3.5" />
-                              </button>
+                              <>
+                                <Link
+                                  to={ROUTES.publicPassport(product.passportSlug || product.passportId || product.id)}
+                                  state={{
+                                    from: `/artisan/inventory${location.search}`,
+                                    fromLabel: 'Inventory',
+                                    sourceRole: 'artisan',
+                                  }}
+                                  title="View public Craft Passport"
+                                  aria-label={`View Passport for ${product.title}`}
+                                  className="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:bg-secondary/10 border border-secondary/30 touch-target transition-colors shrink-0"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTargetProduct(product);
+                                    setIsRevokeModalOpen(true);
+                                  }}
+                                  disabled={isActionProcessing}
+                                  title="Revoke public Craft Passport"
+                                  aria-label={`Revoke Passport for ${product.title}`}
+                                  className="w-8 h-8 rounded-lg flex items-center justify-center text-amber-700 hover:bg-amber-100 border border-amber-300 touch-target transition-colors shrink-0"
+                                >
+                                  <ShieldAlert className="w-3.5 h-3.5" />
+                                </button>
+                              </>
                             )}
                           </div>
                         )}

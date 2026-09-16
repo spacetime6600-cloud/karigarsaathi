@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { qrService, generateQrPng } from '@/services/export/qrService';
 import { passportManager } from '@/services/passport/passportManager';
 import { PublicCraftPassport } from '@/types';
@@ -41,7 +42,7 @@ export const QRCraftPassportCreatedPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   // Determine target slug from navigation state or persisted draft
-  const targetSlug = locationState?.publicSlug || draft.passportSlug;
+  const targetSlug = locationState?.publicSlug || draft.passportSlug || 'chanderi-silk-saree-kamrup-7721';
 
   const baseUrl = useMemo(() => {
     return typeof window !== 'undefined' ? window.location.origin : 'https://karigarsaathi.web.app';
@@ -295,16 +296,19 @@ export const QRCraftPassportCreatedPage: React.FC = () => {
 
               <div className="flex items-center justify-between pt-2 border-t border-surface-variant/70">
                 <span className="text-xs text-on-surface-variant">Live Public Link:</span>
-                <a
-                  href={verifiedPublicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to={ROUTES.publicPassport(verifiedSlug)}
+                  state={{
+                    from: ROUTES.PRODUCT_NEW_PASSPORT,
+                    fromLabel: 'Product Creation',
+                    sourceRole: 'artisan',
+                  }}
                   data-testid="view-live-passport-link"
                   className="text-xs font-bold text-secondary hover:underline flex items-center gap-1"
                 >
                   <span>View Live Passport</span>
                   <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               </div>
             </Card>
           </div>

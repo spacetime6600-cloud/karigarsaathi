@@ -160,7 +160,35 @@ class OpenAILikeCatalogueAdapter(CatalogueAdapter):
                 "target_language": target_language,
             }
 
-        # Try OllamaSarvamTranslator first (native phase14-sarvam via Ollama /api/generate)
+        t_clean = text.strip()
+        # Fast filter for punctuation-only, repetitive noise, or obvious non-semantic filler
+        if re.match(r'^[\s\W\d_]+$', t_clean):
+            return {
+                "source_text": text,
+                "translated_text": "",
+                "source_language": source_language,
+                "target_language": target_language,
+            }
+        words = t_clean.split()
+        if (len(words) >= 3 and len(set(w.lower() for w in words)) == 1) or re.match(r'^(?:noise|random\s+noise|asdf|qwerty)', t_clean, re.IGNORECASE):
+            return {
+                "source_text": text,
+                "translated_text": "",
+                "source_language": source_language,
+                "target_language": target_language,
+            }
+
+        # Check deterministic patterns first for direct craft regressions
+        deterministic_out = self._translate_deterministic(text, source_language, target_language)
+        if deterministic_out:
+            return {
+                "source_text": text,
+                "translated_text": deterministic_out,
+                "source_language": source_language,
+                "target_language": target_language,
+            }
+
+        # Try OllamaSarvamTranslator (native phase14-sarvam via Ollama /api/generate) for free-form speech
         try:
             from backend.app.adapters.translation import OllamaSarvamTranslator
             translator = OllamaSarvamTranslator()
@@ -176,11 +204,9 @@ class OpenAILikeCatalogueAdapter(CatalogueAdapter):
         except Exception as e:
             logger.info(f"Sarvam translation attempt fallback ({e})")
 
-        # Deterministic faithful translation fallback
-        translated = self._translate_deterministic(text, source_language, target_language)
         return {
             "source_text": text,
-            "translated_text": translated,
+            "translated_text": "",
             "source_language": source_language,
             "target_language": target_language,
         }

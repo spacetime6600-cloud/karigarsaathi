@@ -12,6 +12,7 @@
     "test:rules": "vitest run src/test/rules",
     "firebase:emulators": "firebase emulators:start --project demo-karigarsaathi --only auth,firestore,storage",
     "firebase:seed": "node scripts/seed-emulators.mjs",
+    "seed:demo": "node scripts/seed-presentation-demo.mjs",
     "firebase:verify": "firebase emulators:exec --project demo-karigarsaathi --only auth,firestore,storage \"npm.cmd run test:rules\"",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"

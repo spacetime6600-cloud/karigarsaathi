@@ -20,6 +20,7 @@ import { MarketplacePage } from '@/features/marketplace/MarketplacePage';
 import { ProductDetailPage } from '@/features/marketplace/ProductDetailPage';
 import { ReviewsPage } from '@/features/reviews/ReviewsPage';
 import { SignInPage } from '@/features/authentication/SignInPage';
+import { SignInSelectionPage } from '@/features/authentication/SignInSelectionPage';
 import { NotFoundPage } from '@/features/not-found/NotFoundPage';
 import { PublicCraftPassportPage } from '@/features/craft-passport/PublicCraftPassportPage';
 import { PublicPassportShell } from '@/layouts/PublicPassportShell';
@@ -67,7 +68,8 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
                       <Route path="/marketplace/products/:productId" element={<ProductDetailPage />} />
                       <Route path="/reviews" element={<ReviewsPage />} />
                       <Route path="/login" element={<SignInPage />} />
-                      <Route path="/sign-in" element={<Navigate to="/login" replace />} />
+                      <Route path="/sign-in" element={<SignInSelectionPage />} />
+                      <Route path="/coordinator/login" element={<SignInPage />} />
 
                       {/* Public Passport */}
                       <Route element={<PublicPassportShell />}>
@@ -237,37 +239,38 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
   });
 
   describe('3. Protected Deep Links & AuthGuard Redirection Tests', () => {
-    it('redirects unauthenticated user from protected artisan dashboard to /login?returnUrl=...', async () => {
+    it('redirects unauthenticated user from protected artisan dashboard to /sign-in', async () => {
       await authService.signOut();
       await renderRouterTree(['/artisan/dashboard']);
 
-      // Should be redirected to sign in form
+      // Should be redirected to sign in choice portal
       expect(container.querySelector('[data-testid="artisan-dashboard-view"]')).toBeNull();
-      expect(container.textContent).toContain('Sign In');
-      expect(container.textContent).toContain('Phone Demo');
+      expect(container.textContent).toContain('Welcome to KarigarSaathi');
+      expect(container.textContent).toContain('Artisan sign in');
+      expect(container.textContent).toContain('Coordinator sign in');
     });
 
-    it('redirects unauthenticated user from protected inventory to /login?returnUrl=...', async () => {
+    it('redirects unauthenticated user from protected inventory to /sign-in', async () => {
       await authService.signOut();
       await renderRouterTree(['/artisan/inventory']);
 
       expect(container.querySelector('[data-testid="artisan-inventory-view"]')).toBeNull();
-      expect(container.textContent).toContain('Sign In');
+      expect(container.textContent).toContain('Welcome to KarigarSaathi');
     });
 
-    it('redirects unauthenticated user from protected coordinator portal to /login?returnUrl=...', async () => {
+    it('redirects unauthenticated user from protected coordinator portal to /sign-in', async () => {
       await authService.signOut();
       await renderRouterTree(['/coordinator']);
 
       expect(container.querySelector('[data-testid="coordinator-portal-view"]')).toBeNull();
-      expect(container.textContent).toContain('Sign In');
+      expect(container.textContent).toContain('Welcome to KarigarSaathi');
     });
 
-    it('redirects unauthenticated user from product creation to /login?returnUrl=...', async () => {
+    it('redirects unauthenticated user from product creation to /sign-in', async () => {
       await authService.signOut();
       await renderRouterTree(['/artisan/products/new/photos']);
 
-      expect(container.textContent).toContain('Sign In');
+      expect(container.textContent).toContain('Welcome to KarigarSaathi');
     });
   });
 
@@ -302,7 +305,7 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
       expect(container.querySelector('[data-testid="coordinator-portal-view"]')).toBeNull();
       expect(container.textContent).toContain('Role Access Restricted');
       expect(container.textContent).toContain('This area is restricted to authorized coordinator accounts');
-      expect(container.textContent).toContain('Switch to Coordinator Mode');
+      expect(container.textContent).toContain('Sign In with Coordinator Credentials');
     });
 
     it('allows authenticated coordinator access to /coordinator and blocks /artisan/dashboard', async () => {
@@ -326,7 +329,7 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
       await renderRouterTree(['/passport/chanderi-silk-saree-kamrup-7721']);
 
       expect(container.textContent).toContain('KarigarSaathi Craft Passport');
-      const backButton = container.querySelector('button[aria-label="Return to marketplace or previous page"]');
+      const backButton = container.querySelector('button[aria-label="Return to Home"]');
       expect(backButton).not.toBeNull();
     });
   });

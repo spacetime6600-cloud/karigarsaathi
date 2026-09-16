@@ -5,6 +5,7 @@ import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { PageAtmosphere } from '@/components/layout/PageAtmosphere';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 
 export const ArtisanAppShell: React.FC = () => {
   return (
@@ -18,7 +19,9 @@ export const ArtisanAppShell: React.FC = () => {
 
       {/* Main Workspace Container */}
       <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 focus:outline-none">
-        <Outlet />
+        <PageTransitionContainer>
+          <Outlet />
+        </PageTransitionContainer>
       </main>
     </PageAtmosphere>
   );

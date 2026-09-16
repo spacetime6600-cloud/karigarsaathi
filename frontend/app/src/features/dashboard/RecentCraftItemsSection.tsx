@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ProductDraft } from '@/types';
 import { QrCode, MapPin } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ROUTES } from '@/routes';
 
 export interface RecentCraftItemsSectionProps {
   products: ProductDraft[];
@@ -128,6 +129,7 @@ export const RecentCraftItemsSection: React.FC<RecentCraftItemsSectionProps> = (
 
                   <Link
                     to={`/passport/${passportId}`}
+                    state={{ from: ROUTES.ARTISAN_DASHBOARD, fromLabel: 'Artisan Dashboard', sourceRole: 'artisan' }}
                     aria-label={`View Craft Passport for ${item.title}`}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary hover:text-secondary-hover hover:underline touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-md px-1 py-0.5"
                   >

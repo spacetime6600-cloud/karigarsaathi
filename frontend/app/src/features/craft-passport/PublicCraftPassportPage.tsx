@@ -261,11 +261,11 @@ export const PublicCraftPassportPage: React.FC = () => {
         <div className="lg:col-span-7 flex flex-col gap-6">
           {/* Gallery Grid */}
           <div className="grid grid-cols-3 gap-3 rounded-2xl overflow-hidden bg-surface-container-lowest p-2 card-shadow-1 border border-surface-variant">
-            <div className="col-span-3 aspect-[4/3] rounded-xl overflow-hidden relative">
+            <div className="col-span-3 aspect-[4/3] rounded-xl overflow-hidden relative bg-slate-900 flex items-center justify-center p-2">
               <img
                 src={coverPhoto}
                 alt={publicData.title}
-                className="w-full h-full object-cover"
+                className="max-w-full max-h-full w-auto h-auto object-contain object-center"
               />
               <div className="absolute top-3 left-3 bg-surface-container-lowest/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow text-xs font-bold text-primary border border-surface-variant">
                 <CheckCircle2 className="w-4 h-4 text-secondary" />
@@ -274,11 +274,11 @@ export const PublicCraftPassportPage: React.FC = () => {
             </div>
 
             {publicData.photos.slice(1, 4).map((imgUrl, i) => (
-              <div key={i} className="col-span-1 aspect-square rounded-lg overflow-hidden border border-surface-variant">
+              <div key={i} className="col-span-1 aspect-square rounded-lg overflow-hidden border border-surface-variant bg-slate-900 flex items-center justify-center p-1">
                 <img
                   src={imgUrl}
                   alt={`Detail view ${i + 1}`}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full w-auto h-auto object-contain object-center"
                 />
               </div>
             ))}

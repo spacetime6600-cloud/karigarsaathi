@@ -1,66 +1,13 @@
 import { ICoordinatorRepository } from '@/repositories/interfaces/ICoordinatorRepository';
 import { CoordinatorAssignment, CoordinatorArtisanProjection } from '@/types';
+import { DEMO_COORDINATOR_ASSIGNMENTS } from '@/services/demo/demoDataService';
 
 export class MockCoordinatorRepository implements ICoordinatorRepository {
   private assignments: Map<string, CoordinatorAssignment> = new Map();
   private projections: Map<string, CoordinatorArtisanProjection> = new Map();
 
   constructor() {
-    const SEED_ASSIGNMENTS: CoordinatorAssignment[] = [
-      {
-        id: 'coord_coord_001_artisan_001',
-        coordinatorUid: 'coord_001',
-        artisanUid: 'artisan_001',
-        artisanName: 'Ravi Kumar',
-        clusterName: 'Kamrup Silk & Jamdani Cluster',
-        active: true,
-        approvedAt: '2026-08-20T10:00:00Z',
-        approvedBy: 'admin_root',
-        permissions: {
-          viewStatus: true,
-          viewEnquirySummary: true,
-          assistExports: true,
-        },
-        createdAt: '2026-08-20T10:00:00Z',
-        updatedAt: '2026-08-20T10:00:00Z',
-      },
-      {
-        id: 'coord_coord_001_artisan_002',
-        coordinatorUid: 'coord_001',
-        artisanUid: 'artisan_002',
-        artisanName: 'Meera Devi',
-        clusterName: 'Madhubani Painting Cluster',
-        active: true,
-        approvedAt: '2026-08-21T10:00:00Z',
-        approvedBy: 'admin_root',
-        permissions: {
-          viewStatus: true,
-          viewEnquirySummary: true,
-          assistExports: true,
-        },
-        createdAt: '2026-08-21T10:00:00Z',
-        updatedAt: '2026-08-21T10:00:00Z',
-      },
-      {
-        id: 'coord_coord_001_artisan_003',
-        coordinatorUid: 'coord_001',
-        artisanUid: 'artisan_003',
-        artisanName: 'Basant Sahoo',
-        clusterName: 'Raghurajpur Pattachitra Cluster',
-        active: true,
-        approvedAt: '2026-08-22T10:00:00Z',
-        approvedBy: 'admin_root',
-        permissions: {
-          viewStatus: true,
-          viewEnquirySummary: true,
-          assistExports: true,
-        },
-        createdAt: '2026-08-22T10:00:00Z',
-        updatedAt: '2026-08-22T10:00:00Z',
-      },
-    ];
-
-    SEED_ASSIGNMENTS.forEach((s) => {
+    DEMO_COORDINATOR_ASSIGNMENTS.forEach((s) => {
       this.assignments.set(s.id, s);
     });
   }

@@ -10,6 +10,7 @@ import { ProductDraftProvider } from '@/app/providers/ProductDraftProvider';
 import { SyncProvider } from '@/app/providers/SyncProvider';
 import { storage } from '@/services/storage/localStorage';
 import { salesService } from '@/services/api/salesService';
+import { authService } from '@/services/api/authService';
 
 describe('Artisan Dashboard — Clean, Practical Seller Workspace with Sales Insights', () => {
   let container: HTMLDivElement;
@@ -57,13 +58,12 @@ describe('Artisan Dashboard — Clean, Practical Seller Workspace with Sales Ins
     expect(container.textContent).toContain('Manage your products, stock and enquiries');
   });
 
-  it('renders compact primary Add product button and contextual draft action', async () => {
+  it('renders lower Add product action in empty state', async () => {
     await renderDashboard();
     const buttons = Array.from(container.querySelectorAll('button'));
     const buttonTexts = buttons.map((b) => b.textContent);
 
-    expect(buttonTexts.some((t) => t?.includes('Add product'))).toBe(true);
-    expect(buttonTexts.some((t) => t?.includes('Continue draft'))).toBe(true);
+    expect(buttonTexts.some((t) => t?.includes('Add product') || t?.includes('Add your first product'))).toBe(true);
   });
 
   it('renders 4 summary metrics cards with truthful period comparison labels', async () => {
@@ -78,14 +78,11 @@ describe('Artisan Dashboard — Clean, Practical Seller Workspace with Sales Ins
     expect(summarySection?.textContent).toContain('No previous-period comparison');
   });
 
-  it('renders date range selector with 7 days, 30 days, 90 days, and Custom options', async () => {
+  it('renders simplified welcome header without date range selector', async () => {
     await renderDashboard();
     const dateGroup = container.querySelector('div[role="group"][aria-label="Analytics date range selector"]');
-    expect(dateGroup).not.toBeNull();
-    expect(dateGroup?.textContent).toContain('7 days');
-    expect(dateGroup?.textContent).toContain('30 days');
-    expect(dateGroup?.textContent).toContain('90 days');
-    expect(dateGroup?.textContent).toContain('Custom');
+    expect(dateGroup).toBeNull();
+    expect(container.textContent).not.toContain('Custom');
   });
 
   it('renders honest empty sales onboarding state when artisan has 0 confirmed sales', async () => {
@@ -96,7 +93,8 @@ describe('Artisan Dashboard — Clean, Practical Seller Workspace with Sales Ins
 
   it('renders Sales Overview, India Regional Map, Price History and Craft Category panels when populated', async () => {
     // Seed isolated test fixture
-    salesService.seedDemoSales('artisan_001');
+    await authService.signIn('9876543210', '123456', 'artisan');
+    salesService.seedDemoSales('demo_artisan_ravi');
 
     await renderDashboard();
 

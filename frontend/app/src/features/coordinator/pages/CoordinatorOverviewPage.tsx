@@ -18,9 +18,11 @@ import {
   CheckCircle2,
   Clock,
   Download,
+  Sparkles,
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
 import { clsx } from 'clsx';
+import { demoDataService } from '@/services/demo/demoDataService';
 
 export const CoordinatorOverviewPage: React.FC = () => {
   const { user, userAccount } = useAuth();
@@ -117,9 +119,17 @@ export const CoordinatorOverviewPage: React.FC = () => {
               Privacy-Safe
             </Badge>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight">
-            Welcome back, {user?.name || 'Coordinator'}
-          </h2>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight">
+              Welcome back, {user?.name || 'Coordinator'}
+            </h2>
+            {(demoDataService.isSeeded() || coordinatorUid.startsWith('demo_')) && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
+                <Sparkles className="w-3 h-3" />
+                Demo Data Active
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-on-surface-variant flex items-center gap-1.5 mt-0.5">
             <ShieldCheck className="w-4 h-4 text-secondary shrink-0" />
             <span className="font-medium text-primary">{assignedScopeText}</span>

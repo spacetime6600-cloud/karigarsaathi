@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: karigarsaathi-ai-image
+    runtime: python
+    rootDir: AI/Phase13/karigarsaathi-ai
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: CORS_ORIGINS
+        value: http://localhost:3000,http://localhost:3001
+
+  - type: web
+    name: karigarsaathi-ai-voice
+    runtime: python
+    rootDir: AI/phase14/phase14
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: CORS_ORIGINS
+        value: http://localhost:3000,http://localhost:3001
+      - key: WHISPER_MODEL
+        value: base
+      - key: WHISPER_DEVICE
+        value: cpu
+      - key: WHISPER_COMPUTE_TYPE
+        value: int8
+
+  - type: web
+    name: karigarsaathi-ai-pricing
+    runtime: python
+    rootDir: AI/phase15
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production

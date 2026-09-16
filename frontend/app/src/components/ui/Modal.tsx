@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 
@@ -32,6 +33,8 @@ export const Modal: React.FC<ModalProps> = ({
       // Compensate for scrollbar width to prevent horizontal layout shift (CLS = 0)
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       const originalPaddingRight = document.body.style.paddingRight;
+      const originalOverflow = document.body.style.overflow;
+
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
@@ -88,7 +91,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       return () => {
         clearTimeout(focusTimer);
-        document.body.style.overflow = '';
+        document.body.style.overflow = originalOverflow;
         document.body.style.paddingRight = originalPaddingRight;
         window.removeEventListener('keydown', handleKeyDown);
 
@@ -120,51 +123,60 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  return (
+  const modalElement = (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
       aria-describedby={description ? 'modal-description' : undefined}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-primary/60 backdrop-blur-xs motion-fade-enter"
     >
       <div
         ref={modalRef}
         tabIndex={-1}
         className={clsx(
-          'w-full max-h-[90vh] overflow-y-auto bg-surface-container-lowest rounded-lg card-shadow-2 border border-surface-variant p-6 sm:p-8 flex flex-col gap-4 relative animate-in zoom-in-95 duration-150 focus:outline-none',
+          'w-full max-h-[92vh] sm:max-h-[88vh] flex flex-col bg-surface-container-lowest rounded-2xl card-shadow-2 border border-surface-variant relative motion-dialog-enter focus:outline-none overflow-hidden',
           maxWidths[maxWidth]
         )}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            {title && (
-              <h2 id="modal-title" className="font-headline-lg text-xl font-bold text-primary">
-                {title}
-              </h2>
-            )}
-            {description && (
-              <p id="modal-description" className="text-sm text-on-surface-variant mt-1">
-                {description}
-              </p>
+        {(title || description || showCloseButton) && (
+          <div className="shrink-0 px-5 sm:px-6 pt-5 pb-3.5 border-b border-surface-variant/40 flex items-start justify-between gap-4 bg-surface-container-lowest">
+            <div>
+              {title && (
+                <h2 id="modal-title" className="font-headline-lg text-lg sm:text-xl font-bold text-primary">
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p id="modal-description" className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                  {description}
+                </p>
+              )}
+            </div>
+
+            {showCloseButton && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="p-1.5 -mr-1 -mt-1 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
           </div>
+        )}
 
-          {showCloseButton && (
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close dialog"
-              className="p-2 -mr-2 -mt-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 sm:py-5 overscroll-contain flex flex-col gap-4">
+          {children}
         </div>
-
-        <div className="mt-2">{children}</div>
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalElement, document.body);
+  }
+  return modalElement;
 };

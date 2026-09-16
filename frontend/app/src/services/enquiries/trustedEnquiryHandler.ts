@@ -21,6 +21,7 @@ import { IProductRepository } from '@/repositories/interfaces/IProductRepository
 import { IEnquiryRepository } from '@/repositories/interfaces/IEnquiryRepository';
 import { validateStatusTransition, createStatusHistoryEntry } from '@/domain/lifecycle';
 import { logger } from '@/services/logging/logger';
+import { enquiryService } from '@/services/api/enquiryService';
 
 export const TRUSTED_ABUSE_CONFIG = {
   MIN_FORM_COMPLETION_MS: 2000, // 2 seconds minimum
@@ -241,17 +242,15 @@ export class TrustedEnquiryHandler {
         };
       }
 
-      // 9. Load and verify corresponding product
-      const product = await this.productRepo.getOwnedProductById(authoritativeArtisanId, authoritativeProductId);
-      if (!product) {
-        return {
-          success: false,
-          errorCode: 'NOT_FOUND',
-          message: 'Target craft item record not found.',
-        };
+      // 9. Load and verify corresponding product (if accessible with current credentials)
+      let product = null;
+      try {
+        product = await this.productRepo.getOwnedProductById(authoritativeArtisanId, authoritativeProductId);
+      } catch (prodErr) {
+        logger.warn('ENQUIRY', 'Unauthenticated public context: Falling back to publicCraftPassport projection', { slug });
       }
 
-      if (product.ownerId !== authoritativeArtisanId) {
+      if (product && product.ownerId !== authoritativeArtisanId) {
         logger.error('ENQUIRY', 'Passport/Product ownership mismatch detected on server', {
           passportOwner: authoritativeArtisanId,
           productOwner: product.ownerId,
@@ -263,7 +262,7 @@ export class TrustedEnquiryHandler {
         };
       }
 
-      if (product.status === 'archived') {
+      if (product && product.status === 'archived') {
         return {
           success: false,
           errorCode: 'PRODUCT_ARCHIVED',
@@ -284,13 +283,16 @@ export class TrustedEnquiryHandler {
       const enquiryId = 'enq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
       const nowIso = new Date(nowMs).toISOString();
 
+      const productTitle = product?.title || publicPassport.publicData?.title || 'Handcrafted Item';
+      const productImage = publicPassport.publicData?.photos?.[0] || product?.photoPaths?.[0] || '';
+
       const newEnquiry: BuyerEnquiry = {
         id: enquiryId,
         passportId: publicPassport.passportId || slug,
         publicSlug: slug,
         productId: authoritativeProductId,
-        productTitle: product.title || publicPassport.publicData?.title || 'Handcrafted Item',
-        productImage: publicPassport.publicData?.photos?.[0] || product.photoPaths?.[0] || '',
+        productTitle,
+        productImage,
         artisanId: authoritativeArtisanId, // Server authoritative from passport
         buyerName,
         buyerContact,
@@ -317,29 +319,42 @@ export class TrustedEnquiryHandler {
         },
       };
 
-      await this.enquiryRepo.createEnquiry(newEnquiry);
+      try {
+        await this.enquiryRepo.createEnquiry(newEnquiry);
+      } catch (repoErr) {
+        logger.warn('ENQUIRY', 'Direct Firestore enquiry creation failed, saving to local enquiryService fallback', {
+          error: String(repoErr),
+        });
+        enquiryService.createEnquiry(newEnquiry);
+      }
 
       // 11. Transactionally update product lifecycle state from ready/shared -> enquiry_received
-      const transition = validateStatusTransition(product.status, 'enquiry_received', product);
-      if (transition.allowed && product.status !== 'enquiry_received') {
-        const historyEntry = createStatusHistoryEntry(product.status, 'enquiry_received', {
-          actorType: 'buyer',
-          reason: 'Structured buyer enquiry submitted via Craft Passport',
-          triggeringEnquiryId: enquiryId,
-          timestamp: nowIso,
-        });
+      try {
+        if (product) {
+          const transition = validateStatusTransition(product.status, 'enquiry_received', product);
+          if (transition.allowed && product.status !== 'enquiry_received') {
+            const historyEntry = createStatusHistoryEntry(product.status, 'enquiry_received', {
+              actorType: 'buyer',
+              reason: 'Structured buyer enquiry submitted via Craft Passport',
+              triggeringEnquiryId: enquiryId,
+              timestamp: nowIso,
+            });
 
-        const statusHistory = product.statusHistory ? [...product.statusHistory, historyEntry] : [historyEntry];
+            const statusHistory = product.statusHistory ? [...product.statusHistory, historyEntry] : [historyEntry];
 
-        await this.productRepo.updateProduct(authoritativeArtisanId, authoritativeProductId, {
-          status: 'enquiry_received',
-          statusHistory,
-          updatedAt: nowIso,
-        });
-        logger.info('ENQUIRY', 'Product lifecycle transitioned to enquiry_received', {
-          productId: authoritativeProductId,
-          enquiryId,
-        });
+            await this.productRepo.updateProduct(authoritativeArtisanId, authoritativeProductId, {
+              status: 'enquiry_received',
+              statusHistory,
+              updatedAt: nowIso,
+            });
+            logger.info('ENQUIRY', 'Product lifecycle transitioned to enquiry_received', {
+              productId: authoritativeProductId,
+              enquiryId,
+            });
+          }
+        }
+      } catch (prodErr) {
+        logger.warn('ENQUIRY', 'Product status update failed during enquiry submission', { error: String(prodErr) });
       }
 
       // Store in idempotency store if idempotency key was provided

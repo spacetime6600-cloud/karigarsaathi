@@ -61,46 +61,24 @@ class ImageCompositionProcessor:
                 # Transparent background
                 background = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
 
-            # Calculate placement to centre the product with padding
-            # The product area with padding:
-            product_width_with_padding = min(fg_width + 2 * padding, canvas_size - 32)
-            product_height_with_padding = min(fg_height + 2 * padding, canvas_size - 32)
+            # Maintain neutral padding and scale product proportionally to fit
+            pad = min(padding, max(8, canvas_size // 16))
+            available_w = max(1, canvas_size - 2 * pad)
+            available_h = max(1, canvas_size - 2 * pad)
 
-            # Ensure minimum product size
-            product_width_with_padding = max(product_width_with_padding, fg_width)
-            product_height_with_padding = max(product_height_with_padding, fg_height)
+            # Scale foreground to fit proportionally within available canvas area without any cropping
+            scale = min(available_w / fg_width, available_h / fg_height)
+            new_w = max(1, int(round(fg_width * scale)))
+            new_h = max(1, int(round(fg_height * scale)))
 
-            # Calculate offsets to centre
-            x_offset = (canvas_size - product_width_with_padding) // 2
-            y_offset = (canvas_size - product_height_with_padding) // 2
+            resized_fg = fg_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
-            # Ensure offsets are non-negative
-            x_offset = max(0, x_offset)
-            y_offset = max(0, y_offset)
+            # Calculate exact centered offsets
+            paste_x = (canvas_size - new_w) // 2
+            paste_y = (canvas_size - new_h) // 2
 
-            # Paste the foreground onto the canvas with padding
-            # Add padding border
-            padded_fg_width = fg_width + 2 * padding
-            padded_fg_height = fg_height + 2 * padding
-
-            # Limit foreground size to not exceed canvas with padding
-            actual_fg_w = min(fg_width, padded_fg_width)
-            actual_fg_h = min(fg_height, padded_fg_height)
-
-            # Paste the actual foreground (without the padding border,
-            # the padding is just the canvas area around it)
-            paste_x = x_offset + padding if x_offset + padding < canvas_size else 0
-            paste_y = y_offset + padding if y_offset + padding < canvas_size else 0
-
-            # Make sure we don't paste outside canvas
-            if paste_x + actual_fg_w <= canvas_size and paste_y + actual_fg_h <= canvas_size:
-                background.paste(fg_img, (paste_x, paste_y), fg_img)
-            else:
-                # Fallback: just centre the foreground without padding
-                cent_x = (canvas_size - fg_width) // 2
-                cent_y = (canvas_size - fg_height) // 2
-                background.paste(fg_img, (cent_x, cent_y), fg_img)
-                warnings.append("Adjusted placement - product centred without full padding")
+            # Paste the entire resized foreground onto the canvas using alpha mask
+            background.paste(resized_fg, (paste_x, paste_y), resized_fg)
 
             # Generate preview (320x320)
             preview_size = (320, 320)

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ROUTES } from '@/routes';
 import { Loader2, ShieldAlert, ArrowRight, RefreshCw } from 'lucide-react';
@@ -12,11 +12,11 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) => {
-  const { isAuthenticated, isLoading, user, switchRole } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated, isLoading, isSigningOut, user, userAccount, switchRole } = useAuth();
+  const navigate = useNavigate();
 
-  // 1. Loading state: wait for auth verification before making routing decisions
-  if (isLoading) {
+  // 1. Loading / Signing Out state: wait for auth verification before making routing decisions
+  if (isLoading || isSigningOut) {
     return (
       <div
         role="status"
@@ -25,22 +25,26 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
       >
         <Loader2 className="w-8 h-8 animate-spin text-secondary" />
         <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-          Verifying security credentials...
+          {isSigningOut ? 'Signing out securely...' : 'Verifying security credentials...'}
         </span>
       </div>
     );
   }
 
-  // 2. Unauthenticated state: redirect to login preserving return URL
+  // 2. Unauthenticated state: redirect to central sign-in access portal
   if (!isAuthenticated) {
-    const returnUrl = `${location.pathname}${location.search}${location.hash}`;
-    const loginTarget = `${ROUTES.LOGIN}?returnUrl=${encodeURIComponent(returnUrl)}`;
-    return <Navigate to={loginTarget} replace state={{ from: location }} />;
+    return <Navigate to={ROUTES.SIGN_IN} replace />;
   }
 
   // 3. Role enforcement: check if the user's active role matches the required role
-  const userRole = user?.role || 'artisan';
+  const userRole = userAccount?.role || user?.role;
+  if (!userRole) {
+    return <Navigate to={ROUTES.SIGN_IN} replace />;
+  }
+
   if (requiredRole && userRole !== requiredRole) {
+    const isAuthorizedCoordinator = userAccount?.role === 'coordinator' || user?.role === 'coordinator';
+
     return (
       <div className="max-w-md mx-auto py-16 px-4 animate-in fade-in">
         <Card className="p-6 md:p-8 text-center flex flex-col items-center gap-4 bg-white border border-surface-variant rounded-2xl shadow-sm">
@@ -57,19 +61,33 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
           </div>
 
           <div className="flex flex-col gap-2 w-full pt-2">
-            <Button
-              onClick={() => {
-                switchRole(requiredRole);
-              }}
-              leftIcon={<RefreshCw className="w-4 h-4" />}
-              className="w-full text-xs font-bold"
-            >
-              Switch to {requiredRole.charAt(0).toUpperCase() + requiredRole.slice(1)} Mode
-            </Button>
+            {requiredRole === 'coordinator' && !isAuthorizedCoordinator ? (
+              <Button
+                onClick={() => {
+                  navigate(ROUTES.COORDINATOR_LOGIN);
+                }}
+                leftIcon={<ArrowRight className="w-4 h-4" />}
+                className="w-full text-xs font-bold"
+              >
+                Sign In with Coordinator Credentials
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  switchRole(requiredRole);
+                  navigate(requiredRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD);
+                }}
+                leftIcon={<RefreshCw className="w-4 h-4" />}
+                className="w-full text-xs font-bold"
+              >
+                Switch to {requiredRole.charAt(0).toUpperCase() + requiredRole.slice(1)} Mode
+              </Button>
+            )}
+
             <Button
               variant="ghost"
               onClick={() => {
-                window.location.href = userRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
+                navigate(userRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD);
               }}
               rightIcon={<ArrowRight className="w-4 h-4" />}
               className="w-full text-xs"

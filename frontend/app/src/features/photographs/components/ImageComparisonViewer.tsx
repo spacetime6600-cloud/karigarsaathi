@@ -21,7 +21,19 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
   const [sliderPosition, setSliderPosition] = useState<number>(50); // percentage 0-100
   const [viewMode, setViewMode] = useState<'split' | 'original' | 'enhanced'>('split');
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [containerWidth, setContainerWidth] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const handleSliderMove = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -151,7 +163,7 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
             <div
               className="absolute inset-y-0 left-0 h-full"
               style={{
-                width: containerRef.current ? `${containerRef.current.clientWidth}px` : '100%',
+                width: containerWidth || (containerRef.current ? `${containerRef.current.clientWidth}px` : '100%'),
               }}
             >
               <img

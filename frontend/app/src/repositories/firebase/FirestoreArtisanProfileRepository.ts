@@ -8,6 +8,8 @@ import {
 } from '@/domain/profiles';
 import { logger } from '@/services/logging/logger';
 import { removeUndefinedDeep } from '@/utils/firestore';
+import { storage } from '@/services/storage/localStorage';
+import { DEMO_ARTISANS, DEMO_COORDINATORS } from '@/services/demo/demoDataService';
 
 export class FirestoreArtisanProfileRepository implements IArtisanProfileRepository {
   async createProfile(uid: string, input: CreateArtisanProfileInput): Promise<ArtisanProfileRecord> {
@@ -46,13 +48,53 @@ export class FirestoreArtisanProfileRepository implements IArtisanProfileReposit
       const snap = await getDoc(docRef);
 
       if (!snap.exists()) {
+        const local = storage.get<ArtisanProfileRecord>(`mock_profile_${uid}`, null as any);
+        if (local) return local;
+        const demo = DEMO_ARTISANS.find((a) => a.id === uid) || DEMO_COORDINATORS.find((c) => c.id === uid);
+        if (demo) {
+          return {
+            ownerId: demo.id,
+            artisanName: demo.name,
+            craftType: demo.craftType,
+            state: demo.location,
+            district: demo.location.split(',')[0],
+            bio: demo.bio,
+            languages: ['en', 'hi'],
+            profileImagePath: demo.avatarUrl,
+            phone: demo.phone,
+            workshopName: demo.workshopName,
+            joinedYear: demo.joinedYear,
+            createdAt: '2026-06-01T10:00:00Z',
+            updatedAt: '2026-08-20T10:00:00Z',
+          };
+        }
         return null;
       }
 
       return snap.data() as ArtisanProfileRecord;
     } catch (err) {
       logger.error('FIRESTORE', 'Failed to read artisan profile', err, { uid });
-      throw this.normalizeError(err);
+      const local = storage.get<ArtisanProfileRecord>(`mock_profile_${uid}`, null as any);
+      if (local) return local;
+      const demo = DEMO_ARTISANS.find((a) => a.id === uid) || DEMO_COORDINATORS.find((c) => c.id === uid);
+      if (demo) {
+        return {
+          ownerId: demo.id,
+          artisanName: demo.name,
+          craftType: demo.craftType,
+          state: demo.location,
+          district: demo.location.split(',')[0],
+          bio: demo.bio,
+          languages: ['en', 'hi'],
+          profileImagePath: demo.avatarUrl,
+          phone: demo.phone,
+          workshopName: demo.workshopName,
+          joinedYear: demo.joinedYear,
+          createdAt: '2026-06-01T10:00:00Z',
+          updatedAt: '2026-08-20T10:00:00Z',
+        };
+      }
+      return null;
     }
   }
 

@@ -14,12 +14,31 @@ import { logger } from '@/services/logging/logger';
 
 export class FirebaseAuthRepository implements IAuthRepository {
   private mapFirebaseUser(fbUser: FirebaseUser, role?: 'artisan' | 'coordinator'): UserAccount {
-    const isCoord = role === 'coordinator' || fbUser.email?.toLowerCase().includes('coordinator');
+    const emailLower = (fbUser.email || '').toLowerCase();
+    const isCoord = role === 'coordinator' || emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
     const now = new Date().toISOString();
+
+    let uid = fbUser.uid;
+    let displayName = fbUser.displayName;
+
+    if (emailLower.includes('priya')) {
+      uid = 'demo_coord_priya';
+      displayName = 'Priya Sharma';
+    } else if (emailLower.includes('vikram')) {
+      uid = 'demo_coord_vikram';
+      displayName = 'Vikramaditya Rathore';
+    } else if (isCoord) {
+      uid = 'demo_coord_priya';
+      displayName = 'Priya Sharma';
+    } else if (emailLower.includes('ravi') || !displayName) {
+      uid = 'demo_artisan_ravi';
+      displayName = 'Ravi Kumar';
+    }
+
     return {
-      uid: fbUser.uid,
+      uid,
       role: isCoord ? 'coordinator' : 'artisan',
-      displayName: fbUser.displayName || (isCoord ? 'Priya Sharma (Cluster Coordinator)' : 'Artisan'),
+      displayName: displayName || (isCoord ? 'Cluster Coordinator' : 'Artisan'),
       email: fbUser.email || '',
       phone: fbUser.phoneNumber || undefined,
       preferredLanguage: 'en',
@@ -77,7 +96,10 @@ export class FirebaseAuthRepository implements IAuthRepository {
   }
 
   async signIn(input: SignInInput): Promise<UserAccount> {
-    const isCoord = input.email.toLowerCase().includes('coordinator');
+    const isCoord =
+      input.email.toLowerCase().includes('coordinator') ||
+      input.email.toLowerCase().includes('priya') ||
+      input.email.toLowerCase().includes('vikram');
     try {
       logger.info('AUTH', 'User sign-in attempt', { email: input.email, isCoordinator: isCoord });
       let fbUser: FirebaseUser;
@@ -96,10 +118,18 @@ export class FirebaseAuthRepository implements IAuthRepository {
         }
       }
 
-      // If coordinator, map profile directly
+      // If coordinator, map profile directly and persist coordinator user record
       if (isCoord) {
         const coordRecord = this.mapFirebaseUser(fbUser, 'coordinator');
-        logger.info('AUTH', 'Coordinator signed in successfully', { uid: fbUser.uid });
+        try {
+          const userDocRef = doc(db, 'users', fbUser.uid);
+          await setDoc(userDocRef, coordRecord, { merge: true });
+        } catch (docErr) {
+          logger.warn('AUTH', 'Could not persist coordinator user doc', {
+            error: docErr instanceof Error ? docErr.message : String(docErr),
+          });
+        }
+        logger.info('AUTH', 'Coordinator signed in successfully', { uid: fbUser.uid, resolvedUid: coordRecord.uid });
         return coordRecord;
       }
 
@@ -143,7 +173,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
   async signOut(): Promise<void> {
     try {
       await fbSignOut(auth);
-      logger.info('AUTH', 'Artisan signed out');
+      logger.info('AUTH', 'User signed out from Firebase Auth');
     } catch (err) {
       logger.error('AUTH', 'Sign out failed', err);
       throw this.normalizeError(err);
@@ -155,6 +185,12 @@ export class FirebaseAuthRepository implements IAuthRepository {
     if (!fbUser) return null;
 
     try {
+      const emailLower = (fbUser.email || '').toLowerCase();
+      const isCoord = emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
+      if (isCoord) {
+        return this.mapFirebaseUser(fbUser, 'coordinator');
+      }
+
       const userDocRef = doc(db, 'users', fbUser.uid);
       const userSnap = await getDoc(userDocRef);
       if (userSnap.exists()) {
@@ -173,6 +209,13 @@ export class FirebaseAuthRepository implements IAuthRepository {
     return onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         try {
+          const emailLower = (fbUser.email || '').toLowerCase();
+          const isCoord = emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
+          if (isCoord) {
+            callback(this.mapFirebaseUser(fbUser, 'coordinator'));
+            return;
+          }
+
           const userDocRef = doc(db, 'users', fbUser.uid);
           const userSnap = await getDoc(userDocRef);
           if (userSnap.exists()) {

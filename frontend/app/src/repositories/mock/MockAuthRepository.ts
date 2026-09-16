@@ -2,17 +2,6 @@ import { IAuthRepository } from '@/repositories/interfaces/IAuthRepository';
 import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
 import { storage } from '@/services/storage/localStorage';
 
-const DEFAULT_USER: UserAccount = {
-  uid: 'artisan_demo_01',
-  role: 'artisan',
-  displayName: 'Ravi Kumar',
-  email: 'ravi@example.com',
-  phone: '9876543210',
-  preferredLanguage: 'en',
-  createdAt: '2026-08-27T10:00:00.000Z',
-  updatedAt: '2026-08-27T10:00:00.000Z',
-};
-
 export class MockAuthRepository implements IAuthRepository {
   private listeners: Array<(user: UserAccount | null) => void> = [];
 
@@ -33,9 +22,33 @@ export class MockAuthRepository implements IAuthRepository {
   }
 
   async signIn(input: SignInInput): Promise<UserAccount> {
+    let uid = 'demo_artisan_ravi';
+    let role: 'artisan' | 'coordinator' = 'artisan';
+    let displayName = 'Ravi Kumar';
+
+    if (input.email.includes('priya')) {
+      uid = 'demo_coord_priya';
+      role = 'coordinator';
+      displayName = 'Priya Sharma';
+    } else if (input.email.includes('vikram')) {
+      uid = 'demo_coord_vikram';
+      role = 'coordinator';
+      displayName = 'Vikramaditya Rathore';
+    } else if (input.email.includes('coordinator')) {
+      uid = 'demo_coord_priya';
+      role = 'coordinator';
+      displayName = 'Priya Sharma';
+    }
+
     const user: UserAccount = {
-      ...DEFAULT_USER,
+      uid,
+      role,
+      displayName,
       email: input.email,
+      phone: '9876543210',
+      preferredLanguage: 'en',
+      createdAt: '2026-08-27T10:00:00.000Z',
+      updatedAt: '2026-08-27T10:00:00.000Z',
     };
     storage.set('mock_currentUser', user);
     this.notify(user);
@@ -48,12 +61,12 @@ export class MockAuthRepository implements IAuthRepository {
   }
 
   async getCurrentUser(): Promise<UserAccount | null> {
-    return storage.get<UserAccount | null>('mock_currentUser', DEFAULT_USER);
+    return storage.get<UserAccount | null>('mock_currentUser', null);
   }
 
   observeAuthState(callback: (user: UserAccount | null) => void): () => void {
     this.listeners.push(callback);
-    callback(storage.get<UserAccount | null>('mock_currentUser', DEFAULT_USER));
+    callback(storage.get<UserAccount | null>('mock_currentUser', null));
     return () => {
       this.listeners = this.listeners.filter((l) => l !== callback);
     };

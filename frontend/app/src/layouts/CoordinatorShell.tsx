@@ -22,6 +22,7 @@ import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { PageAtmosphere } from '@/components/layout/PageAtmosphere';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 import { ROUTES } from '@/routes';
 import { clsx } from 'clsx';
 
@@ -255,7 +256,7 @@ export const CoordinatorShell: React.FC = () => {
                   ref={accountMenuRef}
                   role="menu"
                   aria-label="Coordinator Account Menu"
-                  className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none flex flex-col gap-3"
+                  className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3"
                 >
                   {/* Coordinator Summary */}
                   <div className="flex items-center gap-3 pb-3 border-b border-surface-variant/80">
@@ -303,8 +304,12 @@ export const CoordinatorShell: React.FC = () => {
                       type="button"
                       onClick={async () => {
                         setIsAccountMenuOpen(false);
-                        await signOut();
-                        navigate(ROUTES.HOME);
+                        try {
+                          await signOut();
+                          navigate(ROUTES.SIGN_IN, { replace: true });
+                        } catch {
+                          // error is captured in AuthProvider
+                        }
                       }}
                       className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-error-container/60 hover:bg-error-container text-error text-xs font-bold transition-colors touch-target active:scale-[0.98]"
                     >
@@ -352,7 +357,9 @@ export const CoordinatorShell: React.FC = () => {
 
         {/* Child Workspace Route Output */}
         <main id="main-content" tabIndex={-1} className="p-4 sm:p-8 max-w-7xl w-full mx-auto outline-none">
-          <Outlet />
+          <PageTransitionContainer>
+            <Outlet />
+          </PageTransitionContainer>
         </main>
       </div>
     </PageAtmosphere>

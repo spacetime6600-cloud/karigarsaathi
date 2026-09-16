@@ -166,11 +166,11 @@ describe('Craft Inventory & Catalogue Management Page', () => {
     });
 
     // Confirmation modal should open
-    expect(container.textContent).toContain('Delete Product Permanently');
-    expect(container.textContent).toContain('Are you sure you want to permanently delete "Silk Jamdani Saree"?');
+    expect(document.body.textContent).toContain('Delete Product Permanently');
+    expect(document.body.textContent).toContain('Are you sure you want to permanently delete "Silk Jamdani Saree"?');
 
     // Confirm permanent deletion
-    const confirmButton = Array.from(container.querySelectorAll('button')).find((b) =>
+    const confirmButton = Array.from(document.body.querySelectorAll('button')).find((b) =>
       b.textContent?.includes('Delete Permanently')
     );
     expect(confirmButton).toBeDefined();

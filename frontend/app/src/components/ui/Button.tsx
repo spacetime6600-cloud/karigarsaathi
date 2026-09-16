@@ -22,7 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-bold tracking-tight rounded-md transition-all duration-150 active:scale-[0.98] select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-tertiary-fixed-dim focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 touch-target';
+    'inline-flex items-center justify-center font-bold tracking-tight rounded-md transition-[transform,background-color,border-color,box-shadow,opacity] duration-150 ease-out active:scale-[0.985] select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-tertiary-fixed-dim focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 touch-target motion-reduce:transform-none motion-reduce:transition-none';
 
   const sizeStyles = {
     sm: 'text-xs px-3 py-2 min-h-[48px]',
