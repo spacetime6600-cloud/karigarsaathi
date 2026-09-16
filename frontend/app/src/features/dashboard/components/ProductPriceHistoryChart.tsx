@@ -51,7 +51,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;
 
-  const entries = priceInsight?.historyEntries || [];
+  const entries = useMemo(() => priceInsight?.historyEntries || [], [priceInsight?.historyEntries]);
 
   const maxPrice = useMemo(() => {
     if (!priceInsight) return 1000;

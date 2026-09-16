@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Privacy-Safe Coordinator & Cluster Helper Service for KarigarSaathi
  * Guarantees assignment-based isolation, privacy-safe aggregations,

@@ -1,8 +1,7 @@
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage as firebaseStorage } from '@/config/firebase';
 import { ProductImageRecord, PhotographItem } from '@/types';
 import { logger } from '@/services/logging/logger';
 import { storageUploadQueue } from '@/services/storage/storageUploadQueue';
+import { mediaStorageService } from '@/services/media/mediaStorageService';
 
 export const MAX_ORIGINAL_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 export const MAX_IMAGES_PER_PRODUCT = 6;
@@ -183,12 +182,6 @@ export async function uploadPhotograph({
   const originalPath = `users/${ownerId}/products/${productId}/originals/${imageId}.${ext}`;
   const displayPath = `users/${ownerId}/products/${productId}/display/${imageId}.webp`;
 
-  const customMetadata = {
-    ownerId,
-    productId,
-    imageId,
-  };
-
   // 5. Upload to Cloud Storage if online, or enqueue to durable storage queue if offline
   const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
@@ -220,6 +213,7 @@ export async function uploadPhotograph({
 
     const imageRecord: ProductImageRecord = {
       id: imageId,
+      ownerId,
       originalPath,
       displayPath,
       originalDownloadURL: localPreviewUrl,
@@ -233,6 +227,7 @@ export async function uploadPhotograph({
       cropInfo: crop,
       uploadStatus: 'pending',
       createdAt: now,
+      updatedAt: now,
     };
 
     const photoItem: PhotographItem = {
@@ -249,39 +244,35 @@ export async function uploadPhotograph({
   }
 
   try {
-    // 5a. Upload original to Cloud Storage
-    const originalRef = ref(firebaseStorage, originalPath);
-    const originalTask = uploadBytesResumable(originalRef, file, {
-      contentType: file.type,
-      customMetadata,
+    // 5a. Upload original
+    const originalResult = await mediaStorageService.upload({
+      file,
+      productId,
+      imageId,
+      ownerId,
+      variant: 'original',
+      filename: file.name,
+      mimeType: file.type,
+      customStoragePath: originalPath,
+      idempotencyKey: `idemp_${ownerId}_${productId}_${imageId}_original`,
+      onProgress: (pct) => onProgress?.(Math.round(pct * 0.5)),
     });
+    const originalDownloadURL = originalResult.downloadUrl;
 
-    if (onProgress) {
-      originalTask.on('state_changed', (snapshot) => {
-        const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 50;
-        onProgress(Math.round(percent));
-      });
-    }
-
-    await originalTask;
-    const originalDownloadURL = await getDownloadURL(originalRef).catch(() => originalPath);
-
-    // 5b. Upload display copy to Cloud Storage
-    const displayRef = ref(firebaseStorage, displayPath);
-    const displayTask = uploadBytesResumable(displayRef, processed.displayBlob, {
-      contentType: 'image/webp',
-      customMetadata,
+    // 5b. Upload display copy
+    const displayResult = await mediaStorageService.upload({
+      file: processed.displayBlob,
+      productId,
+      imageId,
+      ownerId,
+      variant: 'display',
+      filename: `${imageId}.webp`,
+      mimeType: 'image/webp',
+      customStoragePath: displayPath,
+      idempotencyKey: `idemp_${ownerId}_${productId}_${imageId}_display`,
+      onProgress: (pct) => onProgress?.(50 + Math.round(pct * 0.5)),
     });
-
-    if (onProgress) {
-      displayTask.on('state_changed', (snapshot) => {
-        const percent = 50 + (snapshot.bytesTransferred / snapshot.totalBytes) * 50;
-        onProgress(Math.round(percent));
-      });
-    }
-
-    await displayTask;
-    const displayDownloadURL = await getDownloadURL(displayRef).catch(() => displayPath);
+    const displayDownloadURL = displayResult.downloadUrl;
 
     logger.info('STORAGE', 'Uploaded dual product photos', {
       imageId,
@@ -289,12 +280,14 @@ export async function uploadPhotograph({
       displayPath,
       originalSize: file.size,
       displaySize: processed.displaySize,
+      provider: displayResult.provider,
     });
 
     const now = new Date().toISOString();
 
     const imageRecord: ProductImageRecord = {
       id: imageId,
+      ownerId,
       originalPath,
       displayPath,
       originalDownloadURL,
@@ -308,6 +301,17 @@ export async function uploadPhotograph({
       cropInfo: crop,
       uploadStatus: 'completed',
       createdAt: now,
+      updatedAt: now,
+      provider: displayResult.metadata?.provider || originalResult.metadata?.provider,
+      publicId: displayResult.metadata?.publicId || originalResult.metadata?.publicId,
+      secureUrl: displayDownloadURL || originalDownloadURL,
+      version: displayResult.metadata?.version,
+      format: displayResult.metadata?.format,
+      bytes: processed.displaySize,
+      resourceType: displayResult.metadata?.resourceType || 'image',
+      variant: 'display',
+      checksum: originalResult.metadata?.checksum,
+      idempotencyKey: originalResult.metadata?.idempotencyKey,
     };
 
     const photoItem: PhotographItem = {
@@ -373,6 +377,7 @@ export async function uploadPhotograph({
 
     const imageRecord: ProductImageRecord = {
       id: imageId,
+      ownerId,
       originalPath,
       displayPath,
       originalDownloadURL: localPreviewUrl,
@@ -386,6 +391,7 @@ export async function uploadPhotograph({
       cropInfo: crop,
       uploadStatus: 'pending',
       createdAt: now,
+      updatedAt: now,
     };
 
     const photoItem: PhotographItem = {

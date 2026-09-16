@@ -119,6 +119,7 @@ export const BuyerEnquiryPage: React.FC = () => {
       isSubscribed = false;
       unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentArtisanId]);
 
   // Sync activeId with URL param if present
@@ -149,7 +150,7 @@ export const BuyerEnquiryPage: React.FC = () => {
           // Ignore background read error
         });
     }
-  }, [activeEnquiry?.id, activeEnquiry?.status, currentArtisanId]);
+  }, [activeEnquiry, currentArtisanId]);
 
   const handleSelectEnquiry = (id: string) => {
     setActiveId(id);

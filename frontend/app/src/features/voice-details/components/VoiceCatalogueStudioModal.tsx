@@ -161,6 +161,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
     } else {
       cleanupResources();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const cleanupResources = () => {

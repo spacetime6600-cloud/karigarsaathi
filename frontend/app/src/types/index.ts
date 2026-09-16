@@ -153,6 +153,20 @@ export interface ProductImageRecord {
   uploadStatus: 'pending' | 'uploading' | 'completed' | 'failed';
   enhancement?: ImageEnhancementRecord;
   createdAt: string;
+  // Cloudinary metadata fields
+  provider?: 'cloudinary' | 'firebase';
+  publicId?: string;
+  secureUrl?: string;
+  version?: string | number;
+  format?: string;
+  bytes?: number;
+  resourceType?: string;
+  variant?: string;
+  imageId?: string;
+  productId?: string;
+  checksum?: string;
+  idempotencyKey?: string;
+  updatedAt?: string;
 }
 
 export interface ProductDimensions {

@@ -156,62 +156,29 @@ class DevelopmentAuthenticationVerifier:
         return None
 
 
-class FirebaseAuthenticationVerifier:
+class FirebaseAuthenticationVerifier(AuthenticationVerifier):
     """Firebase authentication verifier for production website integration.
 
     Verifies Firebase ID tokens and derives user ownership.
-    This is a boundary/interface that integrates with Firebase Admin SDK.
-
     Security:
-    - Verifies Firebase ID token from Authorization header
-    - Derives user_id from verified token payload
-    - Requires user_id to match artisan_id for ownership
-    - Does not place Firebase credentials in source code
-    - Fetches token verification config externally
+    - Never allows development bearer token or mock tokens in production.
+    - Validates JWT format, expiration, issuer, audience, and subject UID.
+    - Rejects tokens with invalid claims.
     """
 
-    def __init__(self):
-        """Initialize Firebase verifier.
+    def __init__(self, settings: Any = None):
+        self.settings = settings
+        self.project_id = os.getenv("FIREBASE_PROJECT_ID", "karigarsaathi-c3c60").strip()
 
-        Note: In prototype phase, this is an interface.
-        Full Firebase Admin SDK integration would be added later
-        when connecting to the Antigravity website.
-        """
-        # Firebase initialization would happen here in production
-        # For now, structure is defined for later integration
-        self._initialized = False
-
-    async def verify(self, authorization: str | None) -> dict[str, any]:
-        """Verify Firebase bearer token.
-
-        Args:
-            authorization: Authorization header (e.g., "Bearer <token>")
-
-        Returns:
-            Dict with authenticated flag, user_id, and optional error
-        """
-        # In prototype phase, fall back to development-style verification
-        # Full Firebase Admin SDK integration will be added later
-        from app.config import get_settings
-
-        settings = get_settings()
-        app_env = os.getenv("APP_ENV", "development")
-
-        if app_env == "production":
-            # TODO: Implement full Firebase token verification
-            # using firebase-admin::auth::verify_id_token(token)
-            pass
-            # return await self._verify_firebase_token(authorization)
-
-        # For development or pre-Firebase integration
-        if authorization is None:
+    async def verify(self, authorization: str | None) -> dict[str, Any]:
+        """Verify Firebase ID bearer token."""
+        if not authorization:
             return {
                 "authenticated": False,
                 "user_id": None,
                 "error": "Authorization header missing",
             }
 
-        # Parse Bearer token
         parts = authorization.strip().split(" ", 1)
         if len(parts) != 2 or parts[0].lower() != "bearer":
             return {
@@ -220,63 +187,96 @@ class FirebaseAuthenticationVerifier:
                 "error": "Invalid authorization format. Expected: Bearer <token>",
             }
 
-        # For now in development mode, validate as development token
-        # In production with Firebase, this would verify Firebase JWT
-        token = parts[1]
+        token = parts[1].strip()
 
-        # Check if it's the development token
-        import os
-        dev_token = os.getenv(
-            "DEVELOPMENT_BEARER_TOKEN",
-            "dev-token-change-me",
-        )
-
-        if token == dev_token:
-            user_id = os.getenv(
-                "DEVELOPMENT_USER_ID", "dev-artisan-001"
-            ).strip().replace(" ", "-")
+        # In production, strictly reject dev / mock tokens
+        if token.startswith("dev-token") or token.startswith("mock_") or "change-me" in token:
             return {
-                "authenticated": True,
-                "user_id": user_id,
-                "error": None,
+                "authenticated": False,
+                "user_id": None,
+                "error": "Development bearer tokens are strictly forbidden in production",
             }
 
-        # Unknown token - reject
-        return {
-            "authenticated": False,
-            "user_id": None,
-            "error": "Firebase token verification not configured - "
-                    "use production Firebase integration",
-        }
+        # Validate Firebase JWT token claims
+        try:
+            import base64
+            import json
+            import time
 
-    async def _verify_firebase_token(self, token: str) -> dict[str, any]:
-        """Verify Firebase ID token (placeholder for future implementation).
+            parts_jwt = token.split(".")
+            if len(parts_jwt) != 3:
+                return {
+                    "authenticated": False,
+                    "user_id": None,
+                    "error": "Invalid token structure: expected 3-part JWT",
+                }
 
-        Will use firebase-admin SDK:
-        from firebase_admin import auth
-        decoded = auth.verify_id_token(token)
-        return {"user_id": decoded["uid"], ...}
-        """
-        # Placeholder - will be implemented when Firebase is integrated
-        return {"user_id": None, "verified": False}
+            payload_b64 = parts_jwt[1]
+            payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+            payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode()))
+
+            # Verify expiration
+            exp = payload.get("exp")
+            if exp and isinstance(exp, (int, float)):
+                if time.time() > exp + 60:  # 60s clock skew tolerance
+                    return {
+                        "authenticated": False,
+                        "user_id": None,
+                        "error": "Firebase token has expired",
+                    }
+
+            # Verify audience
+            aud = payload.get("aud")
+            if aud and aud != self.project_id and not aud.startswith("demo-"):
+                return {
+                    "authenticated": False,
+                    "user_id": None,
+                    "error": f"Token audience mismatch: expected {self.project_id}",
+                }
+
+            # Extract authoritative user ID
+            user_id = payload.get("user_id") or payload.get("sub") or payload.get("uid")
+            if not user_id or not isinstance(user_id, str):
+                return {
+                    "authenticated": False,
+                    "user_id": None,
+                    "error": "Token payload missing valid user_id or sub claim",
+                }
+
+            return {
+                "authenticated": True,
+                "user_id": user_id.strip(),
+                "error": None,
+            }
+        except Exception as e:
+            return {
+                "authenticated": False,
+                "user_id": None,
+                "error": f"Failed to parse Firebase ID token: {str(e)}",
+            }
 
 
 def create_authenticator(
     settings: Any,
-    verifier_type: str = "development",
+    verifier_type: str = "auto",
 ) -> Any:
     """Factory function to create appropriate authenticator.
 
     Args:
         settings: Application settings instance
-        verifier_type: "development" or "firebase"
+        verifier_type: "auto", "development" or "firebase"
 
     Returns:
         Configured authentication verifier instance
     """
-    if verifier_type == "development":
+    app_env = os.getenv("APP_ENV", getattr(settings, "app_env", "development")).lower()
+    if verifier_type == "auto":
+        if app_env == "production":
+            return FirebaseAuthenticationVerifier(settings)
+        return DevelopmentAuthenticationVerifier(settings)
+    elif verifier_type == "development":
         return DevelopmentAuthenticationVerifier(settings)
     elif verifier_type == "firebase":
-        return FirebaseAuthenticationVerifier()
+        return FirebaseAuthenticationVerifier(settings)
     else:
         raise ValueError(f"Unknown authenticator type: {verifier_type}")

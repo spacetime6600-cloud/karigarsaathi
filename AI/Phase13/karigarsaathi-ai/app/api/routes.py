@@ -52,8 +52,8 @@ lighting_correction_adapter = LightingCorrectionProcessor()
 composition_adapter = ImageCompositionProcessor()
 job_repository = InMemoryJobRepository()
 
-# Create authentication and quota
-authenticator = DevelopmentAuthenticationVerifier(settings)
+# Create authentication and quota (auto switches to Firebase in production)
+authenticator = create_authenticator(settings, "auto")
 quota_service = InMemoryQuotaService(default_daily_limit=settings.default_jobs_per_artisan_per_day)
 
 # Create safety evaluator

@@ -58,6 +58,17 @@ class Settings(BaseSettings):
         default="your-dev-token-here", alias="DEVELOPMENT_BEARER_TOKEN"
     )
 
+    # Media Storage Provider (cloudinary | firebase_emulator | local)
+    media_storage_provider: str = Field(
+        default="firebase_emulator", alias="MEDIA_STORAGE_PROVIDER"
+    )
+    cloudinary_cloud_name: str = Field(default="", alias="CLOUDINARY_CLOUD_NAME")
+    cloudinary_api_key: str = Field(default="", alias="CLOUDINARY_API_KEY")
+    cloudinary_api_secret: str = Field(default="", alias="CLOUDINARY_API_SECRET")
+    firebase_project_id: str = Field(
+        default="karigarsaathi-c3c60", alias="FIREBASE_PROJECT_ID"
+    )
+
 
 def get_settings() -> Settings:
     """Get configured settings instance."""

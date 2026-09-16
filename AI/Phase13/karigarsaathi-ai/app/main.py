@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.api.routes import router
+from app.api.media_routes import router as media_router
 
 # Initialize settings
 settings = get_settings()
@@ -68,6 +69,7 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(router)
+app.include_router(media_router)
 
 
 @app.get("/", include_in_schema=False, tags=["root"])

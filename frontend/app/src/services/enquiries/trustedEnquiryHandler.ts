@@ -246,7 +246,7 @@ export class TrustedEnquiryHandler {
       let product = null;
       try {
         product = await this.productRepo.getOwnedProductById(authoritativeArtisanId, authoritativeProductId);
-      } catch (prodErr) {
+      } catch {
         logger.warn('ENQUIRY', 'Unauthenticated public context: Falling back to publicCraftPassport projection', { slug });
       }
 

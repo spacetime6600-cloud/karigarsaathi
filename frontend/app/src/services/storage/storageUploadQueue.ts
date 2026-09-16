@@ -3,10 +3,9 @@
  * Persists upload jobs to IndexedDB with exponential backoff, single-flight locks,
  * auth-owner isolation, and truthful sync states.
  */
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage as firebaseStorage } from '@/config/firebase';
 import { idbPut, idbGet, idbGetAll, idbDelete, STORES } from './indexedDbStore';
 import { logger } from '@/services/logging/logger';
+import { mediaStorageService } from '@/services/media/mediaStorageService';
 
 export type QueueItemStatus = 'pending' | 'uploading' | 'completed' | 'failed';
 export type QueueVariantType = 'original' | 'processed' | 'thumbnail';
@@ -274,41 +273,27 @@ class StorageUploadQueueManager {
     this.notifyListeners();
 
     try {
-      const storageRef = ref(firebaseStorage, item.uploadDestination);
-
-      const downloadUrl = await new Promise<string>((resolve, reject) => {
-        const uploadTask = uploadBytesResumable(storageRef, item.blob, {
-          contentType: item.mimeType,
-          customMetadata: {
-            ownerId: item.ownerUid,
-            productId: item.productId,
-            operationId: item.operationId,
-            idempotencyKey: item.idempotencyKey,
-          },
-        });
-
-        uploadTask.on(
-          'state_changed',
-          undefined,
-          (error) => reject(error),
-          async () => {
-            try {
-              const url = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(url);
-            } catch (err) {
-              reject(err);
-            }
-          }
-        );
+      const uploadResult = await mediaStorageService.upload({
+        file: item.blob,
+        productId: item.productId,
+        imageId: item.imageId,
+        ownerId: item.ownerUid,
+        variant: item.variantType === 'processed' ? 'display' : item.variantType,
+        filename: item.originalFilename,
+        mimeType: item.mimeType,
+        idempotencyKey: item.idempotencyKey,
+        customStoragePath: item.uploadDestination,
       });
 
       // Mark completed
       item.status = 'completed';
-      item.downloadUrl = downloadUrl;
+      item.downloadUrl = uploadResult.downloadUrl;
       item.updatedAt = new Date().toISOString();
       item.lastError = undefined;
+      // Step 4: IndexedDB binary is removed only after the full operation succeeds
+      item.blob = new Blob([], { type: item.mimeType });
       await idbPut(STORES.UPLOAD_QUEUE, item);
-      logger.info('UPLOAD_QUEUE', 'Completed upload for item', { operationId: item.operationId, destination: item.uploadDestination });
+      logger.info('UPLOAD_QUEUE', 'Completed upload for item', { operationId: item.operationId, destination: item.uploadDestination, provider: uploadResult.provider });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       const isRetryable = this.isErrorRetryable(err);

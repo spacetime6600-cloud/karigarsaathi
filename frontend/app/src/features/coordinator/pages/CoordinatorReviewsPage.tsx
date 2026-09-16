@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
@@ -58,6 +59,7 @@ export const CoordinatorReviewsPage: React.FC = () => {
 
   useEffect(() => {
     loadReviewProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coordinatorUid]);
 
   // Filter products by tab & search

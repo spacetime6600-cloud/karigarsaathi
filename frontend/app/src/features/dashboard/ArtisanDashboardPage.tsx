@@ -96,8 +96,8 @@ function getProductThumbnailUrl(product: ProductRecord): string | null {
       ? product.images.find((img) => img.id === product.primaryImageId)
       : null;
     const img = primary || product.images[0];
-    if (img && (img.displayDownloadURL || img.originalDownloadURL)) {
-      return img.displayDownloadURL || img.originalDownloadURL || null;
+    if (img && (img.secureUrl || img.displayDownloadURL || img.originalDownloadURL)) {
+      return img.secureUrl || img.displayDownloadURL || img.originalDownloadURL || null;
     }
   }
 

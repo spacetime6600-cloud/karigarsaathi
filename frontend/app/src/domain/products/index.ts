@@ -108,8 +108,15 @@ export interface UpdateProductInput extends Partial<Omit<ProductRecord, 'id' | '
 
 export function draftToProductRecord(draft: ProductDraft, ownerId: string): ProductRecord {
   const photoPaths = draft.photos && draft.photos.length > 0
-    ? draft.photos.map((p) => p.url).filter((u): u is string => typeof u === 'string' && u.trim().length > 0)
-    : (draft.photoPaths || []);
+    ? draft.photos
+        .map((p) => {
+          if (p.selectedVariant === 'enhanced' && p.enhancedUrl && !p.enhancedUrl.startsWith('data:')) {
+            return p.enhancedUrl;
+          }
+          return p.url;
+        })
+        .filter((u): u is string => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('data:'))
+    : (draft.photoPaths || []).filter((u) => typeof u === 'string' && !u.startsWith('data:'));
 
   const firstMaterial = draft.materials && draft.materials.length > 0
     ? draft.materials.join(', ')
@@ -227,14 +234,14 @@ export function productRecordToDraft(record: ProductRecord): ProductDraft {
     ? record.images.map((img, idx) => ({
         id: img.id,
         url: (img.enhancement?.approvalStatus === 'approved' && img.enhancement?.selectedVariant === 'enhanced' && (img.enhancement.enhancedDownloadURL || img.enhancement.enhancedPath))
-          ? (img.enhancement.enhancedDownloadURL || img.enhancement.enhancedPath || img.displayDownloadURL || img.originalDownloadURL || img.originalPath)
-          : (img.displayDownloadURL || img.originalDownloadURL || img.originalPath),
+          ? (img.enhancement.enhancedDownloadURL || img.enhancement.enhancedPath || img.secureUrl || img.displayDownloadURL || img.originalDownloadURL || img.originalPath)
+          : (img.secureUrl || img.displayDownloadURL || img.originalDownloadURL || img.originalPath),
         name: img.fileName || `Photo ${idx + 1}`,
         size: img.displaySize || img.originalSize || 1000000,
         type: img.contentType || 'image/jpeg',
         uploadedAt: img.createdAt || record.createdAt,
         isCover: idx === (record.coverPhotoIndex || 0) || img.id === record.primaryImageId,
-        rawOriginalUrl: img.originalDownloadURL || img.originalPath,
+        rawOriginalUrl: img.secureUrl || img.originalDownloadURL || img.originalPath,
         enhancedUrl: img.enhancement?.enhancedDownloadURL || img.enhancement?.enhancedPath,
         previewUrl: img.enhancement?.previewDownloadURL || img.enhancement?.previewPath,
         enhancementStatus: img.enhancement?.status,

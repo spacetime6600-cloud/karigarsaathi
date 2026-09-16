@@ -106,9 +106,10 @@ export class FirebaseAuthRepository implements IAuthRepository {
       try {
         const cred = await signInWithEmailAndPassword(auth, input.email, input.password);
         fbUser = cred.user;
-      } catch (authErr: any) {
+      } catch (authErr: unknown) {
+        const errCode = (authErr as { code?: string })?.code;
         // In local/emulator/demo environment, auto-provision coordinator or artisan account if user not found
-        if (authErr?.code === 'auth/user-not-found' || authErr?.code === 'auth/invalid-credential') {
+        if (errCode === 'auth/user-not-found' || errCode === 'auth/invalid-credential') {
           const cred = await createUserWithEmailAndPassword(auth, input.email, input.password);
           fbUser = cred.user;
           const displayName = isCoord ? 'Priya Sharma (Cluster Coordinator)' : 'Ravi Kumar';

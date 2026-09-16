@@ -4,6 +4,7 @@ import { ProductDraft } from '@/types';
 import { QrCode, MapPin } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ROUTES } from '@/routes';
+import { resolveProductCoverUrl, handleImageFallback } from '@/services/media/imageUrlResolver';
 
 export interface RecentCraftItemsSectionProps {
   products: ProductDraft[];
@@ -71,9 +72,7 @@ export const RecentCraftItemsSection: React.FC<RecentCraftItemsSectionProps> = (
           const isInfoTopOnDesktop = index === 1;
 
           const passportId = `KP_${item.id.replace('draft_', '')}`;
-          const imageUrl =
-            item.photos[0]?.url ||
-            'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop&q=80';
+          const imageUrl = resolveProductCoverUrl(item);
 
           return (
             <li
@@ -96,6 +95,7 @@ export const RecentCraftItemsSection: React.FC<RecentCraftItemsSectionProps> = (
                   src={imageUrl}
                   alt={item.title}
                   loading="lazy"
+                  onError={handleImageFallback}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                 />
                 {/* Refined Small Category Badge */}

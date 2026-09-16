@@ -15,8 +15,8 @@ interface AccountDropdownMenuProps {
   isOpen: boolean;
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement>;
-  user: any;
-  currentLanguageMeta: { name: string; [key: string]: any };
+  user: import('@/types').ArtisanProfile | null;
+  currentLanguageMeta: (typeof import('@/i18n').supportedLanguages)[number];
   switchRole: (role: 'artisan' | 'coordinator') => void;
   signOut: () => Promise<void> | void;
   navigate: (path: string, options?: { replace?: boolean }) => void;

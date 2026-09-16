@@ -12,6 +12,16 @@ services:
         value: production
       - key: CORS_ORIGINS
         value: http://localhost:3000,http://localhost:3001
+      - key: MEDIA_STORAGE_PROVIDER
+        value: cloudinary
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        value: karigarsaathi-c3c60
 
   - type: web
     name: karigarsaathi-ai-voice
@@ -26,6 +36,8 @@ services:
         value: production
       - key: CORS_ORIGINS
         value: http://localhost:3000,http://localhost:3001
+      - key: SARVAM_API_KEY
+        sync: false
       - key: WHISPER_MODEL
         value: base
       - key: WHISPER_DEVICE

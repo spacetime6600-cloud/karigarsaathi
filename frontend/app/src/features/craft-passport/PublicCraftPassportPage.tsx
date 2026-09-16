@@ -23,6 +23,11 @@ import {
   Check,
 } from 'lucide-react';
 import { whatsappService } from '@/services/export/whatsappService';
+import {
+  resolveProductImageUrl,
+  handleImageFallback,
+  FALLBACK_PRODUCT_IMAGE_URL,
+} from '@/services/media/imageUrlResolver';
 
 export const PublicCraftPassportPage: React.FC = () => {
   const { publicSlug, passportId } = useParams<{ publicSlug?: string; passportId?: string }>();
@@ -213,7 +218,9 @@ export const PublicCraftPassportPage: React.FC = () => {
   }
 
   const { publicData } = passport;
-  const coverPhoto = publicData.photos[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800';
+  const coverPhoto = resolveProductImageUrl(publicData.photos?.[0], {
+    fallback: FALLBACK_PRODUCT_IMAGE_URL,
+  });
   const lastUpdatedFormatted = new Date(passport.updatedAt).toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'long',
@@ -265,6 +272,7 @@ export const PublicCraftPassportPage: React.FC = () => {
               <img
                 src={coverPhoto}
                 alt={publicData.title}
+                onError={handleImageFallback}
                 className="max-w-full max-h-full w-auto h-auto object-contain object-center"
               />
               <div className="absolute top-3 left-3 bg-surface-container-lowest/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow text-xs font-bold text-primary border border-surface-variant">
@@ -276,8 +284,9 @@ export const PublicCraftPassportPage: React.FC = () => {
             {publicData.photos.slice(1, 4).map((imgUrl, i) => (
               <div key={i} className="col-span-1 aspect-square rounded-lg overflow-hidden border border-surface-variant bg-slate-900 flex items-center justify-center p-1">
                 <img
-                  src={imgUrl}
+                  src={resolveProductImageUrl(imgUrl)}
                   alt={`Detail view ${i + 1}`}
+                  onError={handleImageFallback}
                   className="max-w-full max-h-full w-auto h-auto object-contain object-center"
                 />
               </div>

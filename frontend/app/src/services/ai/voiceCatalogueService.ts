@@ -157,7 +157,7 @@ class VoiceCatalogueService {
       clearTimeout(timer);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
-    } catch (err) {
+    } catch {
       clearTimeout(timer);
       return {
         status: 'unreachable',

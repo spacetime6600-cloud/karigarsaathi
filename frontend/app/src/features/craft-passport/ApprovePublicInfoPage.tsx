@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { ShieldCheck, ArrowRight, CheckSquare, Square, AlertCircle, Sparkles } from 'lucide-react';
+import { resolveProductImageUrl } from '@/services/media/imageUrlResolver';
 
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800';
 
@@ -118,10 +119,9 @@ export const ApprovePublicInfoPage: React.FC = () => {
 
   const activePhoto = draft.photos[draft.coverPhotoIndex] || draft.photos[0];
   const matchingImage = draft.images?.find(
-    (img) => img.id === activePhoto?.id || img.originalPath === activePhoto?.url || img.displayPath === activePhoto?.url
+    (img) => img.id === activePhoto?.id || img.originalPath === activePhoto?.url || img.displayPath === activePhoto?.url || img.secureUrl === activePhoto?.url
   );
-  const resolvedImageUrl =
-    matchingImage?.displayDownloadURL || matchingImage?.originalDownloadURL || activePhoto?.url || FALLBACK_IMAGE_URL;
+  const resolvedImageUrl = resolveProductImageUrl(matchingImage || activePhoto, { fallback: FALLBACK_IMAGE_URL });
 
   return (
     <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">

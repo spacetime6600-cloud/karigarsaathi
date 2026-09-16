@@ -48,7 +48,7 @@ export class FirestoreArtisanProfileRepository implements IArtisanProfileReposit
       const snap = await getDoc(docRef);
 
       if (!snap.exists()) {
-        const local = storage.get<ArtisanProfileRecord>(`mock_profile_${uid}`, null as any);
+        const local = storage.get<ArtisanProfileRecord | null>(`mock_profile_${uid}`, null);
         if (local) return local;
         const demo = DEMO_ARTISANS.find((a) => a.id === uid) || DEMO_COORDINATORS.find((c) => c.id === uid);
         if (demo) {
@@ -74,7 +74,7 @@ export class FirestoreArtisanProfileRepository implements IArtisanProfileReposit
       return snap.data() as ArtisanProfileRecord;
     } catch (err) {
       logger.error('FIRESTORE', 'Failed to read artisan profile', err, { uid });
-      const local = storage.get<ArtisanProfileRecord>(`mock_profile_${uid}`, null as any);
+      const local = storage.get<ArtisanProfileRecord | null>(`mock_profile_${uid}`, null);
       if (local) return local;
       const demo = DEMO_ARTISANS.find((a) => a.id === uid) || DEMO_COORDINATORS.find((c) => c.id === uid);
       if (demo) {

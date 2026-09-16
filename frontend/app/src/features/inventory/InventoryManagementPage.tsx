@@ -32,6 +32,7 @@ import { logger } from '@/services/logging/logger';
 import { passportManager } from '@/services/passport/passportManager';
 import { storage } from '@/services/storage/localStorage';
 import { ROUTES } from '@/routes';
+import { resolveProductCoverUrl, handleImageFallback } from '@/services/media/imageUrlResolver';
 
 type InventoryTab = 'all' | 'draft' | 'ready' | 'published' | 'archived';
 
@@ -438,7 +439,7 @@ export const InventoryManagementPage: React.FC = () => {
           /* Products Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map((product) => {
-              const coverPhoto = product.photoPaths && product.photoPaths[0];
+              const coverPhoto = resolveProductCoverUrl(product);
               const formattedPrice = Number(product.price).toLocaleString('en-IN');
               const isArchived = product.status === 'archived';
 
@@ -455,6 +456,7 @@ export const InventoryManagementPage: React.FC = () => {
                           <img
                             src={coverPhoto}
                             alt={product.title || 'Product'}
+                            onError={handleImageFallback}
                             className="w-full h-full object-cover"
                           />
                         ) : (
