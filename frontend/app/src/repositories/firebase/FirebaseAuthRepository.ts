@@ -7,7 +7,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db, getFirebaseConfig } from '@/config/firebase';
+import { auth, db, getFirebaseConfig, checkIsEmulatorMode } from '@/config/firebase';
 import { IAuthRepository } from '@/repositories/interfaces/IAuthRepository';
 import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
 import { logger } from '@/services/logging/logger';
@@ -18,21 +18,24 @@ export class FirebaseAuthRepository implements IAuthRepository {
     const isCoord = role === 'coordinator' || emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
     const now = new Date().toISOString();
 
+    const isEmulator = checkIsEmulatorMode();
     let uid = fbUser.uid;
     let displayName = fbUser.displayName;
 
-    if (emailLower.includes('priya')) {
-      uid = 'demo_coord_priya';
-      displayName = 'Priya Sharma';
-    } else if (emailLower.includes('vikram')) {
-      uid = 'demo_coord_vikram';
-      displayName = 'Vikramaditya Rathore';
-    } else if (isCoord) {
-      uid = 'demo_coord_priya';
-      displayName = 'Priya Sharma';
-    } else if (emailLower.includes('ravi') || !displayName) {
-      uid = 'demo_artisan_ravi';
-      displayName = 'Ravi Kumar';
+    if (isEmulator) {
+      if (emailLower.includes('priya')) {
+        uid = 'demo_coord_priya';
+        displayName = 'Priya Sharma';
+      } else if (emailLower.includes('vikram')) {
+        uid = 'demo_coord_vikram';
+        displayName = 'Vikramaditya Rathore';
+      } else if (isCoord) {
+        uid = 'demo_coord_priya';
+        displayName = 'Priya Sharma';
+      } else if (emailLower.includes('ravi')) {
+        uid = 'demo_artisan_ravi';
+        displayName = 'Ravi Kumar';
+      }
     }
 
     return {
@@ -163,7 +166,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
       const userRecord: UserAccount = {
         uid: fbUser.uid,
         role: 'artisan',
-        displayName: fbUser.displayName || 'Ravi Kumar',
+        displayName: fbUser.displayName || 'Artisan',
         email: input.email,
         preferredLanguage: 'en',
         createdAt: now,
@@ -175,6 +178,29 @@ export class FirebaseAuthRepository implements IAuthRepository {
       } catch (docErr) {
         logger.warn('AUTH', 'Could not persist userDocRef, using memory profile', {
           error: docErr instanceof Error ? docErr.message : String(docErr),
+        });
+      }
+
+      // Ensure artisan profile exists as well
+      const profileDocRef = doc(db, 'artisanProfiles', fbUser.uid);
+      try {
+        const profileSnap = await getDoc(profileDocRef);
+        if (!profileSnap.exists()) {
+          await setDoc(profileDocRef, {
+            ownerId: fbUser.uid,
+            artisanName: fbUser.displayName || 'Artisan',
+            craftType: 'Handloom & Traditional Craft',
+            state: 'India',
+            district: 'Cluster',
+            bio: 'Artisan preserving traditional handmade crafts.',
+            languages: ['en'],
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      } catch (profErr) {
+        logger.warn('AUTH', 'Could not ensure artisanProfile doc', {
+          error: profErr instanceof Error ? profErr.message : String(profErr),
         });
       }
 

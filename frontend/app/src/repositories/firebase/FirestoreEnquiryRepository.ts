@@ -72,6 +72,9 @@ export class FirestoreEnquiryRepository implements IEnquiryRepository {
     if (this.isTestUnauthenticated()) {
       return enquiryService.listEnquiries();
     }
+    if (auth.currentUser && auth.currentUser.uid !== artisanId) {
+      return [];
+    }
     try {
       const colRef = collection(db, 'buyerEnquiries');
       const q = query(
@@ -221,6 +224,10 @@ export class FirestoreEnquiryRepository implements IEnquiryRepository {
   ): () => void {
     if (this.isTestUnauthenticated()) {
       callback(enquiryService.listEnquiries());
+      return () => {};
+    }
+    if (auth.currentUser && auth.currentUser.uid !== artisanId) {
+      callback([]);
       return () => {};
     }
     try {

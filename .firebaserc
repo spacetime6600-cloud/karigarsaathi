@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-karigarsaathi"
+    "default": "demo-karigarsaathi",
+    "production": "karigarsaathi-c3c60"
   }
 }

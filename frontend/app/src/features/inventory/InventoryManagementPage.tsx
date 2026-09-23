@@ -4,6 +4,7 @@ import { useAuth } from '@/app/providers/AuthProvider';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { productRepository } from '@/repositories';
 import { productRepository as legacyProductRepo } from '@/services/api/productRepository';
+import { isEmulatorMode } from '@/config/firebase';
 import { ProductRecord, draftToProductRecord } from '@/domain/products';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -60,7 +61,12 @@ export const InventoryManagementPage: React.FC = () => {
   const [feedbackToast, setFeedbackToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchInventory = React.useCallback(async () => {
-    const ownerId = user?.id || 'demo_artisan_ravi';
+    const ownerId = user?.id || (isEmulatorMode ? 'demo_artisan_ravi' : undefined);
+    if (!ownerId) {
+      const fallback = legacyProductRepo.listProducts().map((d) => draftToProductRecord(d, 'demo_artisan_ravi'));
+      setProducts(fallback);
+      return;
+    }
     setIsLoading(true);
     setError(null);
 

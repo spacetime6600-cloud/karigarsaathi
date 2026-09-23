@@ -115,7 +115,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll(['ownerId', 'artisanName', 'craftType', 'state', 'createdAt', 'updatedAt'])
         && request.resource.data.keys().hasOnly([
           'ownerId', 'artisanName', 'craftType', 'state', 'district', 'bio',
-          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'createdAt', 'updatedAt'
+          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'profileImagePath',
+          'phone', 'createdAt', 'updatedAt'
         ])
         && request.resource.data.artisanName is string
         && request.resource.data.artisanName.size() >= 1
@@ -126,6 +127,9 @@ service cloud.firestore {
         && request.resource.data.state.size() <= 100
         && request.resource.data.languages is list
         && request.resource.data.languages.size() <= 10
+        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 30))
+        && (!('profileImagePath' in request.resource.data) || (request.resource.data.profileImagePath is string && request.resource.data.profileImagePath.size() <= 500))
+        && (!('avatarUrl' in request.resource.data) || (request.resource.data.avatarUrl is string && request.resource.data.avatarUrl.size() <= 500))
         && isValidTimestamp(request.resource.data.createdAt)
         && isValidTimestamp(request.resource.data.updatedAt);
 
@@ -136,7 +140,8 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.keys().hasOnly([
           'ownerId', 'artisanName', 'craftType', 'state', 'district', 'bio',
-          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'createdAt', 'updatedAt'
+          'languages', 'workshopName', 'joinedYear', 'avatarUrl', 'profileImagePath',
+          'phone', 'createdAt', 'updatedAt'
         ])
         && request.resource.data.artisanName is string
         && request.resource.data.artisanName.size() >= 1
@@ -147,6 +152,9 @@ service cloud.firestore {
         && request.resource.data.state.size() <= 100
         && request.resource.data.languages is list
         && request.resource.data.languages.size() <= 10
+        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 30))
+        && (!('profileImagePath' in request.resource.data) || (request.resource.data.profileImagePath is string && request.resource.data.profileImagePath.size() <= 500))
+        && (!('avatarUrl' in request.resource.data) || (request.resource.data.avatarUrl is string && request.resource.data.avatarUrl.size() <= 500))
         && isValidTimestamp(request.resource.data.updatedAt);
 
       allow delete: if false;

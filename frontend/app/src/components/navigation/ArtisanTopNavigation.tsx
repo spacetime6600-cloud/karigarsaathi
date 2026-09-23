@@ -9,6 +9,7 @@ import { BuyerEnquiry } from '@/types';
 import { SyncStatusIndicator } from '@/components/navigation/SyncStatusIndicator';
 import { BuyerEnquiryPopover } from '@/components/navigation/BuyerEnquiryPopover';
 import { ROUTES } from '@/routes';
+import { isEmulatorMode } from '@/config/firebase';
 import { clsx } from 'clsx';
 
 interface AccountDropdownMenuProps {
@@ -215,7 +216,7 @@ export const ArtisanTopNavigation: React.FC = () => {
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  const currentArtisanId = userAccount?.uid || user?.id || 'demo_artisan_ravi';
+  const currentArtisanId = userAccount?.uid || user?.id || (isEmulatorMode ? 'demo_artisan_ravi' : null);
 
   // Subscribe to authoritative enquiries for signed-in artisan
   useEffect(() => {

@@ -11,7 +11,7 @@ import {
   limit,
   deleteField,
 } from 'firebase/firestore';
-import { db } from '@/config/firebase';
+import { db, auth } from '@/config/firebase';
 import { IProductRepository } from '@/repositories/interfaces/IProductRepository';
 import { ProductRecord, CreateProductInput, UpdateProductInput } from '@/domain/products';
 import { logger } from '@/services/logging/logger';
@@ -82,6 +82,11 @@ export class FirestoreProductRepository implements IProductRepository {
   }
 
   async listCurrentArtisanProducts(ownerId: string): Promise<ProductRecord[]> {
+    if (auth.currentUser && auth.currentUser.uid !== ownerId) {
+      const demo = DEMO_PRODUCTS.filter((p) => p.ownerId === ownerId);
+      if (demo.length > 0) return demo.filter((p) => p.status !== 'archived');
+      return [];
+    }
     try {
       // Must use owner-scoped query matching Firestore security rules
       const q = query(
@@ -152,6 +157,11 @@ export class FirestoreProductRepository implements IProductRepository {
   }
 
   async listAllArtisanProducts(ownerId: string): Promise<ProductRecord[]> {
+    if (auth.currentUser && auth.currentUser.uid !== ownerId) {
+      const demo = DEMO_PRODUCTS.filter((p) => p.ownerId === ownerId);
+      if (demo.length > 0) return demo;
+      return [];
+    }
     try {
       const q = query(
         collection(db, 'products'),
