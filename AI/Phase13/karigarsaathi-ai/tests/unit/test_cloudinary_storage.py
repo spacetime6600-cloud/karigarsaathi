@@ -347,3 +347,50 @@ def test_api_upload_with_mock_cloudinary(client, valid_jpeg_bytes, mock_uploader
         assert data["publicId"] == "karigarsaathi/products/prod_ok/img_ok/original"
         assert data["secureUrl"].startswith("https://")
         assert data["productId"] == "prod_ok"
+
+
+def test_api_upload_unconfigured_cloudinary_returns_503(client, valid_jpeg_bytes):
+    """Verify that unconfigured Cloudinary raises 503 instead of 500 crash."""
+    with patch("app.api.media_routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_get_adapter.side_effect = ValueError("Cloudinary configuration missing: CLOUDINARY_CLOUD_NAME")
+
+        response = client.post(
+            "/v1/media/upload",
+            headers={"Authorization": "Bearer dev-token-artisan-owner"},
+            data={
+                "product_id": "prod_ok",
+                "image_id": "img_ok",
+                "owner_id": "artisan-owner",
+                "variant": "original",
+            },
+            files={"file": ("test.jpg", valid_jpeg_bytes, "image/jpeg")},
+        )
+
+        assert response.status_code == 503
+        data = response.json()
+        assert data["detail"]["error_code"] == "CLOUDINARY_CONFIG_MISSING"
+
+
+def test_idempotency_cache_prevents_duplicate_cloudinary_upload():
+    """Verify in-memory idempotency cache prevents duplicate uploads."""
+    adapter = CloudinaryStorageAdapter(require_config=False)
+    adapter._configured = True
+
+    cached_meta = {"provider": "cloudinary", "publicId": "karigarsaathi/test", "secureUrl": "https://res.cloudinary.com/test"}
+    adapter._idempotency_cache["key-123"] = cached_meta
+
+    # Calling upload with existing idempotency_key should return cached_meta immediately
+    import asyncio
+    img = Image.new("RGB", (300, 300), color="blue")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+
+    res = asyncio.run(adapter.upload(
+        file_bytes=buf.getvalue(),
+        product_id="prod_test",
+        image_id="img_test",
+        variant="original",
+        idempotency_key="key-123",
+    ))
+    assert res == cached_meta
+

@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, status, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional
@@ -177,11 +177,11 @@ async def health_check():
     """,
 )
 async def create_enhancement(
-    image: bytes = File(...),
+    image: UploadFile = File(...),
     consent_granted: bool = Form(...),
     request_id: str = Form(...),
-    product_id: str = Form(...),
-    artisan_id: str = Form(...),
+    product_id: Optional[str] = Form(default=None),
+    artisan_id: Optional[str] = Form(default=None),
     operations: Optional[list[str]] = Form(default=None),
     output_size: Optional[int] = Form(default=None),
     background: Optional[str] = Form(default=None),
@@ -189,7 +189,30 @@ async def create_enhancement(
 ):
     """Create new enhancement job - form data version."""
 
-    # 1. Validate consent
+    # 1. Validate required string fields
+    if not artisan_id or not str(artisan_id).strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "ARTISAN_ID_REQUIRED",
+                "message": "Artisan ID is required and cannot be empty",
+                "retryable": False,
+                "request_id": request_id,
+            },
+        )
+
+    if not product_id or not str(product_id).strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "PRODUCT_ID_REQUIRED",
+                "message": "Product ID is required and cannot be empty",
+                "retryable": False,
+                "request_id": request_id,
+            },
+        )
+
+    # 2. Validate consent
     if not consent_granted:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -201,7 +224,7 @@ async def create_enhancement(
             },
         )
 
-    # 2. Authentication and ownership validation
+    # 3. Authentication and ownership validation
     auth_result = await authenticator.verify(authorization)
     if not auth_result.get("authenticated", False):
         raise HTTPException(
@@ -216,7 +239,7 @@ async def create_enhancement(
 
     verified_user_id = auth_result.get("user_id", "")
 
-    # 3. Check ownership: verified user must match artisan_id
+    # 4. Check ownership: verified user must match artisan_id
     if verified_user_id != artisan_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -229,8 +252,20 @@ async def create_enhancement(
             },
         )
 
-    # 4. Validate image using comprehensive validator
-    validation_result = ImageValidator.validate(image)
+    # 5. Read and validate image using comprehensive validator
+    file_bytes = await image.read()
+    if not file_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "INVALID_IMAGE_PAYLOAD",
+                "message": "Uploaded image file is empty.",
+                "retryable": False,
+                "request_id": request_id,
+            },
+        )
+
+    validation_result = ImageValidator.validate(file_bytes)
 
     if not validation_result["valid"]:
         error_detail = validation_result["error"]
@@ -246,15 +281,32 @@ async def create_enhancement(
             },
         )
 
-    # 5. Validate operations list
+    # 6. Validate operations list (support multiple form fields, JSON strings, or CSV)
     MAX_OPERATIONS = 10
-    ops = operations or [op.value for op in Operation.defaults()]
-    if isinstance(ops, str):
+    raw_ops = operations
+    if raw_ops is None:
+        ops = [op.value for op in Operation.defaults()]
+    elif isinstance(raw_ops, str):
         import json
         try:
-            ops = json.loads(ops)
+            ops = json.loads(raw_ops)
         except Exception:
-            ops = [ops]
+            ops = [x.strip() for x in raw_ops.split(",") if x.strip()]
+    elif isinstance(raw_ops, list):
+        if len(raw_ops) == 1 and isinstance(raw_ops[0], str) and (raw_ops[0].startswith("[") or "," in raw_ops[0]):
+            import json
+            try:
+                ops = json.loads(raw_ops[0])
+            except Exception:
+                ops = [x.strip() for x in raw_ops[0].split(",") if x.strip()]
+        else:
+            ops = raw_ops
+    else:
+        ops = [op.value for op in Operation.defaults()]
+
+    if not isinstance(ops, list):
+        ops = [ops]
+
     ops = [(op.value if hasattr(op, 'value') else str(op)) for op in ops][:MAX_OPERATIONS]
 
     # 6. Validate output_size if provided
@@ -361,7 +413,7 @@ async def create_enhancement(
     # 11. Run the enhancement pipeline
     try:
         result = await enhancement_service.process_enhancement(
-            image_data=image,
+            image_data=file_bytes,
             consent_granted=True,  # Already validated
             request_id=request_id,
             product_id=product_id,

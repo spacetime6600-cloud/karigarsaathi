@@ -88,6 +88,8 @@ class CloudinaryStorageAdapter:
         else:
             self._configured = False
 
+        self._idempotency_cache: Dict[str, Dict[str, Any]] = {}
+
     @property
     def is_configured(self) -> bool:
         """Check if Cloudinary is configured."""
@@ -171,6 +173,13 @@ class CloudinaryStorageAdapter:
         checksum = hashlib.sha256(file_bytes).hexdigest()
         now_iso = datetime.now(timezone.utc).isoformat()
 
+        if idempotency_key and idempotency_key in self._idempotency_cache:
+            logger.info(
+                "CLOUDINARY_UPLOAD_IDEMPOTENT_HIT",
+                extra={"idempotency_key": idempotency_key, "public_id": public_id},
+            )
+            return self._idempotency_cache[idempotency_key]
+
         logger.info(
             "CLOUDINARY_UPLOAD_INIT",
             extra={
@@ -221,6 +230,9 @@ class CloudinaryStorageAdapter:
             "createdAt": now_iso,
             "updatedAt": now_iso,
         }
+
+        if idempotency_key:
+            self._idempotency_cache[idempotency_key] = metadata
 
         logger.info(
             "CLOUDINARY_UPLOAD_SUCCESS",

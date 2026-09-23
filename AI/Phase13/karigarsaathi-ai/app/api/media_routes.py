@@ -147,7 +147,21 @@ async def upload_media(
             },
         )
 
-    adapter = get_cloudinary_adapter()
+    try:
+        adapter = get_cloudinary_adapter()
+    except ValueError as val_err:
+        logger.error(
+            "CLOUDINARY_CONFIG_MISSING",
+            extra={"product_id": product_id, "image_id": image_id, "error": str(val_err)},
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "error_code": "CLOUDINARY_CONFIG_MISSING",
+                "message": "Cloudinary credentials not configured on backend service. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+                "retryable": False,
+            },
+        )
 
     # Validate image payload
     try:
@@ -210,7 +224,18 @@ async def replace_media(
     await verify_auth_and_ownership(authorization, owner_id, operation="replace")
 
     file_bytes = await file.read()
-    adapter = get_cloudinary_adapter()
+    try:
+        adapter = get_cloudinary_adapter()
+    except ValueError as val_err:
+        logger.error("CLOUDINARY_CONFIG_MISSING", extra={"product_id": product_id, "error": str(val_err)})
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "error_code": "CLOUDINARY_CONFIG_MISSING",
+                "message": "Cloudinary credentials not configured on backend service. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+                "retryable": False,
+            },
+        )
 
     try:
         adapter.validate_image_payload(file_bytes, declared_mime_type=file.content_type)
