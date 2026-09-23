@@ -57,14 +57,19 @@ async def health():
     try:
         from backend.app.api.v1.router import speech_adapter
         model_ready = speech_adapter is not None
+        engine_name = getattr(speech_adapter, "engine_name", "faster-whisper")
+        speech_model = getattr(speech_adapter, "model_name", "saaras:v3")
     except Exception:
         model_ready = False
+        engine_name = "unknown"
+        speech_model = "unknown"
 
     return {
         "status": "ok",
         "ready": model_ready,
         "service": "karigarSaathi-phase14",
         "model_ready": model_ready,
-        "speech_engine": "faster-whisper",
-        "supported_languages": ["en", "hi", "or", "bn"],
+        "speech_engine": engine_name,
+        "speech_model": speech_model,
+        "supported_languages": ["en", "hi", "or", "bn", "te"],
     }

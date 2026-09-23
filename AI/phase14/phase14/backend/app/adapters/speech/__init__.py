@@ -31,6 +31,8 @@ class FasterWhisperSpeechAdapter(SpeechAdapter):
     """
 
     def __init__(self) -> None:
+        self.engine_name = "faster-whisper"
+        self.model_name = getattr(settings, "whisper_model", "medium")
         self._model: Optional[WhisperModel] = None
 
     @property
@@ -313,3 +315,18 @@ class FasterWhisperSpeechAdapter(SpeechAdapter):
             return True, ""
         except Exception as e:
             return False, f"Audio validation failed: {str(e)}"
+
+
+from backend.app.adapters.speech.sarvam import SarvamSpeechAdapter
+
+
+def get_speech_adapter() -> SpeechAdapter:
+    """Factory to instantiate the configured speech transcription adapter."""
+    engine_pref = getattr(settings, "speech_engine", "faster-whisper").lower()
+
+    if engine_pref in ("sarvam", "saaras"):
+        logger.info("Initializing Sarvam / Saaras speech transcription adapter")
+        return SarvamSpeechAdapter()
+
+    logger.info("Initializing Faster Whisper speech transcription adapter")
+    return FasterWhisperSpeechAdapter()

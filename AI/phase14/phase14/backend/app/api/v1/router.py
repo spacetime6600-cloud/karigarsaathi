@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from backend.app.core.config import settings
 from backend.app.security import create_dev_token, decode_dev_token, verify_session_token
-from backend.app.adapters.speech import FasterWhisperSpeechAdapter
+from backend.app.adapters.speech import FasterWhisperSpeechAdapter, get_speech_adapter
 from backend.app.adapters.speech.base import SpeechTranscriptionRequest
 from backend.app.adapters.catalogue import OpenAILikeCatalogueAdapter
 from backend.app.domain.models import (
@@ -55,7 +55,7 @@ router = APIRouter(tags=["v1"])
 http_bearer = HTTPBearer(auto_error=False)
 
 # Singleton instances of adapters
-speech_adapter = FasterWhisperSpeechAdapter()
+speech_adapter = get_speech_adapter()
 catalogue_adapter = OpenAILikeCatalogueAdapter()
 
 

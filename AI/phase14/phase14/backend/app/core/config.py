@@ -1,13 +1,23 @@
 from __future__ import annotations
 
 import os
+from typing import Optional
 from pathlib import Path
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="KAIGAR_", env_file=".env.example")
+    model_config = SettingsConfigDict(
+        env_prefix="KAIGAR_",
+        env_file=(".env", ".env.example"),
+        extra="ignore",
+    )
+
+    # Speech Provider (sarvam / faster-whisper)
+    speech_engine: str = Field(default="faster-whisper", alias="SPEECH_ENGINE")
+    sarvam_api_key: Optional[SecretStr] = Field(default=None, alias="SARVAM_API_KEY")
+    sarvam_model: str = Field(default="saaras:v3", alias="SARVAM_MODEL")
 
     # Application
     app_env: str = Field(default="development", alias="APP_ENV")
