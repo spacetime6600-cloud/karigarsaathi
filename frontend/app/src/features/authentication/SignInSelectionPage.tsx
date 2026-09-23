@@ -33,7 +33,7 @@ export const SignInSelectionPage: React.FC = () => {
   const activeName = userAccount?.displayName || user?.name || 'User';
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 animate-in fade-in duration-200">
+    <div className="w-full max-w-none mx-auto py-6 sm:py-8 px-2 sm:px-4 animate-in fade-in duration-200 flex flex-col items-center">
       {/* Header Block */}
       <div className="flex flex-col items-center text-center gap-3 mb-6 sm:mb-8">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md text-[#FFB955] text-xs font-bold border border-white/20 shadow-xs select-none">
@@ -93,73 +93,75 @@ export const SignInSelectionPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Two Role Choice Cards: Side-by-side on desktop, stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch max-w-[780px] mx-auto">
-        {/* Card 1: Artisan */}
-        <Card className="p-6 sm:p-8 rounded-3xl bg-[#FFFDF9] border border-[#001D36]/10 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_36px_rgb(0,0,0,0.10)] transition-all duration-200 flex flex-col justify-between group hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transform-none animate-in fade-in slide-in-from-bottom-2 duration-200 motion-reduce:animate-none">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center group-hover:scale-105 transition-transform motion-reduce:transform-none">
-                <Palette className="w-6 h-6" />
-              </div>
-              <Badge variant="indigo" className="text-[10px] font-bold uppercase tracking-wider">
-                Craft Producer
-              </Badge>
+      {/* Two Role Choice Panels: Wide side-by-side on desktop, stacked on mobile */}
+      <div className="role-selection">
+        {/* Panel 1: Artisan */}
+        <div className="role-panel">
+          {/* Top row: Icon and Role Label */}
+          <div className="flex items-center justify-between w-full mb-6 sm:mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/12 text-secondary flex items-center justify-center shrink-0 border border-secondary/20 shadow-xs">
+              <Palette className="w-6 h-6" aria-hidden="true" />
             </div>
-
-            <div className="flex flex-col gap-2">
-              <h2 className="font-display text-2xl font-bold text-primary">
-                Artisan sign in
-              </h2>
-              <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                Create catalogues, manage your products, and connect with buyers.
-              </p>
-            </div>
+            <span className="px-3.5 py-1.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-xs sm:text-[13px] font-semibold tracking-wider uppercase select-none">
+              Craft Producer
+            </span>
           </div>
 
-          <div className="pt-6 mt-6 border-t border-surface-variant flex flex-col gap-3">
+          {/* Title & Description */}
+          <div className="flex flex-col gap-2.5 sm:gap-3 mb-6">
+            <h2 className="font-sans text-2xl sm:text-[28px] lg:text-[32px] font-semibold text-primary tracking-tight leading-tight">
+              Artisan sign in
+            </h2>
+            <p className="font-sans text-base sm:text-[17px] font-normal text-on-surface-variant leading-relaxed">
+              Create catalogues, manage your products, and connect with buyers.
+            </p>
+          </div>
+
+          {/* Bottom row: Subtle Divider and Action Button */}
+          <div className="pt-6 sm:pt-8 mt-auto flex flex-col border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.LOGIN)}
-              className="w-full h-[52px] min-h-[52px] font-bold text-sm rounded-xl bg-secondary hover:bg-secondary/90 text-white shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-14 min-h-[56px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-base shadow-sm hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
-              <span className="whitespace-nowrap font-bold text-sm">Continue as Artisan</span>
+              <span className="whitespace-nowrap font-semibold text-base text-[#FFFDF9]">Continue as Artisan</span>
               <ArrowRight className="w-[18px] h-[18px] shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
             </Button>
           </div>
-        </Card>
+        </div>
 
-        {/* Card 2: Coordinator */}
-        <Card className="p-6 sm:p-8 rounded-3xl bg-[#FFFDF9] border border-[#001D36]/10 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_36px_rgb(0,0,0,0.10)] transition-all duration-200 flex flex-col justify-between group hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transform-none animate-in fade-in slide-in-from-bottom-2 duration-200 motion-reduce:animate-none">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition-transform motion-reduce:transform-none">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <Badge variant="neutral" className="text-[10px] font-bold uppercase tracking-wider">
-                Cluster Agency
-              </Badge>
+        {/* Panel 2: Coordinator */}
+        <div className="role-panel">
+          {/* Top row: Icon and Role Label */}
+          <div className="flex items-center justify-between w-full mb-6 sm:mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 shadow-xs">
+              <ShieldCheck className="w-6 h-6" aria-hidden="true" />
             </div>
-
-            <div className="flex flex-col gap-2">
-              <h2 className="font-display text-2xl font-bold text-primary">
-                Coordinator sign in
-              </h2>
-              <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                Support assigned artisans, review products, and manage buyer enquiries.
-              </p>
-            </div>
+            <span className="px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs sm:text-[13px] font-semibold tracking-wider uppercase select-none">
+              Cluster Agency
+            </span>
           </div>
 
-          <div className="pt-6 mt-6 border-t border-surface-variant flex flex-col gap-3">
+          {/* Title & Description */}
+          <div className="flex flex-col gap-2.5 sm:gap-3 mb-6">
+            <h2 className="font-sans text-2xl sm:text-[28px] lg:text-[32px] font-semibold text-primary tracking-tight leading-tight">
+              Coordinator sign in
+            </h2>
+            <p className="font-sans text-base sm:text-[17px] font-normal text-on-surface-variant leading-relaxed">
+              Support assigned artisans, review products, and manage buyer enquiries.
+            </p>
+          </div>
+
+          {/* Bottom row: Subtle Divider and Action Button */}
+          <div className="pt-6 sm:pt-8 mt-auto flex flex-col border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.COORDINATOR_LOGIN)}
-              className="w-full h-[52px] min-h-[52px] font-bold text-sm rounded-xl bg-secondary hover:bg-secondary/90 text-white shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-14 min-h-[56px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-base shadow-sm hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
-              <span className="whitespace-nowrap font-bold text-sm">Continue as Coordinator</span>
+              <span className="whitespace-nowrap font-semibold text-base text-[#FFFDF9]">Continue as Coordinator</span>
               <ArrowRight className="w-[18px] h-[18px] shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
             </Button>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Return to Homepage Link */}

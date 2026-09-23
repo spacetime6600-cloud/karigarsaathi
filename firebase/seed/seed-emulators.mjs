@@ -195,6 +195,21 @@ async function main() {
     3800
   );
 
+  // Seed Coordinator
+  await seedUser(
+    'coordinator@karigarsaathi.gov.in',
+    'CoordinatorPass123!',
+    'Priya Sharma',
+    'Cluster Coordination & Documentation',
+    'Assam',
+    'Guwahati Cluster Hub',
+    'Regional coordinator facilitating digital craft passports and artisan assistance.'
+  );
+
+  // Update coordinator role in user doc
+  const coordUserRef = doc(db, 'users', (await signInWithEmailAndPassword(auth, 'coordinator@karigarsaathi.gov.in', 'CoordinatorPass123!')).user.uid);
+  await setDoc(coordUserRef, { role: 'coordinator' }, { merge: true });
+
   console.log('--- Emulator Seed Completed Successfully ---');
   await deleteApp(app);
   process.exit(0);

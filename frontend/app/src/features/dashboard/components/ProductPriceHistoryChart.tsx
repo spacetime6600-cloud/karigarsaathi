@@ -118,11 +118,11 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
   const activeMilestone = hoveredEntryIndex !== null ? milestones[hoveredEntryIndex] : null;
 
   return (
-    <div className="bg-white rounded-2xl border border-surface-variant/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-4">
+    <div className="analytics-module-card flex flex-col justify-between gap-5 h-full">
       {/* Header & Product Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-variant/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/8">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-primary tracking-tight">
+          <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
             Your product price history
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
@@ -140,7 +140,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
               id="product-price-select"
               value={selectedProductId}
               onChange={(e) => setSelectedProductId(e.target.value)}
-              className="w-full bg-surface-container-low/70 border border-surface-variant/70 text-primary text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-secondary/50 truncate cursor-pointer"
+              className="w-full bg-[#FFF9EF] border border-[#001D36]/15 text-primary text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-secondary/50 truncate cursor-pointer shadow-2xs"
             >
               {activeProducts.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -153,48 +153,49 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
       </div>
 
       {priceInsight ? (
-        <div className="flex flex-col gap-4">
-          {/* Key Metrics Strip for Selected Product */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-surface-container-low/40 border border-surface-variant/50">
-            {/* Current Price */}
+        <div className="flex flex-col gap-4 flex-1 justify-between">
+          {/* Key Metrics Strip for Selected Product: Current Price prominent */}
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 p-4 rounded-2xl bg-[#FFF9EF]/70 border border-[#001D36]/8">
+            {/* Current Price as the strongest number */}
             <div className="flex flex-col">
-              <span className="text-[11px] font-medium text-on-surface-variant">Current listed price</span>
-              <span className="text-lg sm:text-xl font-bold text-primary font-sans mt-0.5">
+              <span className="text-xs font-medium text-on-surface-variant">Current listed price</span>
+              <span className="text-3xl sm:text-4xl font-bold text-primary font-sans tracking-tight mt-0.5 leading-none">
                 {currencySymbol}{formatINR(priceInsight.currentPrice)}
               </span>
             </div>
 
-            {/* Last Changed */}
-            <div className="flex flex-col">
-              <span className="text-[11px] font-medium text-on-surface-variant">Last updated</span>
-              <span className="text-xs sm:text-sm font-semibold text-primary mt-0.5">
-                {formatDate(priceInsight.lastChangeDate)}
-              </span>
-            </div>
+            {/* Last updated and previous change as smaller supporting facts */}
+            <div className="flex items-center gap-5 sm:gap-6 flex-wrap text-xs text-on-surface-variant">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium text-on-surface-variant/75">Last updated</span>
+                <span className="font-semibold text-primary mt-0.5">
+                  {formatDate(priceInsight.lastChangeDate)}
+                </span>
+              </div>
 
-            {/* Price Change Delta */}
-            <div className="flex flex-col col-span-2 sm:col-span-1">
-              <span className="text-[11px] font-medium text-on-surface-variant">Previous change</span>
-              <div className="flex items-center gap-1 mt-0.5">
-                {priceInsight.hasPriceHistory && priceInsight.priceDifference !== null ? (
-                  priceInsight.priceDifference > 0 ? (
-                    <span className="inline-flex items-center text-xs font-bold text-success">
-                      <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
-                      +{currencySymbol}{formatINR(priceInsight.priceDifference)} ({priceInsight.percentChange}%)
-                    </span>
-                  ) : priceInsight.priceDifference < 0 ? (
-                    <span className="inline-flex items-center text-xs font-bold text-error">
-                      <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
-                      -{currencySymbol}{formatINR(Math.abs(priceInsight.priceDifference))} ({priceInsight.percentChange}%)
-                    </span>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium text-on-surface-variant/75">Previous change</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  {priceInsight.hasPriceHistory && priceInsight.priceDifference !== null ? (
+                    priceInsight.priceDifference > 0 ? (
+                      <span className="inline-flex items-center font-bold text-success">
+                        <TrendingUp className="w-3 h-3 mr-0.5" />
+                        +{currencySymbol}{formatINR(priceInsight.priceDifference)} ({priceInsight.percentChange}%)
+                      </span>
+                    ) : priceInsight.priceDifference < 0 ? (
+                      <span className="inline-flex items-center font-bold text-error">
+                        <TrendingDown className="w-3 h-3 mr-0.5" />
+                        -{currencySymbol}{formatINR(Math.abs(priceInsight.priceDifference))} ({priceInsight.percentChange}%)
+                      </span>
+                    ) : (
+                      <span className="font-bold text-on-surface-variant">No change</span>
+                    )
                   ) : (
-                    <span className="text-xs font-bold text-on-surface-variant">No change</span>
-                  )
-                ) : (
-                  <span className="text-xs text-on-surface-variant/80 font-medium">
-                    Initial listed price
-                  </span>
-                )}
+                    <span className="text-on-surface-variant/80 font-medium">
+                      Initial listed price
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -335,19 +336,14 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
               )}
             </div>
           ) : (
-            /* Truthful single price banner */
-            <div className="p-5 rounded-2xl bg-surface border border-surface-variant/60 flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-              <div className="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+            /* Truthful single price quiet footer note */
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[#FFF9EF]/80 border border-[#001D36]/8 flex items-center gap-3 mt-auto">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
                 <Tag className="w-4 h-4" />
               </div>
-              <div className="flex flex-col">
-                <p className="text-xs text-on-surface-variant font-medium">
-                  Price history will appear after recorded price changes.
-                </p>
-                <span className="text-xs font-bold text-primary">
-                  Current listed price: {currencySymbol}{formatINR(priceInsight.currentPrice)} (listed {formatDate(priceInsight.lastChangeDate)})
-                </span>
-              </div>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Price history will appear after recorded price changes. Current listed price: <strong className="text-primary font-bold">{currencySymbol}{formatINR(priceInsight.currentPrice)}</strong> (listed {formatDate(priceInsight.lastChangeDate)}).
+              </p>
             </div>
           )}
 

@@ -290,9 +290,9 @@ export const ArtisanTopNavigation: React.FC = () => {
   return (
     <header
       onKeyDown={handleKeyDown}
-      className="sticky top-0 z-40 w-full pt-2.5 sm:pt-3 px-3 sm:px-6 select-none"
+      className="sticky top-0 z-40 w-full pt-2.5 sm:pt-3 select-none"
     >
-      <div className="max-w-[1220px] mx-auto w-full">
+      <div className="workspace-container w-full">
         {/* ========================================================= */}
         {/* DESKTOP & TABLET THREE-REGION CLEAR iOS GLASS HEADER      */}
         {/* Clear Glass: 56-58px height, rounded-[20px], top reflection */}

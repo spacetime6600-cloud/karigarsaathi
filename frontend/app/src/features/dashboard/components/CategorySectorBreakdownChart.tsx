@@ -46,11 +46,11 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
   const totalValue = useMemo(() => activeData.reduce((acc, d) => acc + d.salesValue, 0), [activeData]);
 
   return (
-    <div className="bg-white rounded-2xl border border-surface-variant/80 p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-4">
+    <div className="analytics-module-card flex flex-col justify-between gap-5 h-full">
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-variant/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/8">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-primary tracking-tight">
+          <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
             {viewType === 'sectors' ? 'Buyer sectors' : 'Sales by craft category'}
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
@@ -165,16 +165,16 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
             );
           })
         ) : (
-          <div className="p-6 text-center text-xs text-on-surface-variant bg-surface rounded-xl border border-surface-variant/40">
+          <div className="p-6 text-center text-xs text-on-surface-variant bg-[#FFF9EF]/80 rounded-xl border border-[#001D36]/8 my-auto">
             No craft category sales recorded in this period.
           </div>
         )}
       </div>
 
       {/* Footer Total */}
-      <div className="pt-2 border-t border-surface-variant/40 flex items-center justify-between text-xs text-on-surface-variant">
+      <div className="pt-3 border-t border-[#001D36]/8 flex items-center justify-between text-xs text-on-surface-variant">
         <span>Total accounting:</span>
-        <span className="font-bold text-primary">
+        <span className="font-bold text-primary font-sans">
           {totalUnits} units ({currencySymbol}{formatINR(totalValue)})
         </span>
       </div>

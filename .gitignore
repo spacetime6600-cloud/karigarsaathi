@@ -19,7 +19,11 @@ coverage/
 .nyc_output/
 playwright-report/
 test-results/
+screenshots/
+**/screenshots/
 .temp_edge_profile*/
+frontend/app/scripts/capture_*.mjs
+frontend/app/src/test/capture_*.py
 
 # Environment Files (Keep .env.example tracked)
 .env

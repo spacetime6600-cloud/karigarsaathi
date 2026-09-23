@@ -107,28 +107,28 @@ export const CoordinatorShell: React.FC = () => {
       {/* ========================================================= */}
       <aside
         onKeyDown={handleKeyDown}
-        className="hidden md:flex flex-col w-64 bg-surface-container-lowest border-r border-surface-variant fixed left-0 top-0 h-full z-40 py-5 px-3.5 gap-4 shadow-sm"
+        className="hidden md:flex flex-col w-[230px] bg-[#FFFDF9] border-r border-[#001D36]/10 fixed left-0 top-0 h-full z-40 py-5 px-3.5 gap-4 shadow-xs"
       >
         {/* Brand Header */}
         <Link
           to={ROUTES.COORDINATOR_DASHBOARD}
-          className="flex items-center gap-3 px-2 py-1.5 rounded-2xl hover:bg-surface-container transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+          className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-[#001D36]/[0.03] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
         >
-          <div className="w-10 h-10 rounded-xl bg-primary text-[#FFB955] flex items-center justify-center font-bold shrink-0 shadow-sm">
-            <ShieldCheck className="w-6 h-6" />
+          <div className="w-9 h-9 rounded-xl bg-[#001D36] text-[#FFB955] flex items-center justify-center font-bold shrink-0 shadow-xs">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="font-display text-base font-bold text-primary tracking-tight leading-none">
+            <span className="font-display text-[15px] font-bold text-[#001D36] tracking-tight leading-none">
               KarigarSaathi
             </span>
-            <span className="text-[10px] text-secondary font-bold tracking-wider uppercase mt-1">
+            <span className="text-[10px] text-[#A13F1C] font-bold tracking-wider uppercase mt-1">
               Coordinator Hub
             </span>
           </div>
         </Link>
 
         {/* Navigation Rail Links */}
-        <nav aria-label="Coordinator Navigation" className="flex-1 flex flex-col gap-1.5 mt-2">
+        <nav aria-label="Coordinator Navigation" className="flex-1 flex flex-col gap-1 mt-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.exact
@@ -140,18 +140,18 @@ export const CoordinatorShell: React.FC = () => {
                 key={item.to}
                 to={item.to}
                 className={clsx(
-                  'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] relative',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] relative',
                   isActive
-                    ? 'bg-secondary/10 text-secondary font-extrabold shadow-xs'
-                    : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'
+                    ? 'bg-[#A13F1C]/10 text-[#A13F1C] font-bold'
+                    : 'text-[#001D36]/70 hover:bg-[#001D36]/[0.04] hover:text-[#001D36]'
                 )}
               >
-                <Icon className={clsx('w-4 h-4 shrink-0', isActive ? 'text-secondary' : 'text-on-surface-variant')} />
+                <Icon className={clsx('w-4 h-4 shrink-0', isActive ? 'text-[#A13F1C]' : 'text-[#001D36]/60')} />
                 <span className="truncate">{item.label}</span>
                 {isActive && (
                   <span
                     aria-hidden="true"
-                    className="absolute right-2 w-1.5 h-4 bg-secondary rounded-full"
+                    className="absolute right-2.5 w-1.5 h-3.5 bg-[#A13F1C] rounded-full"
                   />
                 )}
               </NavLink>
@@ -160,7 +160,7 @@ export const CoordinatorShell: React.FC = () => {
         </nav>
 
         {/* Bottom Rail Controls */}
-        <div className="pt-3 border-t border-surface-variant flex flex-col gap-2">
+        <div className="pt-3 border-t border-[#001D36]/10 flex flex-col gap-2">
           {/* Switch to Artisan View button */}
           <button
             type="button"
@@ -168,9 +168,9 @@ export const CoordinatorShell: React.FC = () => {
               switchRole('artisan');
               navigate(ROUTES.ARTISAN_DASHBOARD);
             }}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-primary/[0.04] hover:bg-primary/[0.08] text-primary text-xs font-bold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#001D36]/[0.04] hover:bg-[#001D36]/[0.08] text-[#001D36] text-xs font-semibold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
           >
-            <Home className="w-4 h-4" />
+            <Home className="w-3.5 h-3.5" />
             <span>Switch to Artisan View</span>
           </button>
 
@@ -181,9 +181,9 @@ export const CoordinatorShell: React.FC = () => {
               await signOut();
               navigate(ROUTES.HOME);
             }}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl hover:bg-error-container/40 text-on-surface-variant hover:text-error text-xs font-semibold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-error"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl hover:bg-error-container/40 text-[#001D36]/70 hover:text-error text-xs font-semibold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-error"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
         </div>
@@ -192,9 +192,9 @@ export const CoordinatorShell: React.FC = () => {
       {/* ========================================================= */}
       {/* MAIN WORKSPACE CONTENT AREA                               */}
       {/* ========================================================= */}
-      <div className="flex-1 flex flex-col md:ml-64 min-w-0 pb-16 md:pb-10">
+      <div className="flex-1 flex flex-col md:ml-[230px] min-w-0 pb-16 md:pb-10">
         {/* Top Utility Header Bar */}
-        <header className="sticky top-0 z-30 bg-surface/95 backdrop-blur-md border-b border-surface-variant px-4 sm:px-8 h-16 flex items-center justify-between shadow-xs">
+        <header className="sticky top-0 z-30 bg-[#FFFDF9]/90 backdrop-blur-md border-b border-[#001D36]/10 px-4 sm:px-8 h-14 flex items-center justify-between shadow-xs">
           {/* Left: Mobile Toggle & Page Context Breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile drawer toggle */}
@@ -203,18 +203,18 @@ export const CoordinatorShell: React.FC = () => {
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               aria-label={isMobileMenuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-primary bg-primary/[0.04] hover:bg-primary/[0.08] border border-primary/[0.08] touch-target"
+              className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-[#001D36] bg-[#001D36]/[0.04] hover:bg-[#001D36]/[0.08] border border-[#001D36]/[0.08] touch-target"
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
 
             {/* Breadcrumb Context */}
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="hidden sm:inline text-xs font-semibold text-on-surface-variant">
+            <div className="flex items-center gap-1.5 min-w-0 text-xs">
+              <span className="hidden sm:inline font-semibold text-[#001D36]/60">
                 Coordinator Hub
               </span>
-              <ChevronRight className="hidden sm:inline w-3.5 h-3.5 text-on-surface-variant" />
-              <h1 className="text-sm sm:text-base font-bold text-primary truncate">
+              <ChevronRight className="hidden sm:inline w-3.5 h-3.5 text-[#001D36]/40" />
+              <h1 className="font-bold text-[#001D36] truncate">
                 {pageTitle}
               </h1>
             </div>
@@ -227,9 +227,9 @@ export const CoordinatorShell: React.FC = () => {
               type="button"
               onClick={() => navigate(ROUTES.LANGUAGE)}
               aria-label={`Change language: current ${currentLanguageMeta.name}`}
-              className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-semibold text-primary bg-primary/[0.04] hover:bg-primary/[0.08] rounded-full border border-primary/[0.08] touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-semibold text-[#001D36] bg-[#001D36]/[0.04] hover:bg-[#001D36]/[0.08] rounded-full border border-[#001D36]/[0.08] touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
-              <Globe className="w-3.5 h-3.5 text-on-surface-variant" />
+              <Globe className="w-3.5 h-3.5 text-[#001D36]/60" />
               <span className="hidden sm:inline">{currentLanguageMeta.name}</span>
             </button>
 
@@ -245,9 +245,9 @@ export const CoordinatorShell: React.FC = () => {
                 aria-haspopup="menu"
                 aria-expanded={isAccountMenuOpen}
                 aria-label="Coordinator account settings"
-                className="w-9 h-9 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold shadow-xs ring-1 ring-white/50 hover:ring-2 hover:ring-secondary/40 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+                className="w-8 h-8 rounded-full bg-[#A13F1C] text-white flex items-center justify-center text-xs font-bold shadow-xs ring-1 ring-white/50 hover:ring-2 hover:ring-[#A13F1C]/40 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
               >
-                {user?.name?.charAt(0) || 'C'}
+                {user?.name?.charAt(0) || 'P'}
               </button>
 
               {/* Anchored Overlay Dropdown */}
@@ -260,12 +260,12 @@ export const CoordinatorShell: React.FC = () => {
                 >
                   {/* Coordinator Summary */}
                   <div className="flex items-center gap-3 pb-3 border-b border-surface-variant/80">
-                    <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center text-base font-bold shrink-0 ring-1 ring-white/50">
-                      {user?.name?.charAt(0) || 'C'}
+                    <div className="w-10 h-10 rounded-full bg-[#A13F1C] text-white flex items-center justify-center text-base font-bold shrink-0 ring-1 ring-white/50">
+                      {user?.name?.charAt(0) || 'P'}
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="font-bold text-sm text-primary truncate">{user?.name || 'Coordinator'}</span>
-                      <span className="text-xs text-secondary font-semibold truncate">Field Coordinator Lead</span>
+                      <span className="font-bold text-sm text-primary truncate">{user?.name || 'Priya Sharma'}</span>
+                      <span className="text-xs text-secondary font-semibold truncate">Regional Coordinator Lead</span>
                     </div>
                   </div>
 
@@ -329,7 +329,7 @@ export const CoordinatorShell: React.FC = () => {
             ref={mobileMenuRef}
             role="dialog"
             aria-label="Mobile Navigation Menu"
-            className="md:hidden p-4 bg-white/95 backdrop-blur-md border-b border-surface-variant shadow-lg flex flex-col gap-2 animate-in slide-in-from-top-2 duration-150"
+            className="md:hidden p-4 bg-[#FFFDF9]/98 backdrop-blur-md border-b border-[#001D36]/10 shadow-lg flex flex-col gap-1.5 animate-in slide-in-from-top-2 duration-150"
           >
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -343,8 +343,8 @@ export const CoordinatorShell: React.FC = () => {
                   to={item.to}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={clsx(
-                    'flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-colors touch-target',
-                    isActive ? 'bg-secondary text-white' : 'bg-primary/[0.04] text-primary'
+                    'flex items-center gap-3 p-2.5 rounded-xl text-xs font-semibold transition-colors touch-target',
+                    isActive ? 'bg-[#A13F1C] text-white font-bold' : 'bg-[#001D36]/[0.03] text-[#001D36]'
                   )}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -356,7 +356,7 @@ export const CoordinatorShell: React.FC = () => {
         )}
 
         {/* Child Workspace Route Output */}
-        <main id="main-content" tabIndex={-1} className="p-4 sm:p-8 max-w-7xl w-full mx-auto outline-none">
+        <main id="main-content" tabIndex={-1} className="w-full coordinator-content py-6 sm:py-8 outline-none">
           <PageTransitionContainer>
             <Outlet />
           </PageTransitionContainer>

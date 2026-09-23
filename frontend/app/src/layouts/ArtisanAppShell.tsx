@@ -18,7 +18,7 @@ export const ArtisanAppShell: React.FC = () => {
       <ArtisanTopNavigation />
 
       {/* Main Workspace Container */}
-      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 focus:outline-none">
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full workspace-container py-6 md:py-8 focus:outline-none">
         <PageTransitionContainer>
           <Outlet />
         </PageTransitionContainer>

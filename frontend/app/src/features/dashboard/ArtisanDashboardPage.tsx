@@ -25,12 +25,10 @@ import { demoDataService } from '@/services/demo/demoDataService';
 import { storage } from '@/services/storage/localStorage';
 
 // Dashboard UI Components
-import { DashboardSummaryCards } from './components/DashboardSummaryCards';
 import { SalesOverviewChart } from './components/SalesOverviewChart';
 import { SalesByRegionMap } from './components/SalesByRegionMap';
 import { ProductPriceHistoryChart } from './components/ProductPriceHistoryChart';
 import { CategorySectorBreakdownChart } from './components/CategorySectorBreakdownChart';
-import { ArtisanEmptySalesState } from './components/ArtisanEmptySalesState';
 
 import {
   Search,
@@ -45,6 +43,14 @@ import {
   Loader2,
   Sparkles,
   QrCode,
+  IndianRupee,
+  Globe2,
+  MessageSquare,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Plus,
+  ArrowRight,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
@@ -53,6 +59,12 @@ import { ROUTES } from '@/routes';
 const LOW_STOCK_THRESHOLD = 2;
 
 type DashboardFilter = 'all' | 'drafts' | 'needs_attention';
+
+function formatINR(val: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    maximumFractionDigits: 0,
+  }).format(val);
+}
 
 function formatRelativeTime(dateString?: string): string {
   if (!dateString) return 'Recently';
@@ -360,127 +372,336 @@ export const ArtisanDashboardPage: React.FC = () => {
   const hasSalesData = sales.length > 0;
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto flex flex-col gap-5 sm:gap-6 animate-in fade-in duration-200">
-      {/* 1. Workshop Welcome Header */}
+    <div className="w-full flex flex-col gap-6 lg:gap-7 animate-in fade-in duration-200">
+      {/* 1. Workshop Welcome Header with Right-Aligned Actions */}
       <section
         aria-label="Workshop Welcome Header"
-        className="flex flex-col gap-1 pb-1"
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1 pb-1"
       >
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <h1 className="font-sans text-2xl sm:text-3xl font-bold text-primary tracking-tight">
-            Namaste, {greetingName}
-          </h1>
-          {isDemoMode && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
-              <Sparkles className="w-3 h-3" />
-              Demonstration Fixture Data
-            </span>
-          )}
+        <div className="flex flex-col gap-1.5 min-w-0">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="font-sans text-3xl sm:text-4xl lg:text-[40px] font-bold text-primary tracking-tight leading-tight">
+              Namaste, {greetingName}
+            </h1>
+            {isDemoMode && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
+                <Sparkles className="w-3 h-3" />
+                Demonstration Fixture Data
+              </span>
+            )}
+          </div>
+          <p className="text-base sm:text-lg text-[#001D36]/75 font-normal leading-normal">
+            Your craft, your customers, your progress. Manage your products, stock and enquiries.
+          </p>
         </div>
-        <p className="text-sm sm:text-base text-on-surface-variant font-normal">
-          Your craft, your customers, your progress. Manage your products, stock and enquiries.
-        </p>
-      </section>
 
-      {/* 2. Four Compact Summary Metric Cards */}
-      <DashboardSummaryCards metrics={summaryMetrics} />
-
-      {/* 3. Operational Strip (Products / Drafts / Low Stock Filter summary) */}
-      <section aria-label="Operational Metrics Summary" className="w-full">
-        <div className="bg-white/95 backdrop-blur-xs rounded-2xl border border-surface-variant/80 p-3 sm:p-4 shadow-xs grid grid-cols-3 divide-x divide-surface-variant/70">
-          <button
-            type="button"
-            onClick={() => setActiveFilter('all')}
-            className={clsx(
-              'flex flex-col items-center sm:items-start text-center sm:text-left px-3 sm:px-5 group transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-lg',
-              activeFilter === 'all' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'
-            )}
-            aria-label={`View all ${inventoryCounts.totalActive} active products`}
+        {/* Action buttons placed on the right side of header */}
+        <div className="flex items-center gap-3 flex-wrap shrink-0 self-start md:self-center">
+          <Link
+            to="/artisan/enquiries"
+            className="px-4 py-2.5 rounded-xl border border-[#001D36]/15 hover:border-[#001D36]/30 bg-[#FFFDF9] hover:bg-primary/[0.04] text-primary text-sm font-semibold flex items-center gap-2 transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] shadow-2xs"
           >
-            <span className="text-xl sm:text-2xl font-bold text-primary tracking-tight font-sans">
-              {inventoryCounts.totalActive}
-            </span>
-            <span className="text-xs font-medium text-on-surface-variant mt-0.5">
-              {inventoryCounts.totalActive === 1 ? 'Product' : 'Products'}
-            </span>
-          </button>
+            <MessageSquare className="w-4 h-4 text-secondary" />
+            <span>Check enquiries</span>
+          </Link>
 
           <button
             type="button"
-            onClick={() => setActiveFilter('drafts')}
-            className={clsx(
-              'flex flex-col items-center sm:items-start text-center sm:text-left px-3 sm:px-5 group transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-lg',
-              activeFilter === 'drafts' ? 'text-primary' : 'text-on-surface-variant hover:text-primary'
-            )}
-            aria-label={`View ${inventoryCounts.draftCount} draft listings`}
+            onClick={handleStartNewProduct}
+            className="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-hover text-white text-sm font-semibold flex items-center gap-2 shadow-xs transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
           >
-            <span className="text-xl sm:text-2xl font-bold text-primary tracking-tight font-sans">
-              {inventoryCounts.draftCount}
-            </span>
-            <span className="text-xs font-medium text-on-surface-variant mt-0.5">
-              {inventoryCounts.draftCount === 1 ? 'Draft' : 'Drafts'}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveFilter('needs_attention')}
-            className={clsx(
-              'flex flex-col items-center sm:items-start text-center sm:text-left px-3 sm:px-5 group transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-lg',
-              activeFilter === 'needs_attention' ? 'text-amber-900' : 'text-on-surface-variant hover:text-amber-900'
-            )}
-            aria-label={`View ${inventoryCounts.lowStockCount} low stock items`}
-          >
-            <span
-              className={clsx(
-                'text-xl sm:text-2xl font-bold tracking-tight font-sans',
-                inventoryCounts.lowStockCount > 0 ? 'text-amber-700' : 'text-primary'
-              )}
-            >
-              {inventoryCounts.lowStockCount}
-            </span>
-            <span className="text-xs font-medium text-on-surface-variant mt-0.5 flex items-center gap-1">
-              Low stock
-              {inventoryCounts.lowStockCount > 0 && (
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 hidden sm:inline-block" />
-              )}
-            </span>
+            <Plus className="w-4 h-4" />
+            <span>Add product</span>
           </button>
         </div>
       </section>
 
-      {/* 4. Sales Overview & Regional Buyer Discovery Grid (Row 1) */}
+      {/* 2. Full-Width Sales-Management Introduction Panel (or Sales Overview if sales exist) */}
       {hasSalesData ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Sales Overview Chart (Approx 7/12 width on desktop) */}
-          <div className="lg:col-span-7">
+        <section aria-label="Sales Overview" className="w-full analytics-module-card analytics-stagger-1 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/10">
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-primary tracking-tight">
+                Sales overview
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                Confirmed sales performance (Last 30 days)
+              </p>
+            </div>
+          </div>
+          <div className="w-full overflow-hidden">
             <SalesOverviewChart buckets={dailyBuckets} />
           </div>
-
-          {/* Regional Discovery Map (Approx 5/12 width on desktop) */}
-          <div className="lg:col-span-5">
-            <SalesByRegionMap regionalSales={regionalSales} />
-          </div>
-        </div>
+        </section>
       ) : (
-        <ArtisanEmptySalesState onAddProduct={handleStartNewProduct} />
+        <section aria-label="Sales Insights Introduction" className="w-full">
+          <div className="w-full rounded-[20px] bg-[#FFFDF9] border border-[#001D36]/10 shadow-[0_1px_4px_rgba(0,29,54,0.03)] p-7 sm:p-8 lg:p-9 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="flex flex-col max-w-3xl">
+              {/* Small editorial eyebrow */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold w-fit select-none">
+                <TrendingUp className="w-3.5 h-3.5 text-secondary" />
+                <span>Your sales insights will appear here</span>
+              </div>
+
+              {/* Heading: 26–32px semibold deep navy */}
+              <h2 className="text-2xl sm:text-[28px] lg:text-[30px] font-semibold text-primary tracking-tight leading-snug mt-3 sm:mt-3.5">
+                Start recording confirmed craft sales
+              </h2>
+
+              {/* Explanatory text */}
+              <p className="text-sm sm:text-[15px] text-[#001D36]/75 leading-relaxed font-normal mt-2">
+                When buyers respond to your verified Craft Passports and confirm orders through direct enquiries or marketplace exports, sales trends, regional distribution and price comparisons will automatically populate here.
+              </p>
+            </div>
+
+            {/* Small sales/inventory icon */}
+            <div className="hidden md:flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/5 text-primary border border-primary/10 shrink-0">
+              <Package className="w-8 h-8 text-primary/70" aria-hidden="true" />
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* 5. Product Price History & Category Breakdown Grid (Row 2) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Product Price History Step Chart (Approx 7/12 width) */}
-        <div className="lg:col-span-7">
-          <ProductPriceHistoryChart products={products} />
-        </div>
+      {/* 3. Three-Column Analytics Grid (6 Modules across 2 rows on laptop) */}
+      <section aria-label="Summary Performance Metrics" className="w-full">
+        <div className="analytics-dashboard-grid w-full items-stretch">
+          {/* Row 1, Module 1: Units sold */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-module-card analytics-stagger-1 flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary tracking-tight">
+                  Units sold
+                </h3>
+                <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10">
+                  <Package className="w-4 h-4" aria-hidden="true" />
+                </div>
+              </div>
 
-        {/* Craft Category & Sector Breakdown (Approx 5/12 width) */}
-        <div className="lg:col-span-5">
-          <CategorySectorBreakdownChart
-            categories={categorySales}
-            sectors={sectorSales}
-          />
+              <div className="mt-4 mb-2">
+                <span className="text-4xl sm:text-[44px] font-bold text-primary font-sans leading-none tracking-tight block">
+                  {summaryMetrics.unitsSold}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="h-[1px] w-full bg-[#001D36]/8 mb-3" />
+              <div className="flex items-center gap-1.5 text-xs text-on-surface-variant font-normal">
+                {summaryMetrics.hasPreviousPeriodData && summaryMetrics.unitsSoldComparisonPercent !== null ? (
+                  <>
+                    {summaryMetrics.unitsSoldComparisonPercent > 0 ? (
+                      <span className="inline-flex items-center text-emerald-700 font-semibold">
+                        <TrendingUp className="w-3 h-3 mr-0.5" />
+                        +{summaryMetrics.unitsSoldComparisonPercent}%
+                      </span>
+                    ) : summaryMetrics.unitsSoldComparisonPercent < 0 ? (
+                      <span className="inline-flex items-center text-rose-700 font-semibold">
+                        <TrendingDown className="w-3 h-3 mr-0.5" />
+                        {summaryMetrics.unitsSoldComparisonPercent}%
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center text-on-surface-variant font-semibold">
+                        <Minus className="w-3 h-3 mr-0.5" />
+                        0%
+                      </span>
+                    )}
+                    <span>vs prev 30 days</span>
+                  </>
+                ) : (
+                  <span>No previous-period comparison</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 1, Module 2: Recorded sales value */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-module-card analytics-stagger-2 flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary tracking-tight">
+                  Recorded sales value
+                </h3>
+                <div className="w-9 h-9 rounded-xl bg-primary/5 text-secondary flex items-center justify-center border border-primary/10">
+                  <IndianRupee className="w-4 h-4" aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="mt-4 mb-2">
+                <span className="text-4xl sm:text-[44px] font-bold text-primary font-sans leading-none tracking-tight block">
+                  ₹{formatINR(summaryMetrics.recordedSalesValue)}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="h-[1px] w-full bg-[#001D36]/8 mb-3" />
+              <div className="flex items-center gap-1.5 text-xs text-on-surface-variant font-normal">
+                {summaryMetrics.hasPreviousPeriodData && summaryMetrics.salesValueComparisonPercent !== null ? (
+                  <>
+                    {summaryMetrics.salesValueComparisonPercent > 0 ? (
+                      <span className="inline-flex items-center text-emerald-700 font-semibold">
+                        <TrendingUp className="w-3 h-3 mr-0.5" />
+                        +{summaryMetrics.salesValueComparisonPercent}%
+                      </span>
+                    ) : summaryMetrics.salesValueComparisonPercent < 0 ? (
+                      <span className="inline-flex items-center text-rose-700 font-semibold">
+                        <TrendingDown className="w-3 h-3 mr-0.5" />
+                        {summaryMetrics.salesValueComparisonPercent}%
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center text-on-surface-variant font-semibold">
+                        <Minus className="w-3 h-3 mr-0.5" />
+                        0%
+                      </span>
+                    )}
+                    <span>vs prev 30 days</span>
+                  </>
+                ) : (
+                  <span>No previous-period comparison</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 1, Module 3: New enquiries */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-module-card analytics-stagger-3 flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary tracking-tight">
+                  New enquiries
+                </h3>
+                <div className="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center border border-secondary/15">
+                  <MessageSquare className="w-4 h-4" aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="mt-4 mb-1">
+                <span className="text-4xl sm:text-[44px] font-bold text-primary font-sans leading-none tracking-tight block">
+                  {summaryMetrics.newEnquiriesCount}
+                </span>
+                <p className="text-xs sm:text-sm text-on-surface-variant font-medium mt-2">
+                  {summaryMetrics.newEnquiriesCount === 0
+                    ? 'No unread enquiries'
+                    : summaryMetrics.newEnquiriesCount === 1
+                    ? '1 unread enquiry'
+                    : `${summaryMetrics.newEnquiriesCount} unread enquiries`}
+                </p>
+                <span className="text-[11px] text-on-surface-variant/70 block mt-0.5">
+                  Received during this period
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="h-[1px] w-full bg-[#001D36]/8 mb-3" />
+              <Link
+                to="/artisan/enquiries"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-secondary hover:text-secondary-hover transition-colors group"
+                aria-label={`View ${summaryMetrics.newEnquiriesCount} new buyer enquiries`}
+              >
+                <span>View enquiries</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Row 2, Module 4: Live products */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-module-card analytics-stagger-4 flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-primary tracking-tight">
+                    Live products
+                  </h3>
+                  <p className="text-xs text-on-surface-variant/75 mt-0.5">
+                    Current inventory snapshot
+                  </p>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10">
+                  <Globe2 className="w-4 h-4" aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="mt-4 mb-2">
+                <span className="text-4xl sm:text-[44px] font-bold text-primary font-sans leading-none tracking-tight block">
+                  {summaryMetrics.liveProductsCount}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="h-[1px] w-full bg-[#001D36]/8 mb-3" />
+              {/* Three compact internal inventory statistics */}
+              <div className="grid grid-cols-3 divide-x divide-[#001D36]/10 text-left">
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('all')}
+                  className="flex flex-col pr-2 text-left group focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FFB955] rounded-sm"
+                  aria-label={`View all ${inventoryCounts.totalActive} active products`}
+                >
+                  <span className="text-base sm:text-lg font-bold text-primary font-sans group-hover:text-secondary transition-colors">
+                    {inventoryCounts.totalActive}
+                  </span>
+                  <span className="text-[11px] font-medium text-on-surface-variant mt-0.5">
+                    {inventoryCounts.totalActive === 1 ? 'Product' : 'Products'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('drafts')}
+                  className="flex flex-col px-2 sm:px-3 text-left group focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FFB955] rounded-sm"
+                  aria-label={`View ${inventoryCounts.draftCount} draft listings`}
+                >
+                  <span className="text-base sm:text-lg font-bold text-primary font-sans group-hover:text-secondary transition-colors">
+                    {inventoryCounts.draftCount}
+                  </span>
+                  <span className="text-[11px] font-medium text-on-surface-variant mt-0.5">
+                    {inventoryCounts.draftCount === 1 ? 'Draft' : 'Drafts'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('needs_attention')}
+                  className="flex flex-col pl-2 sm:pl-3 text-left group focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FFB955] rounded-sm"
+                  aria-label={`View ${inventoryCounts.lowStockCount} low stock items`}
+                >
+                  <span className={clsx('text-base sm:text-lg font-bold font-sans group-hover:text-secondary transition-colors', inventoryCounts.lowStockCount > 0 ? 'text-amber-700' : 'text-primary')}>
+                    {inventoryCounts.lowStockCount}
+                  </span>
+                  <span className="text-[11px] font-medium text-on-surface-variant mt-0.5 flex items-center gap-1">
+                    Low stock
+                    {inventoryCounts.lowStockCount > 0 && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    )}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2, Module 5: Product price history */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-stagger-5 h-full">
+            <ProductPriceHistoryChart products={products} />
+          </div>
+
+          {/* Row 2, Module 6: Sales by craft category */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-4 analytics-stagger-6 h-full">
+            <CategorySectorBreakdownChart
+              categories={categorySales}
+              sectors={sectorSales}
+            />
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* 4. Regional Buyer Discovery Map (when real sales data is populated) */}
+      {hasSalesData && (
+        <section aria-label="Regional Distribution Map" className="w-full analytics-module-card analytics-stagger-5">
+          <SalesByRegionMap regionalSales={regionalSales} />
+        </section>
+      )}
 
       {/* 6. Contextual Notices (Failed upload retry / resumable draft) */}
       {(latestDraft || hasFailedUploads) && (
@@ -559,13 +780,13 @@ export const ArtisanDashboardPage: React.FC = () => {
         </section>
       )}
 
-      {/* 7. Main "Your products" Inventory Workspace Panel */}
+      {/* 5. Final Row: Full-width 12-column "Your products" Management Panel */}
       <section aria-label="Product Catalogue Workspace" className="w-full">
-        <div className="bg-white rounded-2xl border border-surface-variant/80 shadow-xs overflow-hidden flex flex-col">
+        <div className="analytics-module-card p-0 overflow-hidden flex flex-col">
           {/* Panel Header */}
-          <div className="p-5 sm:p-6 border-b border-surface-variant/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+          <div className="p-5 sm:p-6 border-b border-[#001D36]/8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF9]">
             <div className="flex items-baseline gap-2.5">
-              <h2 className="text-lg sm:text-xl font-bold text-primary tracking-tight">
+              <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
                 Your products
               </h2>
               <span className="text-xs sm:text-sm text-on-surface-variant font-medium">
@@ -578,7 +799,7 @@ export const ArtisanDashboardPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleToggleDemoMode}
-                className="text-[11px] font-semibold text-on-surface-variant hover:text-primary px-2 py-1 rounded-md border border-surface-variant/60 hover:bg-surface-container-low"
+                className="text-[11px] font-semibold text-on-surface-variant hover:text-primary px-2.5 py-1.5 rounded-lg border border-[#001D36]/15 hover:bg-[#FFF9EF] transition-colors"
               >
                 {isDemoMode ? 'Reset to live data' : 'Demo populated data'}
               </button>
@@ -594,7 +815,7 @@ export const ArtisanDashboardPage: React.FC = () => {
           </div>
 
           {/* Search & Compact Filter Segmented Controls */}
-          <div className="px-4 sm:px-6 py-3 bg-surface-container-low/40 border-b border-surface-variant/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 bg-[#FFF9EF]/60 border-b border-[#001D36]/8 flex flex-col md:flex-row md:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative w-full md:max-w-md">
               <Search className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -603,7 +824,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products by title, craft, category..."
-                className="w-full bg-white border border-surface-variant/80 rounded-xl pl-9 pr-8 py-2 text-sm text-primary placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all"
+                className="w-full bg-white border border-[#001D36]/15 rounded-xl pl-9 pr-8 py-2 text-sm text-primary placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all shadow-2xs"
                 aria-label="Search products"
               />
               {searchQuery && (
@@ -618,7 +839,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             </div>
 
             {/* Segmented Filter Tabs */}
-            <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-surface-variant/60 self-start md:self-auto overflow-x-auto max-w-full">
+            <div className="flex items-center gap-1 bg-[#FFF9EF] p-1 rounded-xl border border-[#001D36]/10 self-start md:self-auto overflow-x-auto max-w-full">
               <button
                 type="button"
                 onClick={() => setActiveFilter('all')}
@@ -664,7 +885,7 @@ export const ArtisanDashboardPage: React.FC = () => {
           </div>
 
           {/* Desktop Table Header */}
-          <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-2.5 bg-surface-container-low/70 text-xs font-semibold text-on-surface-variant uppercase tracking-wider border-b border-surface-variant/40">
+          <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-[#FFF9EF]/80 text-xs font-semibold text-on-surface-variant uppercase tracking-wider border-b border-[#001D36]/8">
             <span className="col-span-5">Product</span>
             <span className="col-span-2">Price</span>
             <span className="col-span-2">Stock</span>
@@ -673,7 +894,7 @@ export const ArtisanDashboardPage: React.FC = () => {
           </div>
 
           {/* Product List Content */}
-          <div className="flex flex-col divide-y divide-surface-variant/40">
+          <div className="flex flex-col divide-y divide-[#001D36]/8">
             {isLoading && products.length === 0 ? (
               /* Loading Skeletons */
               <div className="p-6 flex flex-col gap-4">

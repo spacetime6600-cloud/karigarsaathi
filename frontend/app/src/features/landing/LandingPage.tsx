@@ -172,61 +172,120 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Editorial Four-Step Workflow: Unboxed, side-by-side on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:[grid-template-columns:repeat(4,minmax(0,1fr))] gap-8 md:gap-x-12 md:gap-y-10 lg:gap-0">
             {/* Step 1: Capture */}
-            <div className="bg-[#FFF9EF]/85 backdrop-blur-xs rounded-2xl p-5 border border-[#001D36]/10 shadow-xs flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-full bg-secondary/10 text-secondary font-bold text-xs flex items-center justify-center">
-                  01
-                </span>
-                <Camera className="w-4 h-4 text-on-surface-variant" />
+            <div className="workflow-step relative flex flex-row items-start gap-5 pb-8 last:pb-0 md:flex-col md:items-start md:gap-0 md:pb-0 lg:pl-0 lg:pr-8 xl:pr-10">
+              {/* Mobile Timeline Track */}
+              <div
+                className="md:hidden absolute left-[21px] top-12 bottom-0 w-px bg-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]"
+                aria-hidden="true"
+              />
+
+              {/* Number */}
+              <span className="font-sans text-[44px] sm:text-[48px] lg:text-[48px] font-medium leading-none text-secondary/70 shrink-0 select-none tracking-tight pt-0.5 md:pt-0">
+                01
+              </span>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 min-w-0 md:w-full">
+                <div className="flex items-center gap-2.5 md:mt-4 lg:mt-5 mb-1.5 md:mb-2 lg:mb-2.5">
+                  <h3 className="font-sans text-xl lg:text-[22px] font-semibold text-primary tracking-tight">
+                    Capture
+                  </h3>
+                  <Camera
+                    className="w-[18px] h-[18px] lg:w-5 lg:h-5 text-secondary/80 shrink-0"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="font-sans text-sm lg:text-[15px] font-normal text-on-surface-variant leading-relaxed">
+                  Take or select product photographs and review them before continuing.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-primary">1. Capture</h3>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Take or select product photographs and review them before continuing.
-              </p>
             </div>
 
             {/* Step 2: Create */}
-            <div className="bg-[#FFF9EF]/85 backdrop-blur-xs rounded-2xl p-5 border border-[#001D36]/10 shadow-xs flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-full bg-secondary/10 text-secondary font-bold text-xs flex items-center justify-center">
-                  02
-                </span>
-                <Mic className="w-4 h-4 text-on-surface-variant" />
+            <div className="workflow-step relative flex flex-row items-start gap-5 pb-8 last:pb-0 md:flex-col md:items-start md:gap-0 md:pb-0 lg:pl-8 xl:pl-10 lg:pr-8 xl:pr-10 lg:border-l lg:border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
+              {/* Mobile Timeline Track */}
+              <div
+                className="md:hidden absolute left-[21px] top-12 bottom-0 w-px bg-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]"
+                aria-hidden="true"
+              />
+
+              {/* Number */}
+              <span className="font-sans text-[44px] sm:text-[48px] lg:text-[48px] font-medium leading-none text-secondary/70 shrink-0 select-none tracking-tight pt-0.5 md:pt-0">
+                02
+              </span>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 min-w-0 md:w-full">
+                <div className="flex items-center gap-2.5 md:mt-4 lg:mt-5 mb-1.5 md:mb-2 lg:mb-2.5">
+                  <h3 className="font-sans text-xl lg:text-[22px] font-semibold text-primary tracking-tight">
+                    Create
+                  </h3>
+                  <Mic
+                    className="w-[18px] h-[18px] lg:w-5 lg:h-5 text-secondary/80 shrink-0"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="font-sans text-sm lg:text-[15px] font-normal text-on-surface-variant leading-relaxed">
+                  Speak or type the craft details, then correct every generated field.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-primary">2. Create</h3>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Speak or type the craft details, then correct every generated field.
-              </p>
             </div>
 
             {/* Step 3: Confirm */}
-            <div className="bg-[#FFF9EF]/85 backdrop-blur-xs rounded-2xl p-5 border border-[#001D36]/10 shadow-xs flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-full bg-secondary/10 text-secondary font-bold text-xs flex items-center justify-center">
-                  03
-                </span>
-                <Calculator className="w-4 h-4 text-on-surface-variant" />
+            <div className="workflow-step relative flex flex-row items-start gap-5 pb-8 last:pb-0 md:flex-col md:items-start md:gap-0 md:pb-0 lg:pl-8 xl:pl-10 lg:pr-8 xl:pr-10 lg:border-l lg:border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
+              {/* Mobile Timeline Track */}
+              <div
+                className="md:hidden absolute left-[21px] top-12 bottom-0 w-px bg-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]"
+                aria-hidden="true"
+              />
+
+              {/* Number */}
+              <span className="font-sans text-[44px] sm:text-[48px] lg:text-[48px] font-medium leading-none text-secondary/70 shrink-0 select-none tracking-tight pt-0.5 md:pt-0">
+                03
+              </span>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 min-w-0 md:w-full">
+                <div className="flex items-center gap-2.5 md:mt-4 lg:mt-5 mb-1.5 md:mb-2 lg:mb-2.5">
+                  <h3 className="font-sans text-xl lg:text-[22px] font-semibold text-primary tracking-tight">
+                    Confirm
+                  </h3>
+                  <Calculator
+                    className="w-[18px] h-[18px] lg:w-5 lg:h-5 text-secondary/80 shrink-0"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="font-sans text-sm lg:text-[15px] font-normal text-on-surface-variant leading-relaxed">
+                  Review the listing, understand the suggested price and approve the Craft Passport.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-primary">3. Confirm</h3>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Review the listing, understand the suggested price and approve the Craft Passport.
-              </p>
             </div>
 
             {/* Step 4: Connect */}
-            <div className="bg-[#FFF9EF]/85 backdrop-blur-xs rounded-2xl p-5 border border-[#001D36]/10 shadow-xs flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-full bg-secondary/10 text-secondary font-bold text-xs flex items-center justify-center">
-                  04
-                </span>
-                <Share2 className="w-4 h-4 text-on-surface-variant" />
+            <div className="workflow-step relative flex flex-row items-start gap-5 pb-8 last:pb-0 md:flex-col md:items-start md:gap-0 md:pb-0 lg:pl-8 xl:pl-10 lg:pr-0 lg:border-l lg:border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
+              {/* Number */}
+              <span className="font-sans text-[44px] sm:text-[48px] lg:text-[48px] font-medium leading-none text-secondary/70 shrink-0 select-none tracking-tight pt-0.5 md:pt-0">
+                04
+              </span>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 min-w-0 md:w-full">
+                <div className="flex items-center gap-2.5 md:mt-4 lg:mt-5 mb-1.5 md:mb-2 lg:mb-2.5">
+                  <h3 className="font-sans text-xl lg:text-[22px] font-semibold text-primary tracking-tight">
+                    Connect
+                  </h3>
+                  <Share2
+                    className="w-[18px] h-[18px] lg:w-5 lg:h-5 text-secondary/80 shrink-0"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="font-sans text-sm lg:text-[15px] font-normal text-on-surface-variant leading-relaxed">
+                  Export the catalogue and continue buyer conversations from one workspace.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-primary">4. Connect</h3>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Export the catalogue and continue buyer conversations from one workspace.
-              </p>
             </div>
           </div>
 
