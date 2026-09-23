@@ -32,8 +32,9 @@ export const CoordinatorLoginPage: React.FC = () => {
     searchParams.get('returnUrl') ||
     (location.state as { from?: { pathname?: string; search?: string } })?.from?.pathname;
 
-  const [email, setEmail] = useState('coordinator@karigarsaathi.gov.in');
-  const [password, setPassword] = useState('CoordinatorPass123!');
+  const isDev = Boolean(import.meta.env.DEV);
+  const [email, setEmail] = useState(isDev ? 'coordinator@karigarsaathi.gov.in' : '');
+  const [password, setPassword] = useState(isDev ? 'CoordinatorPass123!' : '');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

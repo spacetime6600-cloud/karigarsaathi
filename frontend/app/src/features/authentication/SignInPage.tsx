@@ -19,10 +19,11 @@ export const SignInPage: React.FC = () => {
 
   const [authMode, setAuthMode] = useState<'email_signin' | 'email_register'>('email_signin');
 
-  // Email form state
-  const [email, setEmail] = useState('artisan_a@karigarsaathi.local');
-  const [password, setPassword] = useState('KarigarPass123!');
-  const [displayName, setDisplayName] = useState('Ravi Kumar');
+  // Email form state (prefill demo credentials exclusively in development)
+  const isDev = Boolean(import.meta.env.DEV);
+  const [email, setEmail] = useState(isDev ? 'artisan_a@karigarsaathi.local' : '');
+  const [password, setPassword] = useState(isDev ? 'KarigarPass123!' : '');
+  const [displayName, setDisplayName] = useState(isDev ? 'Ravi Kumar' : '');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');

@@ -43,6 +43,22 @@ describe('Firebase Authentication & Error Normalization Regression Suite', () =>
       // @ts-expect-error accessing private method for unit testing
       expect(repo.normalizeError(errorInUse).message).toBe('An account with this email address already exists.');
     });
+
+    it('normalizes invalid or missing Firebase API key errors to clear deployment instructions', () => {
+      const errorApiKeyNotValid = Object.assign(
+        new Error('Firebase: Error (auth/api-key-not-valid.-please-pass-a-valid-api-key.).'),
+        { code: 'auth/api-key-not-valid.-please-pass-a-valid-api-key.' }
+      );
+      const errorShortApiKey = Object.assign(new Error('api key invalid'), { code: 'auth/api-key-not-valid' });
+      const errorInvalidKey = Object.assign(new Error('invalid api key'), { code: 'auth/invalid-api-key' });
+
+      // @ts-expect-error accessing private method for unit testing
+      expect(repo.normalizeError(errorApiKeyNotValid).message).toContain('VITE_FIREBASE_API_KEY');
+      // @ts-expect-error accessing private method for unit testing
+      expect(repo.normalizeError(errorShortApiKey).message).toContain('VITE_FIREBASE_API_KEY');
+      // @ts-expect-error accessing private method for unit testing
+      expect(repo.normalizeError(errorInvalidKey).message).toContain('VITE_FIREBASE_API_KEY');
+    });
   });
 
   describe('2. Live Auth Emulator Integration & Isolation', () => {
@@ -86,4 +102,22 @@ describe('Firebase Authentication & Error Normalization Regression Suite', () =>
       }
     });
   });
+
+  describe('3. Firebase Configuration Validation', () => {
+    it('provides sanitized configuration and distinguishes emulator from production', async () => {
+      const { getFirebaseConfig, EMULATOR_DUMMY_API_KEY } = await import('@/config/firebase');
+      const configResult = getFirebaseConfig();
+
+      expect(configResult).toHaveProperty('config');
+      expect(configResult).toHaveProperty('isValid');
+      expect(configResult).toHaveProperty('isEmulator');
+      expect(configResult.config.apiKey).toBeTruthy();
+
+      if (configResult.isEmulator) {
+        expect(configResult.isValid).toBe(true);
+        expect(configResult.config.apiKey).toBe(EMULATOR_DUMMY_API_KEY);
+      }
+    });
+  });
 });
+

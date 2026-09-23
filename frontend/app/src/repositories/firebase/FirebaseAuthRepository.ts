@@ -7,7 +7,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/config/firebase';
+import { auth, db, getFirebaseConfig } from '@/config/firebase';
 import { IAuthRepository } from '@/repositories/interfaces/IAuthRepository';
 import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
 import { logger } from '@/services/logging/logger';
@@ -50,6 +50,13 @@ export class FirebaseAuthRepository implements IAuthRepository {
   async register(input: RegisterArtisanInput): Promise<UserAccount> {
     try {
       logger.info('AUTH', 'Starting artisan registration', { email: input.email });
+      const { isValid, missingFields, isEmulator } = getFirebaseConfig();
+      if (!isValid && !isEmulator) {
+        throw new Error(
+          `Firebase production configuration is missing: ${missingFields.join(', ')}. Please configure these variables in Vercel Project Settings.`
+        );
+      }
+
       const cred = await createUserWithEmailAndPassword(auth, input.email, input.password);
       const fbUser = cred.user;
 
@@ -102,6 +109,14 @@ export class FirebaseAuthRepository implements IAuthRepository {
       input.email.toLowerCase().includes('vikram');
     try {
       logger.info('AUTH', 'User sign-in attempt', { email: input.email, isCoordinator: isCoord });
+
+      const { isValid, missingFields, isEmulator } = getFirebaseConfig();
+      if (!isValid && !isEmulator) {
+        throw new Error(
+          `Firebase production configuration is missing: ${missingFields.join(', ')}. Please configure these variables in Vercel Project Settings.`
+        );
+      }
+
       let fbUser: FirebaseUser;
       try {
         const cred = await signInWithEmailAndPassword(auth, input.email, input.password);
@@ -109,7 +124,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
       } catch (authErr: unknown) {
         const errCode = (authErr as { code?: string })?.code;
         // In local/emulator/demo environment, auto-provision coordinator or artisan account if user not found
-        if (errCode === 'auth/user-not-found' || errCode === 'auth/invalid-credential') {
+        if (isEmulator && (errCode === 'auth/user-not-found' || errCode === 'auth/invalid-credential')) {
           const cred = await createUserWithEmailAndPassword(auth, input.email, input.password);
           fbUser = cred.user;
           const displayName = isCoord ? 'Priya Sharma (Cluster Coordinator)' : 'Ravi Kumar';
@@ -255,9 +270,20 @@ export class FirebaseAuthRepository implements IAuthRepository {
           return new Error('This account has been disabled. Please contact support.');
         case 'auth/internal-error':
           return new Error('An internal authentication error occurred. Please try again.');
+        case 'auth/api-key-not-valid':
+        case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+        case 'auth/invalid-api-key':
+          return new Error(
+            'Firebase Web API key is not configured or invalid. Please configure VITE_FIREBASE_API_KEY in Vercel project environment variables.'
+          );
         case 'permission-denied':
           return new Error('Permission denied. You do not have access to this resource.');
         default:
+          if (typeof code === 'string' && (code.includes('api-key') || code.includes('invalid-api-key'))) {
+            return new Error(
+              'Firebase Web API key is not configured or invalid. Please configure VITE_FIREBASE_API_KEY in Vercel project environment variables.'
+            );
+          }
           return err;
       }
     }
