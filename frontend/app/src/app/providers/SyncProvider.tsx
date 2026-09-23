@@ -15,6 +15,7 @@ interface SyncContextType {
   retryFailed: (operationId?: string) => Promise<void>;
   cancelUpload: (operationId: string) => Promise<void>;
   clearCompleted: () => Promise<void>;
+  clearFailed: () => Promise<void>;
   toggleSimulatedOffline: (offline: boolean) => void;
 }
 
@@ -103,6 +104,12 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await refreshState();
   };
 
+  const clearFailed = async () => {
+    if (!user?.id) return;
+    await storageUploadQueue.clearFailed(user.id);
+    await refreshState();
+  };
+
   const toggleSimulatedOffline = (offline: boolean) => {
     syncService.setForceOffline(offline);
     refreshState();
@@ -122,6 +129,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
         retryFailed,
         cancelUpload,
         clearCompleted,
+        clearFailed,
         toggleSimulatedOffline,
       }}
     >

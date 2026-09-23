@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { logger } from '@/services/logging/logger';
+import { auth } from '@/config/firebase';
 
 interface AIEnhancementModalProps {
   isOpen: boolean;
@@ -85,7 +86,9 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
   const handleStartEnhancement = async () => {
     if (!photoItem) return;
 
-    if (!artisanId) {
+    const effectiveArtisanId = artisanId || auth?.currentUser?.uid || '';
+
+    if (!effectiveArtisanId) {
       setErrorMessage('Authentication required: Please sign in before requesting AI enhancement.');
       setIsRetryable(false);
       setStep('ERROR');
@@ -115,7 +118,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
         consentGranted: true,
         requestId,
         productId,
-        artisanId,
+        artisanId: effectiveArtisanId,
         outputSize: 512,
         background: 'white',
       });

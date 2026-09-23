@@ -227,6 +227,18 @@ class StorageUploadQueueManager {
   }
 
   /**
+   * Remove failed items to clean up local queue.
+   */
+  async clearFailed(ownerUid: string): Promise<void> {
+    const items = await this.getQueueForUser(ownerUid);
+    const failed = items.filter((i) => i.status === 'failed');
+    for (const item of failed) {
+      await idbDelete(STORES.UPLOAD_QUEUE, item.operationId);
+    }
+    this.notifyListeners();
+  }
+
+  /**
    * Main Queue Processing Loop.
    * Sequential execution (1 upload at a time) to conserve memory on mobile devices.
    */

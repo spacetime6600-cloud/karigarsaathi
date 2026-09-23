@@ -198,7 +198,8 @@ class AIEnhancementService {
       });
     }
 
-    if (!artisanId || artisanId === 'artisan_default') {
+    const resolvedArtisanId = (artisanId && artisanId.trim()) || auth?.currentUser?.uid || '';
+    if (!resolvedArtisanId || resolvedArtisanId === 'artisan_default') {
       throw new AIEnhancementError({
         errorCode: 'AUTHENTICATION_REQUIRED',
         message: 'Authentication required: Please sign in before submitting images for AI enhancement.',
@@ -249,7 +250,7 @@ class AIEnhancementService {
     formData.append('consent_granted', 'true');
     formData.append('request_id', requestId);
     formData.append('product_id', productId);
-    formData.append('artisan_id', artisanId);
+    formData.append('artisan_id', resolvedArtisanId);
     formData.append('output_size', String(outputSize));
     formData.append('background', background);
 
@@ -286,17 +287,18 @@ class AIEnhancementService {
           // ignore non-json
         }
 
-        const detail = (errJson.detail || errJson) as Record<string, unknown>;
-        const errorCode = (detail.error_code as string) || `HTTP_${response.status}`;
-        const message = (detail.message as string) || `AI service enhancement failed with status ${response.status}`;
-        const retryable = detail.retryable !== false && response.status >= 500;
+        const detail = (errJson.detail || errJson) as Record<string, unknown> | Array<unknown>;
+        const errorCode = (!Array.isArray(detail) && (detail.error_code as string)) || `HTTP_${response.status}`;
+        const message = (!Array.isArray(detail) && (detail.message as string))
+          || (Array.isArray(detail) ? detail.map((d: any) => `${d.loc?.join('.')}: ${d.msg}`).join(', ') : `AI service enhancement failed with status ${response.status}`);
+        const retryable = !Array.isArray(detail) && detail.retryable !== false && response.status >= 500;
 
         throw new AIEnhancementError({
           errorCode,
           message,
           retryable,
           requestId,
-          details: detail,
+          details: (Array.isArray(detail) ? { errors: detail } : detail) as Record<string, unknown>,
         });
       }
 
