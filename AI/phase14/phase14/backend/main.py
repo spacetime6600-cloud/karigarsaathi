@@ -5,13 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from backend.app.core.config import settings
-from backend.app.core.database import engine, Base
+from backend.app.core.database import engine, Base, ensure_db_directory
 from backend.app.api.v1.router import router as api_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: run database migrations
+    # Startup: ensure database directory exists and run database migrations
+    ensure_db_directory(settings.database_url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
