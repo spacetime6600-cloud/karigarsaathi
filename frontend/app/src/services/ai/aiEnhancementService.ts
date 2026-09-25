@@ -254,9 +254,16 @@ class AIEnhancementService {
     formData.append('output_size', String(outputSize));
     formData.append('background', background);
 
-    // Add operations as individual form fields or JSON
-    for (const op of operations) {
-      formData.append('operations', op);
+    // When operations matches the default 4 operations, omitting it lets the backend apply its defaults cleanly without multipart array parsing issues.
+    const isDefaultOps =
+      operations.length === 4 &&
+      operations.includes('background_removal') &&
+      operations.includes('lighting_correction') &&
+      operations.includes('centring') &&
+      operations.includes('standard_resize');
+
+    if (!isDefaultOps && operations.length > 0) {
+      formData.append('operations', JSON.stringify(operations));
     }
 
     try {
