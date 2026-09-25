@@ -124,7 +124,7 @@ class StorageUploadQueueManager {
       uploadDestination: destination,
       variantType: variant,
       retryCount: 0,
-      maxRetries: 5,
+      maxRetries: 2,
       status: 'pending',
       createdAt: existing?.createdAt || now,
       updatedAt: now,
@@ -258,6 +258,7 @@ class StorageUploadQueueManager {
       const items = await this.getQueueForUser(this.activeOwnerUid);
       const pendingItems = items.filter((i) => i.status === 'pending');
 
+      let consecutiveFailures = 0;
       for (const item of pendingItems) {
         // Double-check active user hasn't changed
         if (this.activeOwnerUid !== item.ownerUid) break;
@@ -265,7 +266,22 @@ class StorageUploadQueueManager {
         // Skip if already in flight
         if (this.inFlightOperations.has(item.operationId)) continue;
 
-        await this.uploadSingleItem(item);
+        const success = await this.uploadSingleItem(item);
+        if (!success) {
+          consecutiveFailures++;
+          // Halt queue pass immediately if the error was permanent or after 2 consecutive failures
+          // to prevent flood hammering Render
+          if (item.status === 'failed' || consecutiveFailures >= 2) {
+            logger.warn('UPLOAD_QUEUE', 'Halting queue pass to prevent request flooding', {
+              operationId: item.operationId,
+              status: item.status,
+              consecutiveFailures,
+            });
+            break;
+          }
+        } else {
+          consecutiveFailures = 0;
+        }
       }
     } finally {
       this.isProcessing = false;
@@ -275,7 +291,7 @@ class StorageUploadQueueManager {
   /**
    * Upload single item with error classification and exponential backoff.
    */
-  private async uploadSingleItem(item: QueuedUploadItem): Promise<void> {
+  private async uploadSingleItem(item: QueuedUploadItem): Promise<boolean> {
     this.inFlightOperations.add(item.operationId);
 
     // Update status to uploading
@@ -306,6 +322,7 @@ class StorageUploadQueueManager {
       item.blob = new Blob([], { type: item.mimeType });
       await idbPut(STORES.UPLOAD_QUEUE, item);
       logger.info('UPLOAD_QUEUE', 'Completed upload for item', { operationId: item.operationId, destination: item.uploadDestination, provider: uploadResult.provider });
+      return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       const isRetryable = this.isErrorRetryable(err);
@@ -328,12 +345,13 @@ class StorageUploadQueueManager {
         const backoffMs = Math.min(30000, 1000 * Math.pow(2, item.retryCount) + Math.random() * 500);
         this.scheduleProcessing(backoffMs);
       } else {
-        // Mark failed
+        // Mark failed permanently
         item.status = 'failed';
         item.lastError = isRetryable ? `Max retries exceeded (${item.maxRetries}): ${errorMsg}` : errorMsg;
         item.updatedAt = new Date().toISOString();
         await idbPut(STORES.UPLOAD_QUEUE, item);
       }
+      return false;
     } finally {
       this.inFlightOperations.delete(item.operationId);
       this.notifyListeners();
@@ -341,9 +359,42 @@ class StorageUploadQueueManager {
   }
 
   private isErrorRetryable(err: unknown): boolean {
-    if (!err) return true;
+    if (!err) return false;
+    const errObj = err as { status?: number; retryable?: boolean; code?: string; message?: string };
+
+    // Explicit retryable flag from backend / service layer
+    if (errObj.retryable === false) {
+      return false;
+    }
+
     const msg = err instanceof Error ? err.message : String(err);
-    const code = (err as { code?: string })?.code || '';
+    const code = errObj.code || '';
+    const status = errObj.status;
+
+    // HTTP 4xx client errors and upstream auth / bad gateway are not retryable
+    if (status && (status === 400 || status === 401 || status === 403 || status === 404 || status === 502 || status === 503)) {
+      return false;
+    }
+
+    // Render no-deploy or host unreachable: do not rapid retry
+    if (msg.includes('no-deploy') || msg.includes('X-Render-Routing')) {
+      return false;
+    }
+
+    // Cloudinary-specific permanent errors
+    if (
+      msg.includes('AuthorizationRequired') ||
+      msg.includes('BadRequest') ||
+      msg.includes('NotAllowed') ||
+      msg.includes('NotFound') ||
+      msg.includes('Invalid Signature') ||
+      msg.includes('Must supply api_key') ||
+      msg.includes('Unknown cloud_name') ||
+      msg.includes('CLOUDINARY_CONFIG_MISSING') ||
+      msg.includes('CLOUDINARY_CONFIG_ERROR')
+    ) {
+      return false;
+    }
 
     // Non-retryable: permission-denied, unauthenticated, quota exceeded, invalid argument, 401/403
     if (
@@ -359,7 +410,8 @@ class StorageUploadQueueManager {
       msg.includes('User does not have permission') ||
       msg.includes('Ownership mismatch') ||
       msg.includes('403') ||
-      msg.includes('401')
+      msg.includes('401') ||
+      msg.includes('400')
     ) {
       return false;
     }

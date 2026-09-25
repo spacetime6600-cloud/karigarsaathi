@@ -8,7 +8,8 @@ and structured logging without credential leakage.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+import re
+from typing import Any, Dict, Optional, Tuple
 
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
@@ -29,15 +30,100 @@ router = APIRouter(prefix="/v1/media", tags=["media"])
 # Authenticator instance (auto switches to Firebase in production)
 authenticator = create_authenticator(settings, "auto")
 
+
+def sanitize_error_message(msg: str, cloud_name: str = "", api_key: str = "", api_secret: str = "") -> str:
+    """Sanitize error messages to remove sensitive credentials, tokens, or signatures.
+
+    Never exposes api_secret, api_key, bearer tokens, or full signature payloads.
+    """
+    if not msg:
+        return "Unknown error"
+
+    sanitized = str(msg)
+
+    # Redact known secrets if present in message
+    if api_secret and len(api_secret) > 4:
+        sanitized = sanitized.replace(api_secret, "[REDACTED_SECRET]")
+    if api_key and len(api_key) > 4:
+        sanitized = sanitized.replace(api_key, "[REDACTED_KEY]")
+
+    # Redact Bearer tokens
+    sanitized = re.sub(r"Bearer\s+[a-zA-Z0-9_\-\.]+", "Bearer [REDACTED_TOKEN]", sanitized, flags=re.IGNORECASE)
+
+    # Redact String to sign / signatures: e.g. "String to sign - '...'"
+    sanitized = re.sub(r"String to sign\s*-\s*['\"][^'\"]*['\"]", "String to sign - '[REDACTED]'", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"Invalid Signature\s+[a-fA-F0-9]+", "Invalid Signature [REDACTED]", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"api_secret=[^\s&'\"]+", "api_secret=[REDACTED]", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"api_key=[^\s&'\"]+", "api_key=[REDACTED]", sanitized, flags=re.IGNORECASE)
+
+    if len(sanitized) > 500:
+        sanitized = sanitized[:500] + "... [truncated]"
+
+    return sanitized
+
+
+def extract_provider_error_details(
+    exc: Exception, adapter: Optional[CloudinaryStorageAdapter] = None
+) -> Tuple[str, Optional[int], bool, str, int]:
+    """Extract structured, safe diagnostic details from a Cloudinary exception.
+
+    Returns:
+        (exc_type, provider_status_code, is_retryable, safe_msg, http_status)
+    """
+    exc_type = type(exc).__name__
+    raw_code = getattr(exc, "status_code", None) or getattr(exc, "http_code", None)
+
+    provider_status_code = None
+    if isinstance(raw_code, int):
+        provider_status_code = raw_code
+    elif "AuthorizationRequired" in exc_type or "Invalid Signature" in str(exc) or "Must supply api_key" in str(exc):
+        provider_status_code = 401
+    elif "NotAllowed" in exc_type:
+        provider_status_code = 403
+    elif "NotFound" in exc_type:
+        provider_status_code = 404
+    elif "BadRequest" in exc_type:
+        provider_status_code = 400
+    elif "RateLimited" in exc_type:
+        provider_status_code = 429
+    elif "GeneralError" in exc_type:
+        provider_status_code = 500
+
+    # Determine retryability: auth/credential/bad request errors are PERMANENT (never retryable)
+    is_retryable = True
+    if provider_status_code in {400, 401, 403, 404}:
+        is_retryable = False
+    elif any(term in str(exc).lower() for term in ["signature", "api_key", "credentials", "unauthorized", "forbidden", "unknown cloud", "not found"]):
+        is_retryable = False
+
+    cloud_name = getattr(adapter, "cloud_name", "") if adapter else ""
+    api_key = getattr(adapter, "api_key", "") if adapter else ""
+    api_secret = getattr(adapter, "api_secret", "") if adapter else ""
+
+    safe_msg = sanitize_error_message(str(exc), cloud_name=cloud_name, api_key=api_key, api_secret=api_secret)
+
+    # Determine outward HTTP status code
+    if provider_status_code in {401, 403}:
+        http_status = status.HTTP_502_BAD_GATEWAY  # Upstream Cloudinary auth failed
+    elif provider_status_code == 400:
+        http_status = status.HTTP_400_BAD_REQUEST
+    elif provider_status_code == 429:
+        http_status = status.HTTP_429_TOO_MANY_REQUESTS
+    else:
+        http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    return exc_type, provider_status_code, is_retryable, safe_msg, http_status
+
+
 # Storage adapter instance
 def get_cloudinary_adapter() -> CloudinaryStorageAdapter:
     """Factory to get or initialize CloudinaryStorageAdapter."""
-    # When MEDIA_STORAGE_PROVIDER is cloudinary, require credentials
-    require_config = settings.media_storage_provider.lower() == "cloudinary"
+    current_settings = get_settings()
+    require_config = current_settings.media_storage_provider.lower() == "cloudinary"
     return CloudinaryStorageAdapter(
-        cloud_name=settings.cloudinary_cloud_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
+        cloud_name=current_settings.cloudinary_cloud_name,
+        api_key=current_settings.cloudinary_api_key,
+        api_secret=current_settings.cloudinary_api_secret,
         require_config=require_config,
     )
 
@@ -150,15 +236,16 @@ async def upload_media(
     try:
         adapter = get_cloudinary_adapter()
     except ValueError as val_err:
-        logger.error(
-            "CLOUDINARY_CONFIG_MISSING",
-            extra={"product_id": product_id, "image_id": image_id, "error": str(val_err)},
-        )
+        safe_cfg_err = sanitize_error_message(str(val_err))
+        logger.error("CLOUDINARY_CONFIG_MISSING [product_id=%s, image_id=%s]: %s", product_id, image_id, safe_cfg_err)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "error_code": "CLOUDINARY_CONFIG_MISSING",
-                "message": "Cloudinary credentials not configured on backend service. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+                "provider": "cloudinary",
+                "provider_error_type": "ValueError",
+                "provider_status_code": 503,
+                "message": f"Cloudinary configuration missing: {safe_cfg_err}",
                 "retryable": False,
             },
         )
@@ -195,16 +282,25 @@ async def upload_media(
         )
         return MediaMetadataResponse(**metadata)
     except Exception as exc:
+        exc_type, provider_status_code, is_retryable, safe_msg, http_status = extract_provider_error_details(exc, adapter)
         logger.error(
-            "MEDIA_UPLOAD_FAILED",
-            extra={"product_id": product_id, "image_id": image_id, "error": str(exc)},
+            "MEDIA_UPLOAD_FAILED [provider=cloudinary, exc_type=%s, provider_code=%s, retryable=%s, product_id=%s, image_id=%s]: %s",
+            exc_type,
+            provider_status_code or "N/A",
+            is_retryable,
+            product_id,
+            image_id,
+            safe_msg,
         )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status,
             detail={
                 "error_code": "STORAGE_UPLOAD_ERROR",
-                "message": f"Failed to store image on Cloudinary: {str(exc)}",
-                "retryable": True,
+                "provider": "cloudinary",
+                "provider_error_type": exc_type,
+                "provider_status_code": provider_status_code,
+                "message": f"Failed to store image on Cloudinary: {safe_msg}",
+                "retryable": is_retryable,
             },
         )
 
@@ -227,12 +323,16 @@ async def replace_media(
     try:
         adapter = get_cloudinary_adapter()
     except ValueError as val_err:
-        logger.error("CLOUDINARY_CONFIG_MISSING", extra={"product_id": product_id, "error": str(val_err)})
+        safe_cfg_err = sanitize_error_message(str(val_err))
+        logger.error("CLOUDINARY_CONFIG_MISSING [product_id=%s, image_id=%s]: %s", product_id, image_id, safe_cfg_err)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "error_code": "CLOUDINARY_CONFIG_MISSING",
-                "message": "Cloudinary credentials not configured on backend service. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+                "provider": "cloudinary",
+                "provider_error_type": "ValueError",
+                "provider_status_code": 503,
+                "message": f"Cloudinary configuration missing: {safe_cfg_err}",
                 "retryable": False,
             },
         )
@@ -258,16 +358,25 @@ async def replace_media(
         )
         return MediaMetadataResponse(**metadata)
     except Exception as exc:
+        exc_type, provider_status_code, is_retryable, safe_msg, http_status = extract_provider_error_details(exc, adapter)
         logger.error(
-            "MEDIA_REPLACE_FAILED",
-            extra={"product_id": product_id, "image_id": image_id, "error": str(exc)},
+            "MEDIA_REPLACE_FAILED [provider=cloudinary, exc_type=%s, provider_code=%s, retryable=%s, product_id=%s, image_id=%s]: %s",
+            exc_type,
+            provider_status_code or "N/A",
+            is_retryable,
+            product_id,
+            image_id,
+            safe_msg,
         )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status,
             detail={
                 "error_code": "STORAGE_REPLACE_ERROR",
-                "message": "Failed to replace image on Cloudinary.",
-                "retryable": True,
+                "provider": "cloudinary",
+                "provider_error_type": exc_type,
+                "provider_status_code": provider_status_code,
+                "message": f"Failed to replace image on Cloudinary: {safe_msg}",
+                "retryable": is_retryable,
             },
         )
 
@@ -283,7 +392,23 @@ async def delete_media(
     """Delete a specific product photo variant from Cloudinary."""
     await verify_auth_and_ownership(authorization, owner_id, operation="delete")
 
-    adapter = get_cloudinary_adapter()
+    try:
+        adapter = get_cloudinary_adapter()
+    except ValueError as val_err:
+        safe_cfg_err = sanitize_error_message(str(val_err))
+        logger.error("CLOUDINARY_CONFIG_MISSING [product_id=%s, image_id=%s]: %s", product_id, image_id, safe_cfg_err)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "error_code": "CLOUDINARY_CONFIG_MISSING",
+                "provider": "cloudinary",
+                "provider_error_type": "ValueError",
+                "provider_status_code": 503,
+                "message": f"Cloudinary configuration missing: {safe_cfg_err}",
+                "retryable": False,
+            },
+        )
+
     try:
         result = await adapter.destroy(
             product_id=product_id,
@@ -292,15 +417,24 @@ async def delete_media(
         )
         return MediaDeleteResponse(**result)
     except Exception as exc:
+        exc_type, provider_status_code, is_retryable, safe_msg, http_status = extract_provider_error_details(exc, adapter)
         logger.error(
-            "MEDIA_DELETE_FAILED",
-            extra={"product_id": product_id, "image_id": image_id, "error": str(exc)},
+            "MEDIA_DELETE_FAILED [provider=cloudinary, exc_type=%s, provider_code=%s, retryable=%s, product_id=%s, image_id=%s]: %s",
+            exc_type,
+            provider_status_code or "N/A",
+            is_retryable,
+            product_id,
+            image_id,
+            safe_msg,
         )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status,
             detail={
                 "error_code": "STORAGE_DELETE_ERROR",
-                "message": "Failed to delete image from Cloudinary.",
-                "retryable": True,
+                "provider": "cloudinary",
+                "provider_error_type": exc_type,
+                "provider_status_code": provider_status_code,
+                "message": f"Failed to delete image from Cloudinary: {safe_msg}",
+                "retryable": is_retryable,
             },
         )

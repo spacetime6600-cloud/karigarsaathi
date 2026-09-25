@@ -162,13 +162,39 @@ class MediaStorageService {
 
     if (!response.ok) {
       let errDetail = 'Failed to upload to Cloudinary.';
+      let isRetryable = response.status >= 500 && response.status !== 502;
+      let errorCode = 'STORAGE_UPLOAD_ERROR';
+      let providerErrorType = '';
       try {
         const errJson = await response.json();
-        errDetail = errJson.detail?.message || errJson.message || errDetail;
+        const detail = errJson.detail;
+        if (typeof detail === 'object' && detail !== null) {
+          errDetail = detail.message || errDetail;
+          if (detail.retryable !== undefined) {
+            isRetryable = Boolean(detail.retryable);
+          }
+          if (detail.error_code) {
+            errorCode = detail.error_code;
+          }
+          if (detail.provider_error_type) {
+            providerErrorType = detail.provider_error_type;
+          }
+        } else if (typeof detail === 'string') {
+          errDetail = detail;
+        } else if (errJson.message) {
+          errDetail = errJson.message;
+        }
       } catch {
         // use default
       }
-      throw new Error(`Media upload failed (${response.status}): ${errDetail}`);
+      const errorMsg = providerErrorType
+        ? `Media upload failed (${response.status}) [${providerErrorType}]: ${errDetail}`
+        : `Media upload failed (${response.status}): ${errDetail}`;
+      const err = new Error(errorMsg) as Error & { status?: number; retryable?: boolean; errorCode?: string };
+      err.status = response.status;
+      err.retryable = isRetryable;
+      err.errorCode = errorCode;
+      throw err;
     }
 
     const data = await response.json();

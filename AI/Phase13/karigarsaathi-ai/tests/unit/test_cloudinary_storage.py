@@ -394,3 +394,81 @@ def test_idempotency_cache_prevents_duplicate_cloudinary_upload():
     ))
     assert res == cached_meta
 
+
+def test_api_upload_cloudinary_auth_error_returns_502_non_retryable(client, valid_jpeg_bytes):
+    """Verify that Cloudinary AuthorizationRequired returns 502 with retryable=False and sanitized message."""
+    import cloudinary.exceptions
+
+    with patch("app.api.media_routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_adapter = MagicMock()
+        mock_adapter.upload = AsyncMock(
+            side_effect=cloudinary.exceptions.AuthorizationRequired(
+                "Invalid Signature 9f8e7d6c. String to sign - 'api_key=mykey123&timestamp=12345'."
+            )
+        )
+        mock_adapter.validate_image_payload = MagicMock(return_value={"size_bytes": 100, "mime_type": "image/jpeg", "width": 300, "height": 300, "format": "JPEG"})
+        mock_adapter.cloud_name = "test_cloud"
+        mock_adapter.api_key = "mykey123"
+        mock_adapter.api_secret = "secret456"
+        mock_get_adapter.return_value = mock_adapter
+
+        response = client.post(
+            "/v1/media/upload",
+            headers={"Authorization": "Bearer dev-token-artisan-owner"},
+            data={
+                "product_id": "prod_auth_fail",
+                "image_id": "img_auth_fail",
+                "owner_id": "artisan-owner",
+                "variant": "original",
+            },
+            files={"file": ("test.jpg", valid_jpeg_bytes, "image/jpeg")},
+        )
+
+        assert response.status_code == 502
+        data = response.json()
+        detail = data["detail"]
+        assert detail["error_code"] == "STORAGE_UPLOAD_ERROR"
+        assert detail["provider_error_type"] == "AuthorizationRequired"
+        assert detail["provider_status_code"] == 401
+        assert detail["retryable"] is False
+        # Verify credentials and signatures were redacted
+        assert "mykey123" not in detail["message"]
+        assert "9f8e7d6c" not in detail["message"]
+        assert "[REDACTED]" in detail["message"]
+
+
+def test_api_upload_cloudinary_bad_request_returns_400_non_retryable(client, valid_jpeg_bytes):
+    """Verify that Cloudinary BadRequest returns 400 with retryable=False."""
+    import cloudinary.exceptions
+
+    with patch("app.api.media_routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_adapter = MagicMock()
+        mock_adapter.upload = AsyncMock(
+            side_effect=cloudinary.exceptions.BadRequest("Unknown cloud_name bad_cloud")
+        )
+        mock_adapter.validate_image_payload = MagicMock(return_value={"size_bytes": 100, "mime_type": "image/jpeg", "width": 300, "height": 300, "format": "JPEG"})
+        mock_adapter.cloud_name = "bad_cloud"
+        mock_adapter.api_key = "key"
+        mock_adapter.api_secret = "secret"
+        mock_get_adapter.return_value = mock_adapter
+
+        response = client.post(
+            "/v1/media/upload",
+            headers={"Authorization": "Bearer dev-token-artisan-owner"},
+            data={
+                "product_id": "prod_bad_req",
+                "image_id": "img_bad_req",
+                "owner_id": "artisan-owner",
+                "variant": "original",
+            },
+            files={"file": ("test.jpg", valid_jpeg_bytes, "image/jpeg")},
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        detail = data["detail"]
+        assert detail["provider_error_type"] == "BadRequest"
+        assert detail["retryable"] is False
+        assert "Unknown cloud_name" in detail["message"]
+
+

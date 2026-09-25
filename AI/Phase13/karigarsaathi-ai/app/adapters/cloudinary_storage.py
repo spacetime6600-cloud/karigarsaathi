@@ -66,15 +66,44 @@ class CloudinaryStorageAdapter:
             api_secret: Cloudinary API secret
             require_config: If True, raises ValueError when credentials are missing
         """
-        self.cloud_name = (cloud_name or "").strip()
-        self.api_key = (api_key or "").strip()
-        self.api_secret = (api_secret or "").strip()
+        import os
+
+        raw_cloud_name = cloud_name if cloud_name is not None else os.getenv("CLOUDINARY_CLOUD_NAME", "")
+        raw_api_key = api_key if api_key is not None else os.getenv("CLOUDINARY_API_KEY", "")
+        raw_api_secret = api_secret if api_secret is not None else os.getenv("CLOUDINARY_API_SECRET", "")
+
+        self.cloud_name = str(raw_cloud_name).strip().strip("'\"")
+        self.api_key = str(raw_api_key).strip().strip("'\"")
+        self.api_secret = str(raw_api_secret).strip().strip("'\"")
+
+        # Fallback to CLOUDINARY_URL format (cloudinary://api_key:api_secret@cloud_name)
+        if not self.cloud_name or not self.api_key or not self.api_secret:
+            raw_url = os.getenv("CLOUDINARY_URL", "").strip().strip("'\"")
+            if raw_url:
+                try:
+                    import urllib.parse
+                    parsed = urllib.parse.urlparse(raw_url)
+                    if parsed.scheme == "cloudinary":
+                        if not self.api_key and parsed.username:
+                            self.api_key = parsed.username
+                        if not self.api_secret and parsed.password:
+                            self.api_secret = parsed.password
+                        if not self.cloud_name and parsed.hostname:
+                            self.cloud_name = parsed.hostname
+                except Exception:
+                    pass
 
         if require_config:
-            if not self.cloud_name or not self.api_key or not self.api_secret:
+            missing = []
+            if not self.cloud_name:
+                missing.append("CLOUDINARY_CLOUD_NAME")
+            if not self.api_key:
+                missing.append("CLOUDINARY_API_KEY")
+            if not self.api_secret:
+                missing.append("CLOUDINARY_API_SECRET")
+            if missing:
                 raise ValueError(
-                    "Cloudinary configuration missing: CLOUDINARY_CLOUD_NAME, "
-                    "CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET must be configured."
+                    f"Cloudinary configuration missing: {', '.join(missing)} must be configured."
                 )
 
         if CLOUDINARY_AVAILABLE and self.cloud_name and self.api_key and self.api_secret:

@@ -147,5 +147,65 @@ describe('StorageUploadQueue — Durable Offline Queue & Idempotency', () => {
     const queue = await storageUploadQueue.getQueueForUser(testUserA);
     expect(queue[0].status).toBe('pending');
   });
+
+  it('7. Marks item as failed immediately on non-retryable provider error without retrying', async () => {
+    const { mediaStorageService } = await import('@/services/media/mediaStorageService');
+    const vi = (await import('vitest')).vi;
+
+    const mockUpload = vi.spyOn(mediaStorageService, 'upload').mockImplementationOnce(() => {
+      const err = new Error('Media upload failed (502) [AuthorizationRequired]: Invalid Signature');
+      (err as any).status = 502;
+      (err as any).retryable = false;
+      return Promise.reject(err);
+    });
+
+    storageUploadQueue.setActiveUser(testUserA);
+    await storageUploadQueue.enqueueUpload({
+      ownerUid: testUserA,
+      productId: testProductA,
+      imageId: 'img_auth_fail',
+      blob: new Blob(['bytes'], { type: 'image/jpeg' }),
+    });
+
+    await storageUploadQueue.processQueue();
+    const queue = await storageUploadQueue.getQueueForUser(testUserA);
+    expect(queue[0].status).toBe('failed');
+    expect(queue[0].retryCount).toBe(0); // Did NOT retry
+    expect(queue[0].lastError).toContain('AuthorizationRequired');
+
+    mockUpload.mockRestore();
+  });
+
+  it('8. Halts queue processing when consecutive failures occur to prevent flooding Render', async () => {
+    const { mediaStorageService } = await import('@/services/media/mediaStorageService');
+    const vi = (await import('vitest')).vi;
+
+    let uploadAttempts = 0;
+    const mockUpload = vi.spyOn(mediaStorageService, 'upload').mockImplementation(() => {
+      uploadAttempts++;
+      const err = new Error('Media upload failed (500): Server error');
+      (err as any).status = 500;
+      (err as any).retryable = true;
+      return Promise.reject(err);
+    });
+
+    storageUploadQueue.setActiveUser(testUserA);
+
+    // Enqueue 4 items
+    for (let i = 1; i <= 4; i++) {
+      await storageUploadQueue.enqueueUpload({
+        ownerUid: testUserA,
+        productId: testProductA,
+        imageId: `img_batch_${i}`,
+        blob: new Blob([`bytes_${i}`], { type: 'image/jpeg' }),
+      });
+    }
+
+    await storageUploadQueue.processQueue();
+    // After 2 consecutive failures, queue pass should halt instead of attempting all 4 items!
+    expect(uploadAttempts).toBe(2);
+
+    mockUpload.mockRestore();
+  });
 });
 
