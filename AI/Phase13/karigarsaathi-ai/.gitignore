@@ -20,8 +20,9 @@ htmlcov/
 env/
 venv/
 
-# Model weights (downloaded on-demand at runtime)
+# Model weights (large weights ignored, but lightweight 4.5MB u2netp is tracked for fast offline inference)
 models/*.onnx
+!models/u2netp.onnx
 models/*.bin
 models/*.pt
 ~/.cache/rembg/

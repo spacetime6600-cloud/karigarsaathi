@@ -22,6 +22,8 @@ services:
         sync: false
       - key: FIREBASE_PROJECT_ID
         value: karigarsaathi-c3c60
+      - key: U2NET_HOME
+        value: models
 
   - type: web
     name: karigarsaathi-ai-voice

@@ -10,18 +10,27 @@ from app.domain.enums import ErrorCode
 from io import BytesIO
 from PIL import Image
 
-def _ensure_rgba(data: bytes, width: int, height: int) -> np.ndarray:
-    """Convert bytes to RGBA numpy array."""
+def _ensure_rgba(data: bytes, width: int, height: int, max_eval_dim: int = 512) -> np.ndarray:
+    """Convert bytes to RGBA numpy array, bounding evaluation resolution to max_eval_dim to avoid memory spikes."""
     try:
         img = Image.open(BytesIO(data)).convert("RGBA")
-        if img.size != (width, height):
-            img = img.resize((width, height), Image.LANCZOS)
-        return np.array(img)
+        cur_w, cur_h = img.size
+        m = max(cur_w, cur_h)
+        if m > max_eval_dim:
+            scale = max_eval_dim / m
+            tw = max(1, int(cur_w * scale))
+            th = max(1, int(cur_h * scale))
+        else:
+            tw, th = cur_w, cur_h
+
+        if img.size != (tw, th):
+            img = img.resize((tw, th), Image.Resampling.BILINEAR)
+        return np.array(img, dtype=np.uint8)
     except Exception:
         try:
-            return np.frombuffer(data, dtype=np.uint8).reshape((height, width, 4))
+            return np.frombuffer(data, dtype=np.uint8).reshape((min(height, max_eval_dim), min(width, max_eval_dim), 4))
         except Exception:
-            return np.zeros((height, width, 4), dtype=np.uint8)
+            return np.zeros((min(height, max_eval_dim), min(width, max_eval_dim), 4), dtype=np.uint8)
 
 
 def _calculate_ciede2000(
@@ -36,8 +45,8 @@ def _calculate_ciede2000(
         raise ValueError("Arrays must have the same shape")
 
     # Convert RGB to approximate Lab for better colour difference
-    orig_rgb = original[..., :3].astype(np.float64) / 255.0
-    enh_rgb = enhanced[..., :3].astype(np.float64) / 255.0
+    orig_rgb = original[..., :3].astype(np.float32) / 255.0
+    enh_rgb = enhanced[..., :3].astype(np.float32) / 255.0
 
     # Simplified Delta E (CIE76) - mean per-pixel distance
     delta_e = np.sqrt(
@@ -144,6 +153,9 @@ def calculate_metrics(
     except Exception:
         mask_boundary_retention = None
 
+    import gc
+    gc.collect()
+
     return {
         "mean_delta_e": mean_delta_e if not np.isnan(mean_delta_e) else None,
         "p95_delta_e": p95_delta_e if not np.isnan(p95_delta_e) else None,
@@ -159,9 +171,9 @@ def calculate_metrics(
 def _calculate_per_pixel_delta_e(
     original: np.ndarray, enhanced: np.ndarray
 ) -> np.ndarray:
-    """Calculate per-pixel Delta E approximation."""
-    orig_rgb = original[..., :3].astype(np.float64) / 255.0
-    enh_rgb = enhanced[..., :3].astype(np.float64) / 255.0
+    """Calculate per-pixel Delta E approximation using float32 to conserve RAM."""
+    orig_rgb = original[..., :3].astype(np.float32) / 255.0
+    enh_rgb = enhanced[..., :3].astype(np.float32) / 255.0
     return np.sqrt(np.sum((orig_rgb - enh_rgb) ** 2, axis=-1))
 
 

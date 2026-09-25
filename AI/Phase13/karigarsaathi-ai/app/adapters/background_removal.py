@@ -28,16 +28,43 @@ class RembgBackgroundRemovalAdapter:
         self.model_name = os.getenv("REMBG_MODEL", model_name)
         self._session = None
 
+        # Point U2NET_HOME to bundled models directory if present
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        models_dir = os.path.join(base_dir, "models")
+        if os.path.exists(os.path.join(models_dir, f"{self.model_name}.onnx")):
+            os.environ.setdefault("U2NET_HOME", models_dir)
+
     @property
     def is_model_ready(self) -> bool:
         """Check whether the model session is loaded and ready."""
         return self._session is not None
 
     def _get_session(self):
-        """Get or initialize the rembg ONNX session."""
+        """Get or initialize the rembg ONNX session with strict low-memory settings."""
         if self._session is None:
+            import os
+            import logging
+            import onnxruntime as ort
             import rembg
-            self._session = rembg.new_session(self.model_name)
+
+            _logger = logging.getLogger(__name__)
+
+            # Discover bundled models directory
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+            models_dir = os.path.join(base_dir, "models")
+            if os.path.exists(os.path.join(models_dir, f"{self.model_name}.onnx")):
+                os.environ["U2NET_HOME"] = models_dir
+                _logger.info("Found bundled %s at %s", self.model_name, models_dir)
+
+            sess_opts = ort.SessionOptions()
+            sess_opts.enable_cpu_mem_arena = False
+            sess_opts.inter_op_num_threads = 1
+            sess_opts.intra_op_num_threads = 1
+            sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+
+            _logger.info("Initializing rembg session [%s, cpu_arena=False, threads=1]", self.model_name)
+            self._session = rembg.new_session(self.model_name, sess_opts=sess_opts)
+            _logger.info("rembg session ready [%s]", self.model_name)
         return self._session
 
     async def remove_background(
@@ -57,22 +84,22 @@ class RembgBackgroundRemovalAdapter:
             - foreground_coverage: float (0-1, proportion of foreground pixels)
             - warnings: list of warning strings about suspicious masks
         """
+        import gc
         warnings: List[str] = []
 
         try:
-            # Resize image down to max 1024 if needed to avoid excessive memory consumption
+            # Resize image down to max 512 to bound memory strictly under Render 512MB limit
             def _process():
                 import rembg
                 session = self._get_session()
-                # If image is very large, downscale safely
                 try:
                     pil_img = Image.open(BytesIO(image_data))
                     orig_w, orig_h = pil_img.size
                     max_dim = max(orig_w, orig_h)
-                    if max_dim > 1024:
-                        scale = 1024 / max_dim
-                        new_w = int(orig_w * scale)
-                        new_h = int(orig_h * scale)
+                    if max_dim > 512:
+                        scale = 512 / max_dim
+                        new_w = max(1, int(orig_w * scale))
+                        new_h = max(1, int(orig_h * scale))
                         pil_img = pil_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
                         buf = BytesIO()
                         pil_img.save(buf, format="PNG")
@@ -82,8 +109,9 @@ class RembgBackgroundRemovalAdapter:
                 except Exception:
                     proc_bytes = image_data
 
-                # Fast, high-quality rembg removal without expensive CPU matting
-                return rembg.remove(proc_bytes, session=session, alpha_matting=False)
+                result = rembg.remove(proc_bytes, session=session, alpha_matting=False)
+                gc.collect()
+                return result
 
             foreground_rgba = await asyncio.get_event_loop().run_in_executor(
                 None, _process
@@ -97,6 +125,8 @@ class RembgBackgroundRemovalAdapter:
                 foreground_rgba, width, height
             )
             warnings.extend(mask_warnings)
+
+            gc.collect()
 
             # If mask is deemed suspicious, return fallback warning
             if any("SUSPICIOUS" in w or "REJECTED" for w in mask_warnings):
@@ -128,25 +158,24 @@ class RembgBackgroundRemovalAdapter:
             }
 
     def _argb_to_rgba(self, argb_data: bytes) -> bytes:
-        """Convert ARGB bytes to RGBA.
-
-        rembg returns pixels in ARGB format (Alpha, Red, Green, Blue)
-        but we need RGBA (Red, Green, Blue, Alpha).
-        """
-        # rembg returns raw RGBA data actually, no conversion needed
-        # The function returns RGBA directly
+        """Convert ARGB bytes to RGBA."""
         return argb_data
 
-    def _bytes_to_rgba_arr(self, rgba_data: bytes, width: int, height: int) -> np.ndarray:
-        """Decode image bytes to RGBA numpy array safely."""
+    def _bytes_to_rgba_arr(self, rgba_data: bytes, width: int = 512, height: int = 512) -> np.ndarray:
+        """Decode image bytes to RGBA numpy array safely bounded in size."""
         try:
             img = Image.open(BytesIO(rgba_data)).convert("RGBA")
-            return np.array(img)
+            if max(img.size) > 512:
+                scale = 512 / max(img.size)
+                new_w = max(1, int(img.size[0] * scale))
+                new_h = max(1, int(img.size[1] * scale))
+                img = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
+            return np.array(img, dtype=np.uint8)
         except Exception:
             try:
-                return np.frombuffer(rgba_data, dtype=np.uint8).reshape((height, width, 4))
+                return np.frombuffer(rgba_data, dtype=np.uint8).reshape((min(height, 512), min(width, 512), 4))
             except Exception:
-                return np.zeros((height, width, 4), dtype=np.uint8)
+                return np.zeros((min(height, 512), min(width, 512), 4), dtype=np.uint8)
 
     def _calculate_foreground_coverage(
         self, rgba_data: bytes, width: int, height: int

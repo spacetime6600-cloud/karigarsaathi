@@ -41,6 +41,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
   onReject,
 }) => {
   const [step, setStep] = useState<ModalStep>('CONSENT');
+  const [enhancementMode, setEnhancementMode] = useState<'full' | 'basic'>('full');
   const [consentGranted, setConsentGranted] = useState<boolean>(false);
   const [jobResult, setJobResult] = useState<JobResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -76,6 +77,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
         setStep('REVIEW');
       } else {
         setStep('CONSENT');
+        setEnhancementMode('full');
         setConsentGranted(false);
         setJobResult(null);
         setErrorMessage(null);
@@ -83,9 +85,10 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
     }
   }, [isOpen, photoItem, artisanId, productId]);
 
-  const handleStartEnhancement = async () => {
+  const handleStartEnhancement = async (modeOverride?: 'full' | 'basic') => {
     if (!photoItem) return;
 
+    const effectiveMode = modeOverride || enhancementMode;
     const effectiveArtisanId = artisanId || auth?.currentUser?.uid || '';
 
     if (!effectiveArtisanId) {
@@ -106,11 +109,21 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
 
     setStep('PROCESSING');
     setErrorMessage(null);
-    announce('Processing product photograph enhancement with AI Image Studio...', 'polite');
+    announce(
+      effectiveMode === 'basic'
+        ? 'Processing basic clean enhancement with lighting balance and centering...'
+        : 'Processing product photograph enhancement with AI Image Studio...',
+      'polite'
+    );
 
     try {
       // 1. Fetch image Blob from existing photo URL (object URL or remote URL)
       const blob = await aiEnhancementService.urlToBlob(photoItem.rawOriginalUrl || photoItem.url);
+
+      const operations: ('background_removal' | 'lighting_correction' | 'centring' | 'standard_resize')[] | undefined =
+        effectiveMode === 'basic'
+          ? ['lighting_correction', 'centring', 'standard_resize']
+          : undefined;
 
       // 2. Submit to AI microservice
       const result = await aiEnhancementService.enhanceImage({
@@ -121,6 +134,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
         artisanId: effectiveArtisanId,
         outputSize: 512,
         background: 'white',
+        ...(operations ? { operations } : {}),
       });
 
       setJobResult(result);
@@ -218,6 +232,54 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
               </ul>
             </div>
 
+            {/* Enhancement Mode Options */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold text-primary">Choose Enhancement Style:</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEnhancementMode('full')}
+                  className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer ${
+                    enhancementMode === 'full'
+                      ? 'border-secondary bg-secondary/10 shadow-xs'
+                      : 'border-surface-variant bg-surface hover:bg-surface-container-low'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-secondary" />
+                      Studio Clean
+                    </span>
+                    {enhancementMode === 'full' && <Check className="w-3.5 h-3.5 text-secondary" />}
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant leading-tight">
+                    Removes busy background; balances lighting on white canvas.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEnhancementMode('basic')}
+                  className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer ${
+                    enhancementMode === 'basic'
+                      ? 'border-secondary bg-secondary/10 shadow-xs'
+                      : 'border-surface-variant bg-surface hover:bg-surface-container-low'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-success" />
+                      Basic Enhancement
+                    </span>
+                    {enhancementMode === 'basic' && <Check className="w-3.5 h-3.5 text-secondary" />}
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant leading-tight">
+                    Preserves authentic background; enhances lighting balance & centering.
+                  </span>
+                </button>
+              </div>
+            </div>
+
             {/* Offline or Disabled Alert */}
             {!isAiEnabled ? (
               <div className="p-3 bg-surface-container rounded-xl border border-surface-variant text-xs text-on-surface-variant flex items-center gap-2">
@@ -239,7 +301,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                   className="mt-0.5 w-4 h-4 text-secondary rounded accent-secondary cursor-pointer"
                 />
                 <span className="text-xs text-primary font-medium leading-relaxed select-none">
-                  I give consent to enhance this photograph. I understand this adjusts background and lighting presentation only and will not modify my craft's authentic colours or weave.
+                  I give consent to enhance this photograph. I understand this adjusts presentation only and will not modify my craft's authentic colours or weave.
                 </span>
               </label>
             )}
@@ -253,12 +315,12 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
               <Button
                 variant="primary"
                 size="sm"
-                onClick={handleStartEnhancement}
+                onClick={() => handleStartEnhancement()}
                 disabled={!isAiEnabled || !isOnline || !consentGranted}
                 leftIcon={<Sparkles className="w-4 h-4" />}
                 className="text-xs font-bold"
               >
-                Enhance with AI
+                {enhancementMode === 'basic' ? 'Apply Basic Enhancement' : 'Enhance with AI'}
               </Button>
             </div>
           </div>
@@ -273,9 +335,13 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
             </div>
 
             <div className="flex flex-col gap-1 max-w-sm">
-              <h3 className="font-bold text-base text-primary">Enhancing Photograph...</h3>
+              <h3 className="font-bold text-base text-primary">
+                {enhancementMode === 'basic' ? 'Applying Basic Enhancement...' : 'Enhancing Photograph...'}
+              </h3>
               <p className="text-xs text-on-surface-variant">
-                Removing background and applying conservative lighting balance. This usually takes 1–3 seconds.
+                {enhancementMode === 'basic'
+                  ? 'Applying conservative lighting balance and centering while keeping your authentic craft background intact.'
+                  : 'Removing background and applying conservative lighting balance. This usually takes 1–3 seconds.'}
               </p>
             </div>
 
@@ -293,6 +359,19 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
         {/* Step 3: Comparison & Review */}
         {step === 'REVIEW' && jobResult && (
           <div className="flex flex-col gap-4">
+            {/* Clear, truthful notification of applied operations */}
+            {jobResult.operations_applied?.includes('background_removal') ? (
+              <div className="p-2.5 bg-success/10 text-success border border-success/20 rounded-xl text-xs flex items-center gap-2 font-medium">
+                <Check className="w-4 h-4 shrink-0" />
+                <span>Studio Clean applied: Background removed cleanly, lighting balanced, product centered.</span>
+              </div>
+            ) : (
+              <div className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-xl text-xs flex items-center gap-2 font-medium">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Basic Enhancement applied: Authentic craft background preserved, lighting balanced, product centered.</span>
+              </div>
+            )}
+
             <p className="text-xs text-on-surface-variant">
               Compare the original photo with the enhanced catalogue version below. You can approve the enhanced version or continue using your original photo.
             </p>
@@ -320,7 +399,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={handleStartEnhancement}
+                  onClick={() => handleStartEnhancement()}
                   leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
                   className="text-xs"
                 >
@@ -357,16 +436,31 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
               <span>Your authentic original photo remains 100% intact and ready for use.</span>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-variant">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-variant flex-wrap">
               <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
                 Continue with Original Photo
               </Button>
+
+              {enhancementMode === 'full' && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setEnhancementMode('basic');
+                    handleStartEnhancement('basic');
+                  }}
+                  leftIcon={<ShieldCheck className="w-3.5 h-3.5" />}
+                  className="text-xs font-semibold"
+                >
+                  Try Basic Enhancement (Lightweight)
+                </Button>
+              )}
 
               {isRetryable && (
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={handleStartEnhancement}
+                  onClick={() => handleStartEnhancement()}
                   leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
                   className="text-xs font-bold"
                 >

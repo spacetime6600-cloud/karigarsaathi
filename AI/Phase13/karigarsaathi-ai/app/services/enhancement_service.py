@@ -181,7 +181,7 @@ class ImageEnhancementService:
             await self.job_repository.update_job(job_id, status=JobState.PROCESSING)
 
             # 9. Process pipeline
-            enhanced_bytes, preview_bytes, warnings = await self._enhance_pipeline(
+            enhanced_bytes, preview_bytes, warnings, applied_operations = await self._enhance_pipeline(
                 image_data,
                 operations,
                 output_size,
@@ -234,6 +234,10 @@ class ImageEnhancementService:
                 processing_duration_ms=processing_duration_ms,
             )
 
+            # Clean up intermediate garbage to prevent memory buildup
+            import gc
+            gc.collect()
+
             # 18. Return job result
             result = self._build_job_result({
                 "job_id": job_id,
@@ -245,7 +249,7 @@ class ImageEnhancementService:
                 "enhanced_image_reference": f"/v1/enhancements/{job_id}/enhanced",
                 "preview_image_reference": f"/v1/enhancements/{job_id}/preview",
                 "operations_requested": operations,
-                "operations_applied": self._get_applied_operations(operations),
+                "operations_applied": applied_operations,
                 "warnings": warnings,
                 "metrics": metrics,
                 "processing_duration_ms": processing_duration_ms,
@@ -397,52 +401,100 @@ class ImageEnhancementService:
         output_size: int | None,
         background: str | None,
         validation_result: dict[str, any],
-    ) -> Tuple[bytes, bytes, List[str]]:
+    ) -> Tuple[bytes, bytes, List[str], List[str]]:
         """Run the enhancement pipeline on image copies.
 
         Returns:
-            (enhanced_bytes, preview_bytes, warnings_list)
+            (enhanced_bytes, preview_bytes, warnings_list, applied_operations_list)
         """
+        import gc
+        from PIL import Image
+        from io import BytesIO
+
         warnings: List[str] = []
-        current_image = image_data
-        details = validation_result.get("details", validation_result)
-        current_width = details.get("width", 512)
-        current_height = details.get("height", 512)
+        applied_operations: List[str] = []
+        target_size = output_size or 512
+
+        # 1. Downscale working image to target canvas size (default 512) to bound memory strictly
+        try:
+            pil_init = Image.open(BytesIO(image_data))
+            init_w, init_h = pil_init.size
+            max_dim = max(init_w, init_h)
+            if max_dim > target_size:
+                scale = target_size / max_dim
+                current_width = max(1, int(init_w * scale))
+                current_height = max(1, int(init_h * scale))
+                pil_init = pil_init.resize((current_width, current_height), Image.Resampling.LANCZOS)
+                buf = BytesIO()
+                pil_init.save(buf, format="PNG")
+                current_image = buf.getvalue()
+            else:
+                current_width, current_height = init_w, init_h
+                current_image = image_data
+            del pil_init
+            gc.collect()
+        except Exception:
+            current_image = image_data
+            details = validation_result.get("details", validation_result)
+            current_width = min(details.get("width", 512), target_size)
+            current_height = min(details.get("height", 512), target_size)
 
         for op in operations:
             if op == "background_removal":
-                bg_result = await self.background_removal.remove_background(
-                    current_image, current_width, current_height
-                )
-                current_image = bg_result.get("foreground", current_image)
-                op_warnings = bg_result.get("warnings", [])
-                warnings.extend(op_warnings)
-
-            elif op == "lighting_correction":
-                current_image, op_warnings = (
-                    await self.lighting_correction.correct_lighting(
+                try:
+                    bg_result = await self.background_removal.remove_background(
                         current_image, current_width, current_height
                     )
-                )
-                warnings.extend(op_warnings)
+                    if not bg_result.get("fallback", False):
+                        current_image = bg_result.get("foreground", current_image)
+                        applied_operations.append("background_removal")
+                    else:
+                        warnings.append("Background removal omitted: authentic background preserved.")
+                    op_warnings = bg_result.get("warnings", [])
+                    warnings.extend(op_warnings)
+                except Exception as exc:
+                    warnings.append(f"Background removal skipped ({type(exc).__name__}): authentic background preserved.")
+                gc.collect()
+
+            elif op == "lighting_correction":
+                try:
+                    current_image, op_warnings = (
+                        await self.lighting_correction.correct_lighting(
+                            current_image, current_width, current_height
+                        )
+                    )
+                    applied_operations.append("lighting_correction")
+                    warnings.extend(op_warnings)
+                except Exception as exc:
+                    warnings.append(f"Lighting correction skipped ({type(exc).__name__})")
+                gc.collect()
 
             elif op == "centring":
-                bg_enum = BackgroundType.TRANSPARENT if background == "transparent" else BackgroundType.WHITE
-                comp_result = await self.composition.compose_image(
-                    current_image,
-                    canvas_size=output_size or 512,
-                    padding=32,
-                    background_type=bg_enum,
-                )
-                current_image = comp_result.get("result", current_image)
-                warnings.extend(comp_result.get("warnings", []))
+                try:
+                    bg_enum = BackgroundType.TRANSPARENT if background == "transparent" else BackgroundType.WHITE
+                    comp_result = await self.composition.compose_image(
+                        current_image,
+                        canvas_size=target_size,
+                        padding=32,
+                        background_type=bg_enum,
+                    )
+                    current_image = comp_result.get("result", current_image)
+                    applied_operations.append("centring")
+                    warnings.extend(comp_result.get("warnings", []))
+                except Exception as exc:
+                    warnings.append(f"Centring skipped ({type(exc).__name__})")
+                gc.collect()
 
             elif op == "standard_resize":
-                target_size = output_size or 512
-                current_image = await self._resize_image(
-                    current_image, target_size, target_size
-                )
-                warnings.append(f"Resized to {target_size}x{target_size}")
+                try:
+                    current_image = await self._resize_image(
+                        current_image, target_size, target_size
+                    )
+                    applied_operations.append("standard_resize")
+                    warnings.append(f"Resized to {target_size}x{target_size}")
+                except Exception as exc:
+                    warnings.append(f"Standard resize skipped ({type(exc).__name__})")
+                gc.collect()
 
         # Generate preview (320x320) from the final composed image
         preview_bytes = await self._generate_preview(current_image, 320, 320)
@@ -453,16 +505,17 @@ class ImageEnhancementService:
         else:
             enhanced_bytes = image_data
 
-        return enhanced_bytes, preview_bytes, warnings
+        gc.collect()
+        return enhanced_bytes, preview_bytes, warnings, applied_operations
 
     async def _calculate_quality_metrics(
         self, original_data: bytes, enhanced_bytes: bytes,
         validation_result: dict[str, any],
     ) -> dict[str, float | None]:
-        """Calculate quality metrics comparing original and enhanced."""
+        """Calculate quality metrics comparing original and enhanced with bounded resolution."""
         details = validation_result.get("details", validation_result)
-        width = details.get("width", 0)
-        height = details.get("height", 0)
+        width = details.get("width", 512)
+        height = details.get("height", 512)
 
         if width == 0 or height == 0:
             return {
@@ -476,13 +529,17 @@ class ImageEnhancementService:
                 "mask_boundary_retention": None,
             }
 
+        # Bound evaluation dimensions to max 512 to prevent large intermediate arrays
+        eval_w = min(width, 512)
+        eval_h = min(height, 512)
+
         return calculate_metrics(
             original_rgba=original_data,
             enhanced_rgba=enhanced_bytes,
             original_alpha=details.get("alpha_data", b""),
             enhanced_alpha=b"",
-            original_width=width,
-            original_height=height,
+            original_width=eval_w,
+            original_height=eval_h,
         )
 
     def _determine_final_state(
