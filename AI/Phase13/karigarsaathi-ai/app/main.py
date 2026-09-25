@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import os
+import logging
+from contextlib import asynccontextmanager
 
 import uvicorn
-import os
-import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,12 +27,32 @@ def setup_logging() -> None:
         handlers=[logging.StreamHandler()],
     )
 
-# Structured logger
+setup_logging()
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """FastAPI lifespan context manager for startup diagnostics."""
+    port = os.getenv("PORT", str(settings.port))
+    env = os.getenv("APP_ENV", settings.app_env)
+    provider = os.getenv("MEDIA_STORAGE_PROVIDER", settings.media_storage_provider)
+    model_name = os.getenv("REMBG_MODEL", "u2netp")
+    logger.info(
+        "AI Image Studio started [env=%s, port=%s, storage_provider=%s, rembg_model=%s, model_loading=lazy]",
+        env,
+        port,
+        provider,
+        model_name,
+    )
+    yield
+    logger.info("AI Image Studio shutting down")
+
 
 # Create FastAPI application
 app = FastAPI(
     title=settings.app_name,
+    lifespan=lifespan,
     description=(
         "KarigarSaathi AI Image Studio - AI-powered product photograph "
         "enhancement service for Indian artisans. Improves product photographs "
@@ -90,8 +110,8 @@ async def health():
     Returns service status, service version and model readiness.
     Never exposes secrets or internal paths.
     """
-    from app.config import get_settings
     from pydantic import BaseModel
+    from app.api.routes import background_removal_adapter
 
     class _HealthModel(BaseModel):
         status: str
@@ -99,11 +119,13 @@ async def health():
         version: str
         model_ready: bool
 
+    model_ready = getattr(background_removal_adapter, "is_model_ready", False)
+
     return _HealthModel(
         status="healthy",
         service=settings.app_name,
         version=settings.app_version,
-        model_ready=True,
+        model_ready=model_ready,
     )
 
 

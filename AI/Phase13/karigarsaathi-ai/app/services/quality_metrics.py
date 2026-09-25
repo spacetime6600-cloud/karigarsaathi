@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-from skimage.metrics import structural_similarity as ssim
-from skimage.transform import resize
 
 from app.domain.enums import ErrorCode
 
@@ -85,6 +83,9 @@ def calculate_metrics(
 
     # Luminance SSIM - work in LAB space
     try:
+        from skimage.metrics import structural_similarity as ssim
+        from skimage.transform import resize
+
         orig_lab = _rgb_to_lab(orig_arr)
         enh_lab = _rgb_to_lab(enh_arr)
         # Use only luminance channel (L)

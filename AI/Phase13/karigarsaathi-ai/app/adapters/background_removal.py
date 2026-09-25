@@ -9,8 +9,6 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 
-import rembg
-
 from app.domain.interfaces import (
     BackgroundRemovalAdapterProtocol,
     ImageStorageProtocol,
@@ -29,6 +27,11 @@ class RembgBackgroundRemovalAdapter:
         import os
         self.model_name = os.getenv("REMBG_MODEL", model_name)
         self._session = None
+
+    @property
+    def is_model_ready(self) -> bool:
+        """Check whether the model session is loaded and ready."""
+        return self._session is not None
 
     def _get_session(self):
         """Get or initialize the rembg ONNX session."""
@@ -59,6 +62,7 @@ class RembgBackgroundRemovalAdapter:
         try:
             # Resize image down to max 1024 if needed to avoid excessive memory consumption
             def _process():
+                import rembg
                 session = self._get_session()
                 # If image is very large, downscale safely
                 try:
