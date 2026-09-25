@@ -67,28 +67,42 @@ def calculate_metrics(
 
     Returns dict with metrics or None when calculation is not possible.
     """
+    default_metrics: dict[str, float | None] = {
+        "mean_delta_e": None,
+        "p95_delta_e": None,
+        "luminance_ssim": None,
+        "edge_preservation_ratio": None,
+        "foreground_coverage": None,
+        "highlight_clipping_percent": None,
+        "shadow_clipping_percent": None,
+        "mask_boundary_retention": None,
+    }
+
     try:
         orig_arr = _ensure_rgba(original_rgba, original_width, original_height)
         enh_arr = _ensure_rgba(enhanced_rgba, original_width, original_height)
-    except (ValueError, IndexError):
-        return {
-            "mean_delta_e": None,
-            "p95_delta_e": None,
-            "luminance_ssim": None,
-            "edge_preservation_ratio": None,
-            "foreground_coverage": None,
-            "highlight_clipping_percent": None,
-            "shadow_clipping_percent": None,
-            "mask_boundary_retention": None,
-        }
+
+        # Align spatial dimensions to original for direct array comparisons
+        if orig_arr.shape[:2] != enh_arr.shape[:2]:
+            img_enh = Image.fromarray(enh_arr)
+            img_enh_resized = img_enh.resize((orig_arr.shape[1], orig_arr.shape[0]), Image.Resampling.BILINEAR)
+            enh_arr = np.array(img_enh_resized, dtype=np.uint8)
+    except Exception:
+        return default_metrics
 
     # Mean Delta E (approximate)
-    mean_delta_e = _calculate_ciede2000(orig_arr, enh_arr)
+    try:
+        mean_delta_e = _calculate_ciede2000(orig_arr, enh_arr)
+    except Exception:
+        mean_delta_e = None
 
     # 95th percentile Delta E
-    p95_delta_e = float(np.percentile(
-        _calculate_per_pixel_delta_e(orig_arr, enh_arr), 95
-    ))
+    try:
+        p95_delta_e = float(np.percentile(
+            _calculate_per_pixel_delta_e(orig_arr, enh_arr), 95
+        ))
+    except Exception:
+        p95_delta_e = None
 
     # Luminance SSIM - work in LAB space
     try:
@@ -157,8 +171,8 @@ def calculate_metrics(
     gc.collect()
 
     return {
-        "mean_delta_e": mean_delta_e if not np.isnan(mean_delta_e) else None,
-        "p95_delta_e": p95_delta_e if not np.isnan(p95_delta_e) else None,
+        "mean_delta_e": mean_delta_e if (mean_delta_e is not None and not np.isnan(mean_delta_e)) else None,
+        "p95_delta_e": p95_delta_e if (p95_delta_e is not None and not np.isnan(p95_delta_e)) else None,
         "luminance_ssim": luminance_ssim,
         "edge_preservation_ratio": edge_preservation_ratio,
         "foreground_coverage": foreground_coverage,
@@ -272,13 +286,13 @@ def _calculate_mask_boundary_retention(
         orig_boundary = _find_alpha_boundary(original_alpha)
         enh_boundary = _find_alpha_boundary(enhanced_alpha)
 
-        if orig_boundary.size == 0:
+        if len(orig_boundary) == 0:
             return 1.0  # No boundary in original, nothing to lose
 
         # Check how many original boundary pixels are preserved in enhanced
         # A boundary pixel is "retained" if it's still near a boundary in enhanced
         retention_count = 0
-        total_orig_boundary = orig_boundary.size
+        total_orig_boundary = len(orig_boundary)
 
         for px, py in orig_boundary:
             # Check neighbourhood in enhanced

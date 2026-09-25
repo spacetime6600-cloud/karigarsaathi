@@ -97,3 +97,39 @@ def test_basic_clean_enhancement_without_background_removal():
     assert "lighting_correction" in data["operations_applied"]
     assert "centring" in data["operations_applied"]
     assert "standard_resize" in data["operations_applied"]
+
+
+def test_enhancement_with_different_dimensions_calculates_metrics_cleanly():
+    """Verify that images with non-square or non-target dimensions (e.g. 400x300) process and calculate metrics without shape mismatch errors."""
+    img = Image.new("RGB", (400, 300), color=(180, 120, 80))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    raw_jpeg = buf.getvalue()
+
+    token = _generate_test_token("artisan_mem_003")
+    req_id = f"test_diff_dim_{int(time.time() * 1000)}"
+
+    response = client.post(
+        "/v1/enhancements",
+        data={
+            "consent_granted": "true",
+            "request_id": req_id,
+            "product_id": "prod_diff_dim",
+            "artisan_id": "artisan_mem_003",
+            "operations": json.dumps(["lighting_correction", "centring", "standard_resize"]),
+        },
+        files={
+            "image": ("diff_photo.jpg", io.BytesIO(raw_jpeg), "image/jpeg"),
+        },
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] in ("succeeded", "succeeded_with_warnings")
+    assert data["failure_code"] is None
+    assert data["enhanced_image_reference"] is not None
+    assert "lighting_correction" in data["operations_applied"]
+

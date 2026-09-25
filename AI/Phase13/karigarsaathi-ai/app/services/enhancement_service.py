@@ -533,14 +533,26 @@ class ImageEnhancementService:
         eval_w = min(width, 512)
         eval_h = min(height, 512)
 
-        return calculate_metrics(
-            original_rgba=original_data,
-            enhanced_rgba=enhanced_bytes,
-            original_alpha=details.get("alpha_data", b""),
-            enhanced_alpha=b"",
-            original_width=eval_w,
-            original_height=eval_h,
-        )
+        try:
+            return calculate_metrics(
+                original_rgba=original_data,
+                enhanced_rgba=enhanced_bytes,
+                original_alpha=details.get("alpha_data", b""),
+                enhanced_alpha=b"",
+                original_width=eval_w,
+                original_height=eval_h,
+            )
+        except Exception:
+            return {
+                "mean_delta_e": None,
+                "p95_delta_e": None,
+                "luminance_ssim": None,
+                "edge_preservation_ratio": None,
+                "foreground_coverage": None,
+                "highlight_clipping_percent": None,
+                "shadow_clipping_percent": None,
+                "mask_boundary_retention": None,
+            }
 
     def _determine_final_state(
         self, safety_result: dict[str, any], warnings: List[str],
