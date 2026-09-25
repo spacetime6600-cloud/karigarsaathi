@@ -203,7 +203,7 @@ async def upload_media(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error_code": "STORAGE_UPLOAD_ERROR",
-                "message": "Failed to store image on Cloudinary.",
+                "message": f"Failed to store image on Cloudinary: {str(exc)}",
                 "retryable": True,
             },
         )

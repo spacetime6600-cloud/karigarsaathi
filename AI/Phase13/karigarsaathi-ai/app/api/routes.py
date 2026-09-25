@@ -182,7 +182,7 @@ async def create_enhancement(
     request_id: str = Form(...),
     product_id: Optional[str] = Form(default=None),
     artisan_id: Optional[str] = Form(default=None),
-    operations: Optional[list[str]] = Form(default=None),
+    operations: Optional[Any] = Form(default=None),
     output_size: Optional[int] = Form(default=None),
     background: Optional[str] = Form(default=None),
     authorization: Optional[str] = Header(None),

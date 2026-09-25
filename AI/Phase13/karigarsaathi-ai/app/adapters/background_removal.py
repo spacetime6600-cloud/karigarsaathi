@@ -20,13 +20,14 @@ from app.domain.interfaces import (
 class RembgBackgroundRemovalAdapter:
     """Background removal using rembg with cached u2net neural network."""
 
-    def __init__(self, model_name: str = "u2net"):
+    def __init__(self, model_name: str = "u2netp"):
         """Initialize the rembg background removal adapter.
 
         Args:
-            model_name: Name of the rembg model to use (default: 'u2net').
+            model_name: Name of the rembg model to use (default: 'u2netp').
         """
-        self.model_name = model_name
+        import os
+        self.model_name = os.getenv("REMBG_MODEL", model_name)
         self._session = None
 
     def _get_session(self):
