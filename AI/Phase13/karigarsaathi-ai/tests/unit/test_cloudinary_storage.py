@@ -472,3 +472,39 @@ def test_api_upload_cloudinary_bad_request_returns_400_non_retryable(client, val
         assert "Unknown cloud_name" in detail["message"]
 
 
+def test_api_sign_upload_generates_valid_signature_without_secrets(client):
+    """Verify that /v1/media/sign-upload generates valid signatures without exposing api_secret."""
+    with patch("app.api.media_routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_adapter = MagicMock()
+        mock_adapter.generate_upload_signature = MagicMock(return_value={
+            "cloud_name": "demo_cloud",
+            "api_key": "demo_key",
+            "public_id": "karigarsaathi/products/prod_sign/img_sign/original",
+            "timestamp": 1234567890,
+            "signature": "abcdef1234567890",
+            "upload_url": "https://api.cloudinary.com/v1_1/demo_cloud/image/upload",
+        })
+        mock_get_adapter.return_value = mock_adapter
+
+        response = client.post(
+            "/v1/media/sign-upload",
+            headers={"Authorization": "Bearer dev-token-artisan-owner"},
+            json={
+                "product_id": "prod_sign",
+                "image_id": "img_sign",
+                "owner_id": "artisan-owner",
+                "variant": "original",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["cloud_name"] == "demo_cloud"
+        assert data["api_key"] == "demo_key"
+        assert data["public_id"] == "karigarsaathi/products/prod_sign/img_sign/original"
+        assert data["signature"] == "abcdef1234567890"
+        assert "api_secret" not in data
+        assert "secret" not in data
+
+
+

@@ -5,13 +5,13 @@ pydantic==2.8.2
 pydantic-settings==2.2.1
 
 # Image processing
-Pillow==10.0.0
+Pillow>=10.1.0
 opencv-python-headless==4.10.0.84
 numpy==1.26.4
 
 # Background removal
 rembg==2.0.69
-onnxruntime==1.16.3
+onnxruntime>=1.17.0
 
 # Utilities
 python-multipart==0.0.6

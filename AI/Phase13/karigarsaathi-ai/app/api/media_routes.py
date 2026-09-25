@@ -209,6 +209,55 @@ async def verify_auth_and_ownership(
     return verified_user_id
 
 
+class SignUploadRequest(BaseModel):
+    """Request model for server-side pre-signed upload signature."""
+    product_id: str = Field(..., description="Target Product ID")
+    image_id: str = Field(..., description="Unique Image ID")
+    owner_id: str = Field(..., description="Artisan / Owner UID")
+    variant: str = Field(default="original", description="Variant ('original', 'display', 'enhanced', 'thumbnail')")
+
+
+class SignUploadResponse(BaseModel):
+    """Pre-signed upload parameters returned to client for direct Cloudinary upload."""
+    cloud_name: str
+    api_key: str
+    public_id: str
+    timestamp: int
+    signature: str
+    upload_url: str
+
+
+@router.post("/sign-upload", response_model=SignUploadResponse, summary="Generate server-side upload signature for direct 10MB upload")
+async def sign_upload(
+    payload: SignUploadRequest,
+    authorization: Optional[str] = Header(None),
+):
+    """Authenticate, verify artisan ownership, and generate a secure pre-signed Cloudinary upload signature.
+
+    Preserves the full 10 MB image upload capability on serverless platforms (which enforce a 4.5 MB payload limit)
+    while keeping the Cloudinary API secret strictly protected on the server.
+    """
+    await verify_auth_and_ownership(authorization, payload.owner_id, operation="sign_upload")
+
+    try:
+        adapter = get_cloudinary_adapter()
+        return adapter.generate_upload_signature(
+            product_id=payload.product_id,
+            image_id=payload.image_id,
+            variant=payload.variant,
+        )
+    except Exception as exc:
+        safe_msg = sanitize_error_message(str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error_code": "SIGNATURE_GENERATION_FAILED",
+                "message": f"Failed to generate upload signature: {safe_msg}",
+                "retryable": False,
+            },
+        )
+
+
 @router.post("/upload", response_model=MediaMetadataResponse, summary="Upload product photograph to Cloudinary")
 async def upload_media(
     file: UploadFile = File(..., description="Image file (JPEG, PNG, WebP)"),

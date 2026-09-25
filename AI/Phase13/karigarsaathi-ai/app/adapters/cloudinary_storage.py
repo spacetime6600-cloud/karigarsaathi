@@ -134,6 +134,39 @@ class CloudinaryStorageAdapter:
         clean_variant = "display" if variant == "processed" else variant
         return f"karigarsaathi/products/{product_id}/{image_id}/{clean_variant}"
 
+    def generate_upload_signature(
+        self,
+        product_id: str,
+        image_id: str,
+        variant: str = "original",
+    ) -> Dict[str, Any]:
+        """Generate server-side upload signature for direct client-to-Cloudinary upload.
+
+        Preserves 10 MB upload workflow without sending large payloads through
+        serverless functions (4.5 MB limit). Secrets are NEVER exposed to client.
+        """
+        import time
+        if not CLOUDINARY_AVAILABLE or not self.is_configured:
+            raise RuntimeError("Cloudinary is not configured on server")
+
+        public_id = self.build_public_id(product_id, image_id, variant)
+        timestamp = int(time.time())
+        params_to_sign = {
+            "overwrite": "true",
+            "public_id": public_id,
+            "timestamp": str(timestamp),
+        }
+        signature = cloudinary.utils.api_sign_request(params_to_sign, self.api_secret)
+
+        return {
+            "cloud_name": self.cloud_name,
+            "api_key": self.api_key,
+            "public_id": public_id,
+            "timestamp": timestamp,
+            "signature": signature,
+            "upload_url": f"https://api.cloudinary.com/v1_1/{self.cloud_name}/image/upload",
+        }
+
     def validate_image_payload(self, file_bytes: bytes, declared_mime_type: Optional[str] = None) -> Dict[str, Any]:
         """Thoroughly validate image bytes before sending to Cloudinary.
 
