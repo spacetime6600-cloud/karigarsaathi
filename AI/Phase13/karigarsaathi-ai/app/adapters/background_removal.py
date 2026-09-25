@@ -18,14 +18,19 @@ from app.domain.interfaces import (
 class RembgBackgroundRemovalAdapter:
     """Background removal using rembg with cached u2net neural network."""
 
-    def __init__(self, model_name: str = "u2netp"):
+    def __init__(self, model_name: str = "u2netp", enable_ml: bool | None = None):
         """Initialize the rembg background removal adapter.
 
         Args:
             model_name: Name of the rembg model to use (default: 'u2netp').
+            enable_ml: Whether ML background removal is enabled (default from ENABLE_ML_BACKGROUND_REMOVAL).
         """
         import os
         self.model_name = os.getenv("REMBG_MODEL", model_name)
+        if enable_ml is not None:
+            self.enable_ml = enable_ml
+        else:
+            self.enable_ml = os.getenv("ENABLE_ML_BACKGROUND_REMOVAL", "false").lower() in ("true", "1", "yes")
         self._session = None
 
         # Point U2NET_HOME to bundled models directory if present
@@ -84,6 +89,17 @@ class RembgBackgroundRemovalAdapter:
             - foreground_coverage: float (0-1, proportion of foreground pixels)
             - warnings: list of warning strings about suspicious masks
         """
+        if not self.enable_ml:
+            return {
+                "foreground": image_data,
+                "mask": None,
+                "foreground_coverage": 1.0,
+                "warnings": [
+                    "Background removal omitted for free-tier stability. Authentic background preserved."
+                ],
+                "fallback": True,
+            }
+
         import gc
         warnings: List[str] = []
 

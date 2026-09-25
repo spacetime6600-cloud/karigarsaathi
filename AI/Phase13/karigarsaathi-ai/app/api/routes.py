@@ -47,7 +47,9 @@ storage_adapter = LocalFileStorageAdapter(
     previews_dir=settings.previews_dir,
 )
 
-background_removal_adapter = RembgBackgroundRemovalAdapter()
+background_removal_adapter = RembgBackgroundRemovalAdapter(
+    enable_ml=settings.enable_ml_background_removal
+)
 lighting_correction_adapter = LightingCorrectionProcessor()
 composition_adapter = ImageCompositionProcessor()
 job_repository = InMemoryJobRepository()

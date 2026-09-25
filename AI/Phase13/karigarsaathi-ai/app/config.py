@@ -58,6 +58,11 @@ class Settings(BaseSettings):
         default="your-dev-token-here", alias="DEVELOPMENT_BEARER_TOKEN"
     )
 
+    # ML Background Removal capability flag (disabled by default for Render Free 512MB RAM stability)
+    enable_ml_background_removal: bool = Field(
+        default=False, alias="ENABLE_ML_BACKGROUND_REMOVAL"
+    )
+
     # Media Storage Provider (cloudinary | firebase_emulator | local)
     media_storage_provider: str = Field(
         default="firebase_emulator", alias="MEDIA_STORAGE_PROVIDER"
