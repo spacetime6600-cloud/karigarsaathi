@@ -68,9 +68,9 @@ class CloudinaryStorageAdapter:
         """
         import os
 
-        raw_cloud_name = cloud_name if cloud_name is not None else os.getenv("CLOUDINARY_CLOUD_NAME", "")
-        raw_api_key = api_key if api_key is not None else os.getenv("CLOUDINARY_API_KEY", "")
-        raw_api_secret = api_secret if api_secret is not None else os.getenv("CLOUDINARY_API_SECRET", "")
+        raw_cloud_name = (cloud_name if cloud_name else None) or os.getenv("CLOUDINARY_CLOUD_NAME", "")
+        raw_api_key = (api_key if api_key else None) or os.getenv("CLOUDINARY_API_KEY", "")
+        raw_api_secret = (api_secret if api_secret else None) or os.getenv("CLOUDINARY_API_SECRET", "")
 
         self.cloud_name = str(raw_cloud_name).strip().strip("'\"")
         self.api_key = str(raw_api_key).strip().strip("'\"")
@@ -257,20 +257,30 @@ class CloudinaryStorageAdapter:
         if not uploader:
             raise RuntimeError("Cloudinary uploader not available")
 
+        if not uploader_override and not self.is_configured:
+            raise ValueError("Cloudinary storage adapter is not properly configured. Missing server-side credentials.")
+
         # 2. Execute Cloudinary upload
-        upload_result = uploader.upload(
-            file_bytes,
-            public_id=public_id,
-            overwrite=True,
-            resource_type="image",
-            context={
+        upload_options: Dict[str, Any] = {
+            "public_id": public_id,
+            "overwrite": True,
+            "resource_type": "image",
+            "context": {
                 "productId": product_id,
                 "imageId": image_id,
                 "variant": variant,
                 "idempotencyKey": idempotency_key or "",
                 "checksum": checksum,
             },
-        )
+        }
+        if self.cloud_name:
+            upload_options["cloud_name"] = self.cloud_name
+        if self.api_key:
+            upload_options["api_key"] = self.api_key
+        if self.api_secret:
+            upload_options["api_secret"] = self.api_secret
+
+        upload_result = uploader.upload(file_bytes, **upload_options)
 
         # 3. Format safe metadata (strictly NO secrets or private credentials)
         secure_url = upload_result.get("secure_url") or upload_result.get("url") or ""
@@ -331,7 +341,18 @@ class CloudinaryStorageAdapter:
         if not uploader:
             raise RuntimeError("Cloudinary uploader not available")
 
-        destroy_result = uploader.destroy(public_id, invalidate=True)
+        if not uploader_override and not self.is_configured:
+            raise ValueError("Cloudinary storage adapter is not properly configured. Missing server-side credentials.")
+
+        destroy_options: Dict[str, Any] = {"invalidate": True}
+        if self.cloud_name:
+            destroy_options["cloud_name"] = self.cloud_name
+        if self.api_key:
+            destroy_options["api_key"] = self.api_key
+        if self.api_secret:
+            destroy_options["api_secret"] = self.api_secret
+
+        destroy_result = uploader.destroy(public_id, **destroy_options)
         result_status = destroy_result.get("result", "ok") if isinstance(destroy_result, dict) else "ok"
 
         logger.info(

@@ -117,14 +117,16 @@ def extract_provider_error_details(
 
 # Storage adapter instance
 def get_cloudinary_adapter() -> CloudinaryStorageAdapter:
-    """Factory to get or initialize CloudinaryStorageAdapter."""
+    """Factory to get or initialize CloudinaryStorageAdapter.
+
+    Calls to /v1/media/* strictly require Cloudinary credentials to be configured.
+    """
     current_settings = get_settings()
-    require_config = current_settings.media_storage_provider.lower() == "cloudinary"
     return CloudinaryStorageAdapter(
         cloud_name=current_settings.cloudinary_cloud_name,
         api_key=current_settings.cloudinary_api_key,
         api_secret=current_settings.cloudinary_api_secret,
-        require_config=require_config,
+        require_config=True,
     )
 
 

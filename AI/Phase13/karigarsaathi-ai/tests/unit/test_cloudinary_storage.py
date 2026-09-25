@@ -507,4 +507,84 @@ def test_api_sign_upload_generates_valid_signature_without_secrets(client):
         assert "secret" not in data
 
 
+def test_empty_string_arguments_fallback_to_os_env(monkeypatch):
+    """Verify that passing empty strings to CloudinaryStorageAdapter falls back to os.getenv."""
+    monkeypatch.setenv("CLOUDINARY_CLOUD_NAME", "env_cloud")
+    monkeypatch.setenv("CLOUDINARY_API_KEY", "env_key")
+    monkeypatch.setenv("CLOUDINARY_API_SECRET", "env_secret")
+
+    adapter = CloudinaryStorageAdapter(
+        cloud_name="",
+        api_key="",
+        api_secret="",
+        require_config=True,
+    )
+    assert adapter.cloud_name == "env_cloud"
+    assert adapter.api_key == "env_key"
+    assert adapter.api_secret == "env_secret"
+    assert adapter.is_configured is True
+
+
+@pytest.mark.asyncio
+async def test_upload_and_destroy_fail_if_unconfigured_without_override(valid_jpeg_bytes):
+    """Verify upload and destroy raise ValueError if called when not configured."""
+    adapter = CloudinaryStorageAdapter(
+        cloud_name="", api_key="", api_secret="", require_config=False
+    )
+    assert adapter.is_configured is False
+
+    with pytest.raises(ValueError) as exc_info:
+        await adapter.upload(
+            file_bytes=valid_jpeg_bytes,
+            product_id="prod_1",
+            image_id="img_1",
+        )
+    assert "not properly configured" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        await adapter.destroy(
+            product_id="prod_1",
+            image_id="img_1",
+        )
+    assert "not properly configured" in str(exc_info.value)
+
+
+def test_api_authorization_required_mapped_to_502_bad_gateway(client, valid_jpeg_bytes):
+    """Verify AuthorizationRequired (e.g. Invalid Signature) maps to 502 with retryable=False and sanitized message."""
+    class FakeAuthError(Exception):
+        http_code = 401
+        status_code = 401
+
+    with patch("app.api.media_routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_adapter = MagicMock()
+        mock_adapter.validate_image_payload = MagicMock(return_value={"valid": True, "size_bytes": 1000, "width": 100, "height": 100, "format": "jpeg"})
+        mock_adapter.upload = AsyncMock(side_effect=FakeAuthError("Invalid Signature abcdef123456. String to sign - 'context=p=1&timestamp=123'."))
+        mock_adapter.cloud_name = "test_cloud"
+        mock_adapter.api_key = "test_key"
+        mock_adapter.api_secret = "test_secret"
+        mock_get_adapter.return_value = mock_adapter
+
+        response = client.post(
+            "/v1/media/upload",
+            headers={"Authorization": "Bearer dev-token-artisan-owner"},
+            data={
+                "product_id": "prod_auth_fail",
+                "image_id": "img_auth_fail",
+                "owner_id": "artisan-owner",
+                "variant": "original",
+            },
+            files={"file": ("test.jpg", valid_jpeg_bytes, "image/jpeg")},
+        )
+
+        assert response.status_code == 502
+        data = response.json()
+        detail = data["detail"]
+        assert detail["error_code"] == "STORAGE_UPLOAD_ERROR"
+        assert detail["provider_status_code"] == 401
+        assert detail["retryable"] is False
+        assert "Invalid Signature [REDACTED]" in detail["message"]
+        assert "test_secret" not in response.text
+
+
+
 
