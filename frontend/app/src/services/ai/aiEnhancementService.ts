@@ -294,10 +294,10 @@ class AIEnhancementService {
           // ignore non-json
         }
 
-        const detail = (errJson.detail || errJson) as Record<string, unknown> | Array<unknown>;
+        const detail = (errJson.detail || errJson) as Record<string, unknown> | Array<{ loc?: string[]; msg?: string }>;
         const errorCode = (!Array.isArray(detail) && (detail.error_code as string)) || `HTTP_${response.status}`;
         const message = (!Array.isArray(detail) && (detail.message as string))
-          || (Array.isArray(detail) ? detail.map((d: any) => `${d.loc?.join('.')}: ${d.msg}`).join(', ') : `AI service enhancement failed with status ${response.status}`);
+          || (Array.isArray(detail) ? detail.map((d) => `${d.loc?.join('.')}: ${d.msg}`).join(', ') : `AI service enhancement failed with status ${response.status}`);
         const retryable = !Array.isArray(detail) && detail.retryable !== false && response.status >= 500;
 
         throw new AIEnhancementError({

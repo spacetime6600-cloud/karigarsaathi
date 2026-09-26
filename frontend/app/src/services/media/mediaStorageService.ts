@@ -243,7 +243,7 @@ class MediaStorageService {
 
     if (!cloudinaryResponse.ok) {
       let cldErr = 'Direct upload to Cloudinary failed.';
-      let isRetryable = cloudinaryResponse.status >= 500;
+      const isRetryable = cloudinaryResponse.status >= 500;
       try {
         const cldJson = await cloudinaryResponse.json();
         if (cldJson?.error?.message) {
