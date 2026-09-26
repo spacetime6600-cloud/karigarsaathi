@@ -64,19 +64,22 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-# Add CORS middleware with explicit development origins
+# Add CORS middleware with explicit development and production origins
 cors_origin_list = [
     origin.strip()
     for origin in settings.cors_origins.split(",")
     if origin.strip()
-] if settings.cors_origins else [
+] if settings.cors_origins else []
+
+for default_origin in [
+    "https://karigarsaathi.vercel.app",
     "http://localhost:3001",
     "http://localhost:3000",
     "http://127.0.0.1:3001",
     "http://127.0.0.1:3000",
-    "http://10.5.0.2:3001",
-    "http://10.5.0.2:3000",
-]
+]:
+    if default_origin not in cors_origin_list:
+        cors_origin_list.append(default_origin)
 
 app.add_middleware(
     CORSMiddleware,

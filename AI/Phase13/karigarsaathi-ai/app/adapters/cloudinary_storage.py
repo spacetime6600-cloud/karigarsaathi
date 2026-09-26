@@ -417,3 +417,39 @@ class CloudinaryStorageAdapter:
                 )
 
         return new_metadata
+
+    async def verify_asset(
+        self,
+        public_id: str,
+        resource_type: str = "image",
+        api_override: Optional[Any] = None,
+    ) -> Dict[str, Any]:
+        """Verify an asset exists in Cloudinary and complies with size and format bounds.
+
+        Used by /v1/media/verify-upload after direct client-to-Cloudinary upload.
+        """
+        if not api_override and not self.is_configured:
+            raise ValueError("Cloudinary storage adapter is not properly configured.")
+
+        api = api_override or (cloudinary.api if CLOUDINARY_AVAILABLE else None)
+        if not api:
+            raise RuntimeError("Cloudinary API client not available.")
+
+        options: Dict[str, Any] = {
+            "resource_type": resource_type,
+            "cloud_name": self.cloud_name,
+            "api_key": self.api_key,
+            "api_secret": self.api_secret,
+        }
+        resource_info = api.resource(public_id, **options)
+
+        file_bytes_len = int(resource_info.get("bytes", 0))
+        if file_bytes_len > MAX_FILE_SIZE_BYTES:
+            raise ValueError(f"Uploaded asset exceeds 10 MB limit ({file_bytes_len / (1024*1024):.1f} MB)")
+
+        fmt = str(resource_info.get("format", "")).lower()
+        if fmt not in {"jpg", "jpeg", "png", "webp"}:
+            raise ValueError(f"Invalid uploaded asset format '{fmt}'. Allowed: JPEG, PNG, WebP.")
+
+        return resource_info
+

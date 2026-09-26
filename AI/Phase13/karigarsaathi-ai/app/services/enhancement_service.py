@@ -209,8 +209,12 @@ class ImageEnhancementService:
             enhanced_filename = f"{request_id}_enhanced.png"
             preview_filename = f"{request_id}_preview.png"
 
-            await self.storage.store_enhanced(enhanced_filename, enhanced_bytes)
-            await self.storage.store_preview(preview_filename, preview_bytes)
+            enhanced_ref = await self.storage.store_enhanced(enhanced_filename, enhanced_bytes)
+            preview_ref = await self.storage.store_preview(preview_filename, preview_bytes)
+
+            enhanced_image_ref = enhanced_ref if str(enhanced_ref).startswith("http") else f"/v1/enhancements/{job_id}/enhanced"
+            preview_image_ref = preview_ref if str(preview_ref).startswith("http") else f"/v1/enhancements/{job_id}/preview"
+            orig_ref = original_filename if str(original_filename).startswith("http") else f"/v1/enhancements/{job_id}/original"
 
             # 15. Verify original checksum unchanged
             verified_checksum = await self._verify_original_checksum(
@@ -227,6 +231,9 @@ class ImageEnhancementService:
                 status=final_status,
                 enhanced_filename=enhanced_filename,
                 preview_filename=preview_filename,
+                enhanced_image_reference=enhanced_image_ref,
+                preview_image_reference=preview_image_ref,
+                original_image_reference=orig_ref,
                 original_checksum_verified=verified_checksum,
                 warnings="; ".join(warnings) if warnings else None,
                 metrics=metrics,
@@ -245,9 +252,9 @@ class ImageEnhancementService:
                 "artisan_id": artisan_id,
                 "product_id": product_id,
                 "status": final_status,
-                "original_image_reference": f"/v1/enhancements/{job_id}/original",
-                "enhanced_image_reference": f"/v1/enhancements/{job_id}/enhanced",
-                "preview_image_reference": f"/v1/enhancements/{job_id}/preview",
+                "original_image_reference": orig_ref,
+                "enhanced_image_reference": enhanced_image_ref,
+                "preview_image_reference": preview_image_ref,
                 "operations_requested": operations,
                 "operations_applied": applied_operations,
                 "warnings": warnings,

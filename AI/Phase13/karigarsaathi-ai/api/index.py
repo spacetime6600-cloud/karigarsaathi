@@ -14,5 +14,6 @@ if os.getenv("VERCEL"):
     os.environ.setdefault("ORIGINALS_DIR", "/tmp/storage/originals")
     os.environ.setdefault("ENHANCED_DIR", "/tmp/storage/enhanced")
     os.environ.setdefault("PREVIEWS_DIR", "/tmp/storage/previews")
+    os.environ.setdefault("JOBS_DIR", "/tmp/storage/jobs")
 
 from app.main import app

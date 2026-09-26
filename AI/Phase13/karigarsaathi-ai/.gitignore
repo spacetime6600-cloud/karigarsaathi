@@ -8,6 +8,7 @@
 # Local storage (replaced by cloud/storage in production)
 /storage/uploads/
 /storage/outputs/
+/storage/jobs/
 
 # Cache and runtime
 __pycache__/

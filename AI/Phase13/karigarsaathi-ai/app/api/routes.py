@@ -40,11 +40,22 @@ from app.utils.logging import log_security_event, log_validation_event
 # Initialize settings and components
 settings = get_settings()
 
+from app.adapters.cloudinary_storage import CloudinaryStorageAdapter
+from app.adapters.storage import DurableImageStorageAdapter, DurableJobRepository
+
+cloudinary_adapter = CloudinaryStorageAdapter(
+    cloud_name=settings.cloudinary_cloud_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    require_config=False,
+)
+
 # Create adapter instances
-storage_adapter = LocalFileStorageAdapter(
+storage_adapter = DurableImageStorageAdapter(
     originals_dir=settings.originals_dir,
     enhanced_dir=settings.enhanced_dir,
     previews_dir=settings.previews_dir,
+    cloudinary_adapter=cloudinary_adapter,
 )
 
 background_removal_adapter = RembgBackgroundRemovalAdapter(
@@ -52,7 +63,9 @@ background_removal_adapter = RembgBackgroundRemovalAdapter(
 )
 lighting_correction_adapter = LightingCorrectionProcessor()
 composition_adapter = ImageCompositionProcessor()
-job_repository = InMemoryJobRepository()
+job_repository = DurableJobRepository(
+    cloudinary_adapter=cloudinary_adapter,
+)
 
 # Create authentication and quota (auto switches to Firebase in production)
 authenticator = create_authenticator(settings, "auto")
@@ -179,7 +192,8 @@ async def health_check():
     """,
 )
 async def create_enhancement(
-    image: UploadFile = File(...),
+    image: Optional[UploadFile] = File(default=None),
+    image_url: Optional[str] = Form(default=None),
     consent_granted: bool = Form(...),
     request_id: str = Form(...),
     product_id: Optional[str] = Form(default=None),
@@ -189,7 +203,7 @@ async def create_enhancement(
     background: Optional[str] = Form(default=None),
     authorization: Optional[str] = Header(None),
 ):
-    """Create new enhancement job - form data version."""
+    """Create new enhancement job - form data version with 10MB direct URL support."""
 
     # 1. Validate required string fields
     if not artisan_id or not str(artisan_id).strip():
@@ -254,8 +268,47 @@ async def create_enhancement(
             },
         )
 
-    # 5. Read and validate image using comprehensive validator
-    file_bytes = await image.read()
+    # 5. Read and validate image (either from direct UploadFile or via durable image_url)
+    if image is not None:
+        file_bytes = await image.read()
+    elif image_url:
+        clean_url = str(image_url).strip()
+        if not (clean_url.startswith("http://") or clean_url.startswith("https://")):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error_code": "INVALID_IMAGE_URL",
+                    "message": "image_url must be a valid http or https URL",
+                    "retryable": False,
+                    "request_id": request_id,
+                },
+            )
+        import urllib.request
+        req = urllib.request.Request(clean_url, headers={"User-Agent": "KarigarSaathi-AI/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                file_bytes = resp.read()
+        except Exception as dl_err:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error_code": "IMAGE_DOWNLOAD_FAILED",
+                    "message": f"Failed to download image from image_url: {dl_err}",
+                    "retryable": False,
+                    "request_id": request_id,
+                },
+            )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "IMAGE_REQUIRED",
+                "message": "Either image file or image_url must be provided.",
+                "retryable": False,
+                "request_id": request_id,
+            },
+        )
+
     if not file_bytes:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -579,7 +632,14 @@ async def get_job_status(job_id: str):
 
 @router.get("/{job_id}/original")
 async def get_original_image(job_id: str):
-    """Retrieve original image file."""
+    """Retrieve original image file (redirects to durable URL if stored on Cloudinary)."""
+    job = await job_repository.get_job(job_id)
+    if job and job.get("original_image_reference"):
+        ref = str(job["original_image_reference"])
+        if ref.startswith("http://") or ref.startswith("https://"):
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=ref, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
     import os
     import glob
     from fastapi.responses import FileResponse
@@ -595,7 +655,14 @@ async def get_original_image(job_id: str):
 
 @router.get("/{job_id}/enhanced")
 async def get_enhanced_image(job_id: str):
-    """Retrieve enhanced image file."""
+    """Retrieve enhanced image file (redirects to durable URL if stored on Cloudinary)."""
+    job = await job_repository.get_job(job_id)
+    if job and job.get("enhanced_image_reference"):
+        ref = str(job["enhanced_image_reference"])
+        if ref.startswith("http://") or ref.startswith("https://"):
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=ref, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
     import os
     import glob
     from fastapi.responses import FileResponse
@@ -611,7 +678,14 @@ async def get_enhanced_image(job_id: str):
 
 @router.get("/{job_id}/preview")
 async def get_preview_image(job_id: str):
-    """Retrieve preview image file."""
+    """Retrieve preview image file (redirects to durable URL if stored on Cloudinary)."""
+    job = await job_repository.get_job(job_id)
+    if job and job.get("preview_image_reference"):
+        ref = str(job["preview_image_reference"])
+        if ref.startswith("http://") or ref.startswith("https://"):
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=ref, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
     import os
     import glob
     from fastapi.responses import FileResponse

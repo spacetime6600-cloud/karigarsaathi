@@ -260,6 +260,89 @@ async def sign_upload(
         )
 
 
+class VerifyUploadRequest(BaseModel):
+    """Request model for server-side verification of direct Cloudinary upload."""
+    product_id: str = Field(..., description="Target Product ID")
+    image_id: str = Field(..., description="Unique Image ID")
+    owner_id: str = Field(..., description="Artisan / Owner UID")
+    variant: str = Field(default="original", description="Variant ('original', 'display', 'enhanced', 'thumbnail')")
+    public_id: str = Field(..., description="Cloudinary public ID returned by direct upload")
+    idempotency_key: Optional[str] = Field(default=None, description="Deterministic idempotency key")
+
+
+@router.post("/verify-upload", response_model=MediaMetadataResponse, summary="Verify direct-to-Cloudinary upload and record ownership")
+async def verify_upload(
+    payload: VerifyUploadRequest,
+    authorization: Optional[str] = Header(None),
+):
+    """Authenticate, verify artisan ownership, and verify direct upload with Cloudinary.
+
+    Confirms asset exists in Cloudinary, adheres to security limits (<=10MB, allowed image MIME),
+    matches expected deterministic public ID, and returns canonical metadata for Firestore persistence.
+    """
+    await verify_auth_and_ownership(authorization, payload.owner_id, operation="verify_upload")
+
+    adapter = get_cloudinary_adapter()
+    expected_public_id = adapter.build_public_id(payload.product_id, payload.image_id, payload.variant)
+    if payload.public_id != expected_public_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "INVALID_PUBLIC_ID",
+                "message": f"Asset public ID does not match expected product/image path. Expected '{expected_public_id}', got '{payload.public_id}'.",
+                "retryable": False,
+            },
+        )
+
+    try:
+        resource_info = await adapter.verify_asset(payload.public_id)
+    except ValueError as val_err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": "INVALID_IMAGE_PAYLOAD",
+                "message": str(val_err),
+                "retryable": False,
+            },
+        )
+    except Exception as exc:
+        exc_type, provider_status_code, is_retryable, safe_msg, http_status = extract_provider_error_details(exc, adapter)
+        raise HTTPException(
+            status_code=http_status,
+            detail={
+                "error_code": "ASSET_VERIFICATION_FAILED",
+                "provider": "cloudinary",
+                "provider_error_type": exc_type,
+                "provider_status_code": provider_status_code,
+                "message": f"Failed to verify asset on Cloudinary: {safe_msg}",
+                "retryable": is_retryable,
+            },
+        )
+
+    from datetime import datetime, timezone
+    now_iso = datetime.now(timezone.utc).isoformat()
+    secure_url = resource_info.get("secure_url") or resource_info.get("url") or f"https://res.cloudinary.com/{adapter.cloud_name}/image/upload/{payload.public_id}.{resource_info.get('format', 'jpg')}"
+
+    return MediaMetadataResponse(
+        provider="cloudinary",
+        publicId=payload.public_id,
+        secureUrl=secure_url,
+        version=str(resource_info.get("version", "")),
+        width=int(resource_info.get("width", 0)),
+        height=int(resource_info.get("height", 0)),
+        format=str(resource_info.get("format", "jpg")),
+        bytes=int(resource_info.get("bytes", 0)),
+        resourceType=str(resource_info.get("resource_type", "image")),
+        variant=payload.variant,
+        imageId=payload.image_id,
+        productId=payload.product_id,
+        checksum=f"sha256:{resource_info.get('etag', '')}",
+        idempotencyKey=payload.idempotency_key or f"idemp_{payload.product_id}_{payload.image_id}_{payload.variant}",
+        createdAt=str(resource_info.get("created_at", now_iso)),
+        updatedAt=now_iso,
+    )
+
+
 @router.post("/upload", response_model=MediaMetadataResponse, summary="Upload product photograph to Cloudinary")
 async def upload_media(
     file: UploadFile = File(..., description="Image file (JPEG, PNG, WebP)"),
