@@ -217,6 +217,7 @@ class SignUploadRequest(BaseModel):
     image_id: str = Field(..., description="Unique Image ID")
     owner_id: str = Field(..., description="Artisan / Owner UID")
     variant: str = Field(default="original", description="Variant ('original', 'display', 'enhanced', 'thumbnail')")
+    idempotency_key: Optional[str] = Field(default=None, description="Deterministic idempotency key")
 
 
 class SignUploadResponse(BaseModel):
