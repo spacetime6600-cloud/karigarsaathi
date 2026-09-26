@@ -17,6 +17,7 @@ from PIL import Image
 
 try:
     import cloudinary
+    import cloudinary.api
     import cloudinary.uploader
     import cloudinary.utils
     CLOUDINARY_AVAILABLE = True
@@ -149,6 +150,9 @@ class CloudinaryStorageAdapter:
         if not CLOUDINARY_AVAILABLE or not self.is_configured:
             raise RuntimeError("Cloudinary is not configured on server")
 
+        if CLOUDINARY_AVAILABLE:
+            import cloudinary.utils
+
         public_id = self.build_public_id(product_id, image_id, variant)
         timestamp = int(time.time())
         params_to_sign = {
@@ -253,6 +257,9 @@ class CloudinaryStorageAdapter:
             },
         )
 
+        if CLOUDINARY_AVAILABLE:
+            import cloudinary.uploader
+
         uploader = uploader_override or (cloudinary.uploader if CLOUDINARY_AVAILABLE else None)
         if not uploader:
             raise RuntimeError("Cloudinary uploader not available")
@@ -336,6 +343,9 @@ class CloudinaryStorageAdapter:
         """
         public_id = public_id_override or self.build_public_id(product_id, image_id, variant)
         logger.info("CLOUDINARY_DELETE_INIT", extra={"public_id": public_id})
+
+        if CLOUDINARY_AVAILABLE:
+            import cloudinary.uploader
 
         uploader = uploader_override or (cloudinary.uploader if CLOUDINARY_AVAILABLE else None)
         if not uploader:
@@ -430,6 +440,9 @@ class CloudinaryStorageAdapter:
         """
         if not api_override and not self.is_configured:
             raise ValueError("Cloudinary storage adapter is not properly configured.")
+
+        if CLOUDINARY_AVAILABLE:
+            import cloudinary.api
 
         api = api_override or (cloudinary.api if CLOUDINARY_AVAILABLE else None)
         if not api:

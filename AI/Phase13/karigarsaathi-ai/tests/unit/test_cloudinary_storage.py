@@ -586,5 +586,113 @@ def test_api_authorization_required_mapped_to_502_bad_gateway(client, valid_jpeg
         assert "test_secret" not in response.text
 
 
+# --------------------------------------------------------------------------
+# 17. Cloudinary API Submodule Loading & verify-upload Verification
+# --------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_verify_asset_explicitly_loads_cloudinary_api_without_network_request():
+    """Verify verify_asset explicitly loads and calls cloudinary.api without api_override.
+
+    Catches the regression where cloudinary.api was not imported and raised:
+    AttributeError: module 'cloudinary' has no attribute 'api'.
+    Uses the real installed Cloudinary SDK and patches only the low-level HTTP transport
+    so no external network requests are made.
+    """
+    import sys
+    import cloudinary
+
+    # Simulate a fresh/unloaded state for cloudinary.api
+    if hasattr(cloudinary, "api"):
+        delattr(cloudinary, "api")
+    sys.modules.pop("cloudinary.api", None)
+
+    adapter = CloudinaryStorageAdapter(
+        cloud_name="demo_cloud",
+        api_key="demo_key",
+        api_secret="demo_secret",
+        require_config=True,
+    )
+
+    # Intercept only the low-level HTTP execution so the real cloudinary.api module and logic run
+    with patch("cloudinary.api_client.call_api._call_api") as mock_http_call:
+        mock_http_call.return_value = {
+            "bytes": 2048,
+            "format": "jpg",
+            "width": 800,
+            "height": 600,
+            "resource_type": "image",
+            "version": "12345",
+            "secure_url": "https://res.cloudinary.com/demo_cloud/image/upload/v12345/test.jpg",
+            "etag": "sha_etag_123",
+            "created_at": "2026-09-26T00:00:00Z",
+        }
+
+        result = await adapter.verify_asset("karigarsaathi/products/prod_1/img_1/original")
+
+        assert hasattr(cloudinary, "api"), "cloudinary.api should be dynamically loaded and accessible"
+        assert result["bytes"] == 2048
+        assert result["format"] == "jpg"
+        assert result["width"] == 800
+        assert result["height"] == 600
+        assert mock_http_call.called
+
+
+def test_api_verify_upload_end_to_end_loads_cloudinary_api(client, monkeypatch):
+    """Verify /v1/media/verify-upload route successfully loads cloudinary.api and returns 200.
+
+    Tests the full FastAPI route with a real CloudinaryStorageAdapter and real Cloudinary SDK,
+    intercepting only the low-level network request. Confirms that no AttributeError(api) is thrown.
+    """
+    import sys
+    import cloudinary
+
+    # Ensure clean state to guarantee explicit module loading is tested
+    if hasattr(cloudinary, "api"):
+        delattr(cloudinary, "api")
+    sys.modules.pop("cloudinary.api", None)
+
+    monkeypatch.setenv("CLOUDINARY_CLOUD_NAME", "demo_cloud")
+    monkeypatch.setenv("CLOUDINARY_API_KEY", "demo_key")
+    monkeypatch.setenv("CLOUDINARY_API_SECRET", "demo_secret")
+
+    with patch("cloudinary.api_client.call_api._call_api") as mock_http_call:
+        mock_http_call.return_value = {
+            "bytes": 102400,
+            "format": "jpg",
+            "width": 1080,
+            "height": 1080,
+            "resource_type": "image",
+            "version": "1790000002",
+            "secure_url": "https://res.cloudinary.com/demo_cloud/image/upload/v1790000002/karigarsaathi/products/prod_v1/img_v1/original.jpg",
+            "etag": "etag_verify_123",
+            "created_at": "2026-09-26T12:00:00Z",
+        }
+
+        response = client.post(
+            "/v1/media/verify-upload",
+            headers={"Authorization": "Bearer dev-token-artisan_owner_1"},
+            json={
+                "product_id": "prod_v1",
+                "image_id": "img_v1",
+                "owner_id": "artisan_owner_1",
+                "variant": "original",
+                "public_id": "karigarsaathi/products/prod_v1/img_v1/original",
+            },
+        )
+
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        data = response.json()
+        assert data["provider"] == "cloudinary"
+        assert data["publicId"] == "karigarsaathi/products/prod_v1/img_v1/original"
+        assert data["width"] == 1080
+        assert data["height"] == 1080
+        assert data["format"] == "jpg"
+        assert data["bytes"] == 102400
+        assert data["secureUrl"].startswith("https://res.cloudinary.com/")
+        assert data["checksum"] == "sha256:etag_verify_123"
+
+
+
 
 
