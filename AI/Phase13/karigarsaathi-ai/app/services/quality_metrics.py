@@ -106,19 +106,40 @@ def calculate_metrics(
 
     # Luminance SSIM - work in LAB space
     try:
-        from skimage.metrics import structural_similarity as ssim
-        from skimage.transform import resize
+        import cv2
 
         orig_lab = _rgb_to_lab(orig_arr)
         enh_lab = _rgb_to_lab(enh_arr)
         # Use only luminance channel (L)
-        orig_l = orig_lab[..., 0]
-        enh_l = enh_lab[..., 0]
+        orig_l = orig_lab[..., 0].astype(np.float64)
+        enh_l = enh_lab[..., 0].astype(np.float64)
         # Resize if needed for SSIM (must be same size)
         if orig_l.shape != enh_l.shape:
-            enh_l = resize(enh_l, orig_l.shape, anti_aliasing=False)
-        luminance_ssim_val = ssim(orig_l, enh_l, data_range=100.0)
-        luminance_ssim = float(luminance_ssim_val)
+            enh_l = cv2.resize(enh_l, (orig_l.shape[1], orig_l.shape[0]), interpolation=cv2.INTER_NEAREST)
+
+        # Exact SSIM calculation with data_range=100.0 using standard Gaussian window
+        data_range = 100.0
+        c1 = (0.01 * data_range) ** 2
+        c2 = (0.03 * data_range) ** 2
+        win_size = 7
+        sigma = 1.5
+        kernel = cv2.getGaussianKernel(win_size, sigma)
+        window = np.outer(kernel, kernel.transpose())
+
+        mu1 = cv2.filter2D(orig_l, -1, window)
+        mu2 = cv2.filter2D(enh_l, -1, window)
+        mu1_sq = mu1 * mu1
+        mu2_sq = mu2 * mu2
+        mu1_mu2 = mu1 * mu2
+
+        sigma1_sq = cv2.filter2D(orig_l * orig_l, -1, window) - mu1_sq
+        sigma2_sq = cv2.filter2D(enh_l * enh_l, -1, window) - mu2_sq
+        sigma12 = cv2.filter2D(orig_l * enh_l, -1, window) - mu1_mu2
+
+        ssim_map = ((2 * mu1_mu2 + c1) * (2 * sigma12 + c2)) / (
+            (mu1_sq + mu2_sq + c1) * (sigma1_sq + sigma2_sq + c2)
+        )
+        luminance_ssim = float(np.mean(ssim_map))
     except Exception:
         luminance_ssim = None
 
@@ -247,14 +268,14 @@ def _calculate_edge_preservation(
         enh_gray = np.mean(enhanced[..., :3], axis=-1)
 
         # Sobel gradients
-        from scipy import ndimage
+        import cv2
 
-        orig_dx = ndimage.sobel(orig_gray, axis=1)
-        orig_dy = ndimage.sobel(orig_gray, axis=0)
+        orig_dx = cv2.Sobel(orig_gray, cv2.CV_64F, 1, 0, ksize=3)
+        orig_dy = cv2.Sobel(orig_gray, cv2.CV_64F, 0, 1, ksize=3)
         orig_gradient = np.sqrt(orig_dx ** 2 + orig_dy ** 2)
 
-        enh_dx = ndimage.sobel(enh_gray, axis=1)
-        enh_dy = ndimage.sobel(enh_gray, axis=0)
+        enh_dx = cv2.Sobel(enh_gray, cv2.CV_64F, 1, 0, ksize=3)
+        enh_dy = cv2.Sobel(enh_gray, cv2.CV_64F, 0, 1, ksize=3)
         enh_gradient = np.sqrt(enh_dx ** 2 + enh_dy ** 2)
 
         # Avoid division by zero

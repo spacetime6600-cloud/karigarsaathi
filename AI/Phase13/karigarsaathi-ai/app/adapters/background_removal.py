@@ -47,37 +47,55 @@ class RembgBackgroundRemovalAdapter:
         return self._session is not None
 
     def _get_session(self):
-        """Get or initialize the rembg ONNX session with strict low-memory settings."""
+        """Get or initialize the ONNX session with strict low-memory settings."""
         if self._session is None:
             import os
             import logging
             import onnxruntime as ort
-            import rembg
 
             _logger = logging.getLogger(__name__)
 
             # Discover bundled models directory
             base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
             models_dir = os.path.join(base_dir, "models")
-            if os.path.exists(os.path.join(models_dir, f"{self.model_name}.onnx")):
-                os.environ["U2NET_HOME"] = models_dir
-                _logger.info("Found bundled %s at %s", self.model_name, models_dir)
+            candidate_paths = [
+                os.path.join(models_dir, f"{self.model_name}.onnx"),
+                os.path.join(os.getenv("U2NET_HOME", ""), f"{self.model_name}.onnx"),
+                os.path.expanduser(f"~/.u2net/{self.model_name}.onnx"),
+                f"/tmp/models/{self.model_name}.onnx",
+            ]
+            model_path = next((p for p in candidate_paths if p and os.path.exists(p)), None)
 
+            if not model_path:
+                # If not bundled locally, download u2netp weights to writable /tmp/models
+                import urllib.request
+                target_dir = os.getenv("U2NET_HOME") or "/tmp/models"
+                os.makedirs(target_dir, exist_ok=True)
+                model_path = os.path.join(target_dir, f"{self.model_name}.onnx")
+                url = f"https://github.com/danielgatis/rembg/releases/download/v0.0.0/{self.model_name}.onnx"
+                _logger.info("Downloading %s model to %s...", self.model_name, model_path)
+                urllib.request.urlretrieve(url, model_path)
+
+            _logger.info("Loading %s model from %s", self.model_name, model_path)
             sess_opts = ort.SessionOptions()
             sess_opts.enable_cpu_mem_arena = False
             sess_opts.inter_op_num_threads = 1
             sess_opts.intra_op_num_threads = 1
             sess_opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
 
-            _logger.info("Initializing rembg session [%s, cpu_arena=False, threads=1]", self.model_name)
-            self._session = rembg.new_session(self.model_name, sess_opts=sess_opts)
-            _logger.info("rembg session ready [%s]", self.model_name)
+            _logger.info("Initializing ONNX session [%s, cpu_arena=False, threads=1]", self.model_name)
+            self._session = ort.InferenceSession(
+                model_path,
+                sess_options=sess_opts,
+                providers=["CPUExecutionProvider"],
+            )
+            _logger.info("ONNX session ready [%s]", self.model_name)
         return self._session
 
     async def remove_background(
         self, image_data: bytes, width: int, height: int
     ) -> Dict[str, any]:
-        """Remove background from image using rembg.
+        """Remove background from image using native ONNX u2netp model.
 
         Args:
             image_data: Raw image bytes (RGB or RGBA)
@@ -108,7 +126,6 @@ class RembgBackgroundRemovalAdapter:
         try:
             # Resize image down to max 512 to bound memory strictly under Render 512MB limit
             def _process():
-                import rembg
                 session = self._get_session()
                 try:
                     pil_img = Image.open(BytesIO(image_data))
@@ -119,17 +136,44 @@ class RembgBackgroundRemovalAdapter:
                         new_w = max(1, int(orig_w * scale))
                         new_h = max(1, int(orig_h * scale))
                         pil_img = pil_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
-                        buf = BytesIO()
-                        pil_img.save(buf, format="PNG")
-                        proc_bytes = buf.getvalue()
-                    else:
-                        proc_bytes = image_data
                 except Exception:
-                    proc_bytes = image_data
+                    pil_img = Image.open(BytesIO(image_data))
 
-                result = rembg.remove(proc_bytes, session=session, alpha_matting=False)
+                rgb_img = pil_img.convert("RGB")
+                cur_w, cur_h = rgb_img.size
+
+                # 1. Normalize for u2netp (320x320, ImageNet mean/std)
+                in_resized = rgb_img.resize((320, 320), Image.Resampling.LANCZOS)
+                im_ary = np.array(in_resized, dtype=np.float32) / 255.0
+                mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+                std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+                norm_tensor = (im_ary - mean) / std
+                norm_tensor = np.expand_dims(norm_tensor.transpose((2, 0, 1)), 0).astype(np.float32)
+
+                # 2. Run ONNX inference
+                input_name = session.get_inputs()[0].name
+                ort_outs = session.run(None, {input_name: norm_tensor})
+                pred = ort_outs[0][:, 0, :, :]
+
+                # 3. Min-max normalization of saliency map
+                ma = float(np.max(pred))
+                mi = float(np.min(pred))
+                if ma > mi:
+                    pred = (pred - mi) / (ma - mi)
+                pred = np.squeeze(pred)
+
+                # 4. Generate alpha mask and resize to image dimensions
+                mask = Image.fromarray((pred * 255).astype(np.uint8), mode="L")
+                mask = mask.resize((cur_w, cur_h), Image.Resampling.LANCZOS)
+
+                # 5. Composite foreground with transparent background
+                empty = Image.new("RGBA", (cur_w, cur_h), (0, 0, 0, 0))
+                cutout = Image.composite(rgb_img.convert("RGBA"), empty, mask)
+
+                buf = BytesIO()
+                cutout.save(buf, format="PNG")
                 gc.collect()
-                return result
+                return buf.getvalue()
 
             foreground_rgba = await asyncio.get_event_loop().run_in_executor(
                 None, _process
@@ -278,44 +322,30 @@ class RembgBackgroundRemovalAdapter:
 
         # Check 4: Excessive internal holes
         # Count connected components of foreground minus the main component
-        # Simple approach: count zero-alpha "islands" surrounded by foreground
-        # This is a heuristic - count small foreground regions surrounded by transparent
         try:
-            from scipy import ndimage
+            import cv2
 
-            # Binary mask: 1 for foreground, 0 for background
             binary_mask = (alpha_channel > 0).astype(np.uint8)
+            num_labels, labeled_mask, stats, _ = cv2.connectedComponentsWithStats(
+                binary_mask, connectivity=8
+            )
 
-            # Label connected components (8-connectivity for foreground)
-            labeled_mask, num_components = ndimage.label(binary_mask)
-
-            if num_components > 1:
-                # There are multiple components; find sizes
-                component_sizes = [
-                    np.sum(labeled_mask == i) for i in range(1, num_components + 1)
-                ]
-                # Sort sizes descending
-                component_sizes.sort(reverse=True)
-
-                # If there are small components (beyond the largest = main product),
-                # they might be holes or noise
-                if len(component_sizes) > 1:
-                    main_component_size = component_sizes[0]
-                    # If second largest is >5% of main, might be legitimate second object
-                    # If much smaller, might be holes
-                    second_size = component_sizes[1]
-                    if second_size < main_component_size * 0.05:
-                        # Many tiny holes - check count
-                        small_holes = sum(
-                            1 for s in component_sizes[1:] if s < main_component_size * 0.01
+            # stats[:, cv2.CC_STAT_AREA] has area of each label (label 0 is background)
+            if num_labels > 2:  # at least 2 foreground components
+                areas = [int(stats[i, cv2.CC_STAT_AREA]) for i in range(1, num_labels)]
+                areas.sort(reverse=True)
+                main_component_size = areas[0]
+                second_size = areas[1]
+                if second_size < main_component_size * 0.05:
+                    small_holes = sum(
+                        1 for s in areas[1:] if s < main_component_size * 0.01
+                    )
+                    if small_holes > 20:
+                        warnings.append(
+                            "SUSPICIOUS: Excessive internal holes detected "
+                            f"({small_holes} small holes)"
                         )
-                        if small_holes > 20:
-                            warnings.append(
-                                "SUSPICIOUS: Excessive internal holes detected "
-                                f"({small_holes} small holes)"
-                            )
         except Exception:
-            # scipy not available - skip detailed hole analysis
             pass
 
         # Check 5: Nearly empty alpha mask
