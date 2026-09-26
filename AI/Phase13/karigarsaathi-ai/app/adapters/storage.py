@@ -327,10 +327,34 @@ class DurableJobRepository:
     async def get_artisan_quotas(self, artisan_id: str) -> dict[str, any]:
         return {}
 
+    SAFE_JOB_FIELDS = {
+        "job_id",
+        "request_id",
+        "artisan_id",
+        "product_id",
+        "status",
+        "original_image_reference",
+        "enhanced_image_reference",
+        "preview_image_reference",
+        "operations_requested",
+        "operations_applied",
+        "warnings",
+        "metrics",
+        "processing_duration_ms",
+        "retryable",
+        "failure_code",
+        "adapter_version",
+        "created_at",
+        "completed_at",
+        "updated_at",
+    }
+
     def _serialize_job(self, data: dict[str, Any]) -> dict[str, Any]:
         from datetime import datetime
         result = {}
         for k, v in data.items():
+            if k not in self.SAFE_JOB_FIELDS:
+                continue
             if hasattr(v, "name"):
                 result[k] = v.name.lower()
             elif isinstance(v, datetime):
@@ -372,6 +396,7 @@ class DurableJobRepository:
                 payload_bytes,
                 public_id=f"karigarsaathi/jobs/{safe_id}.json",
                 resource_type="raw",
+                type="authenticated",
                 overwrite=True,
                 cloud_name=self.cloudinary_adapter.cloud_name,
                 api_key=self.cloudinary_adapter.api_key,
@@ -386,9 +411,20 @@ class DurableJobRepository:
         try:
             import json
             import urllib.request
+            import cloudinary.utils
             safe_id = "".join(c for c in job_id if c.isalnum() or c in ("-", "_"))
-            url = f"https://res.cloudinary.com/{self.cloudinary_adapter.cloud_name}/raw/upload/karigarsaathi/jobs/{safe_id}.json"
-            req = urllib.request.Request(url, headers={"User-Agent": "KarigarSaathi/1.0"})
+            public_id = f"karigarsaathi/jobs/{safe_id}.json"
+            signed_url, _ = cloudinary.utils.cloudinary_url(
+                public_id,
+                resource_type="raw",
+                type="authenticated",
+                sign_url=True,
+                secure=True,
+                cloud_name=self.cloudinary_adapter.cloud_name,
+                api_key=self.cloudinary_adapter.api_key,
+                api_secret=self.cloudinary_adapter.api_secret,
+            )
+            req = urllib.request.Request(signed_url, headers={"User-Agent": "KarigarSaathi/1.0"})
             with urllib.request.urlopen(req, timeout=5) as resp:
                 if resp.status == 200:
                     return json.loads(resp.read().decode("utf-8"))

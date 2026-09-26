@@ -50,6 +50,11 @@ cloudinary_adapter = CloudinaryStorageAdapter(
     require_config=False,
 )
 
+
+def get_cloudinary_adapter() -> CloudinaryStorageAdapter:
+    """Return the active Cloudinary adapter instance."""
+    return cloudinary_adapter
+
 # Create adapter instances
 storage_adapter = DurableImageStorageAdapter(
     originals_dir=settings.originals_dir,
@@ -273,17 +278,102 @@ async def create_enhancement(
         file_bytes = await image.read()
     elif image_url:
         clean_url = str(image_url).strip()
-        if not (clean_url.startswith("http://") or clean_url.startswith("https://")):
+        import urllib.parse
+        import urllib.request
+        import re
+
+        try:
+            parsed = urllib.parse.urlparse(clean_url)
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={
                     "error_code": "INVALID_IMAGE_URL",
-                    "message": "image_url must be a valid http or https URL",
+                    "message": "image_url is not a valid URL",
                     "retryable": False,
                     "request_id": request_id,
                 },
             )
-        import urllib.request
+
+        if parsed.scheme not in ("http", "https"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error_code": "INVALID_IMAGE_URL",
+                    "message": "image_url scheme must be http or https",
+                    "retryable": False,
+                    "request_id": request_id,
+                },
+            )
+
+        # 5a. Verify host is trusted Cloudinary CDN
+        if parsed.netloc != "res.cloudinary.com":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error_code": "INVALID_IMAGE_SOURCE",
+                    "message": "Only verified Cloudinary asset URLs from res.cloudinary.com are accepted.",
+                    "retryable": False,
+                    "request_id": request_id,
+                },
+            )
+
+        # 5b. Verify asset belongs to this Cloudinary cloud name (if configured)
+        adapter = get_cloudinary_adapter()
+        if adapter and getattr(adapter, "cloud_name", None):
+            if not parsed.path.startswith(f"/{adapter.cloud_name}/"):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "error_code": "INVALID_IMAGE_SOURCE",
+                        "message": "image_url does not belong to the authorized Cloudinary account.",
+                        "retryable": False,
+                        "request_id": request_id,
+                    },
+                )
+
+        # 5c. Verify URL belongs to KarigarSaathi product namespace and matches the product_id
+        if "/products/" in parsed.path:
+            expected_prefix = f"karigarsaathi/products/{product_id}/"
+            if expected_prefix not in parsed.path:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "error_code": "INVALID_IMAGE_URL",
+                        "message": f"image_url does not belong to product '{product_id}'",
+                        "retryable": False,
+                        "request_id": request_id,
+                    },
+                )
+        elif "karigarsaathi/" not in parsed.path:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error_code": "INVALID_IMAGE_URL",
+                    "message": "image_url must belong to the karigarsaathi namespace",
+                    "retryable": False,
+                    "request_id": request_id,
+                },
+            )
+
+        # 5d. Verify asset exists in Cloudinary and is within security bounds (<=10MB, image MIME)
+        match = re.search(r'/image/upload/(?:v\d+/)?(karigarsaathi/[^.]+)', clean_url)
+        if match and adapter and getattr(adapter, "is_configured", False):
+            public_id = match.group(1)
+            try:
+                await adapter.verify_asset(public_id)
+            except Exception as v_err:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "error_code": "UNVERIFIED_IMAGE_ASSET",
+                        "message": f"Asset verification failed on Cloudinary: {v_err}",
+                        "retryable": False,
+                        "request_id": request_id,
+                    },
+                )
+
+        # 5e. Safely download asset within memory/size bounds
         req = urllib.request.Request(clean_url, headers={"User-Agent": "KarigarSaathi-AI/1.0"})
         try:
             with urllib.request.urlopen(req, timeout=20) as resp:

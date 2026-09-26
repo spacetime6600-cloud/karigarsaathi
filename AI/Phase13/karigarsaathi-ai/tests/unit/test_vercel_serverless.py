@@ -267,7 +267,13 @@ def test_enhancement_accepts_durable_image_url(client):
     """Verify that /v1/enhancements accepts an image_url (<1KB request body) for direct-uploaded photos."""
     valid_jpeg = create_test_jpeg((300, 300), color="green")
 
-    with patch("urllib.request.urlopen") as mock_urlopen:
+    with patch("urllib.request.urlopen") as mock_urlopen, \
+         patch("app.api.routes.get_cloudinary_adapter") as mock_get_adapter:
+        mock_adapter = MagicMock()
+        mock_adapter.cloud_name = "skq4sow9"
+        mock_adapter.is_configured = False  # Skip live API verification in mock test
+        mock_get_adapter.return_value = mock_adapter
+
         mock_resp = MagicMock()
         mock_resp.read.return_value = valid_jpeg
         mock_urlopen.return_value.__enter__.return_value = mock_resp
@@ -280,7 +286,7 @@ def test_enhancement_accepts_durable_image_url(client):
                 "request_id": "req_via_url",
                 "product_id": "prod_url",
                 "artisan_id": "artisan_url",
-                "image_url": "https://res.cloudinary.com/skq4sow9/image/upload/v1/original.jpg",
+                "image_url": "https://res.cloudinary.com/skq4sow9/image/upload/v1/karigarsaathi/products/prod_url/img_1/original.jpg",
                 "operations": json.dumps(["lighting_correction", "standard_resize"]),
             },
         )
@@ -290,6 +296,99 @@ def test_enhancement_accepts_durable_image_url(client):
         assert data["product_id"] == "prod_url"
         assert data["artisan_id"] == "artisan_url"
         assert data["status"] in ("succeeded", "succeeded_with_warnings")
+
+
+def test_enhancement_rejects_unverified_image_url_domain(client):
+    """Verify that /v1/enhancements rejects non-Cloudinary image_url to prevent SSRF."""
+    response = client.post(
+        "/v1/enhancements",
+        headers={"Authorization": "Bearer dev-token-artisan_url"},
+        data={
+            "consent_granted": "true",
+            "request_id": "req_ssrf_attempt",
+            "product_id": "prod_url",
+            "artisan_id": "artisan_url",
+            "image_url": "https://malicious-external-site.com/exploit.jpg",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"]["error_code"] == "INVALID_IMAGE_SOURCE"
+
+
+def test_enhancement_rejects_image_url_for_different_product(client):
+    """Verify that /v1/enhancements rejects an image_url referencing a different product."""
+    response = client.post(
+        "/v1/enhancements",
+        headers={"Authorization": "Bearer dev-token-artisan_url"},
+        data={
+            "consent_granted": "true",
+            "request_id": "req_mismatched_prod",
+            "product_id": "prod_expected",
+            "artisan_id": "artisan_url",
+            "image_url": "https://res.cloudinary.com/skq4sow9/image/upload/v1/karigarsaathi/products/prod_attacker/img_1/original.jpg",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"]["error_code"] == "INVALID_IMAGE_URL"
+    assert "does not belong to product" in response.json()["detail"]["message"]
+
+
+@pytest.mark.asyncio
+async def test_stored_job_json_authenticated_and_sanitized(tmp_path):
+    """Verify DurableJobRepository uploads with type='authenticated' and strips sensitive fields."""
+    mock_adapter = MagicMock()
+    mock_adapter.is_configured = True
+    mock_adapter.cloud_name = "test_cloud"
+    mock_adapter.api_key = "test_key"
+    mock_adapter.api_secret = "test_secret"
+
+    repo = DurableJobRepository(jobs_dir=str(tmp_path / "jobs"), cloudinary_adapter=mock_adapter)
+
+    with patch("cloudinary.uploader.upload") as mock_upload, \
+         patch("cloudinary.utils.cloudinary_url") as mock_cloud_url, \
+         patch("urllib.request.urlopen") as mock_urlopen:
+
+        mock_cloud_url.return_value = ("https://signed.cloudinary.com/test.json", {})
+
+        # Test job creation & update with sensitive metadata
+        sensitive_job_data = {
+            "job_id": "job_priv_123",
+            "artisan_id": "art_1",
+            "product_id": "prod_1",
+            "status": JobState.SUCCEEDED,
+            "secret_bearer_token": "super-secret-token",
+            "internal_server_path": "/var/secrets/app.key",
+            "user_password_hash": "hash123",
+        }
+
+        serialized = repo._serialize_job(sensitive_job_data)
+        assert "secret_bearer_token" not in serialized
+        assert "internal_server_path" not in serialized
+        assert "user_password_hash" not in serialized
+        assert serialized["artisan_id"] == "art_1"
+        assert serialized["job_id"] == "job_priv_123"
+
+        # Verify upload call uses type="authenticated"
+        await repo._save_to_cloudinary("job_priv_123", serialized)
+        mock_upload.assert_called_once()
+        call_kwargs = mock_upload.call_args[1]
+        assert call_kwargs["resource_type"] == "raw"
+        assert call_kwargs["type"] == "authenticated"
+        assert call_kwargs["public_id"] == "karigarsaathi/jobs/job_priv_123.json"
+
+        # Verify retrieval generates signed URL
+        mock_resp = MagicMock()
+        mock_resp.status = 200
+        mock_resp.read.return_value = json.dumps(serialized).encode("utf-8")
+        mock_urlopen.return_value.__enter__.return_value = mock_resp
+
+        loaded = await repo._load_from_cloudinary("job_priv_123")
+        assert loaded is not None
+        assert loaded["job_id"] == "job_priv_123"
+        mock_cloud_url.assert_called_once()
+        url_kwargs = mock_cloud_url.call_args[1]
+        assert url_kwargs["type"] == "authenticated"
+        assert url_kwargs["sign_url"] is True
 
 
 # --------------------------------------------------------------------------

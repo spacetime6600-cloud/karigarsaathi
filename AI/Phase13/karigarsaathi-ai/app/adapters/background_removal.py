@@ -38,6 +38,8 @@ class RembgBackgroundRemovalAdapter:
         models_dir = os.path.join(base_dir, "models")
         if os.path.exists(os.path.join(models_dir, f"{self.model_name}.onnx")):
             os.environ.setdefault("U2NET_HOME", models_dir)
+        else:
+            os.environ.setdefault("U2NET_HOME", "/tmp/models")
 
     @property
     def is_model_ready(self) -> bool:
