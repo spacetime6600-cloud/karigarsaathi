@@ -16,4 +16,7 @@ if os.getenv("VERCEL"):
     os.environ.setdefault("PREVIEWS_DIR", "/tmp/storage/previews")
     os.environ.setdefault("JOBS_DIR", "/tmp/storage/jobs")
 
-from app.main import app
+from app.main import app, VercelPathFixMiddleware
+
+# Handler alias for serverless runtimes
+handler = app

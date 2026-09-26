@@ -406,3 +406,92 @@ def test_enhanced_image_retrieval_redirects_to_durable_url(client):
         response = client.get("/v1/enhancements/job_durable_cdn/enhanced", follow_redirects=False)
         assert response.status_code == 307
         assert response.headers["location"] == "https://res.cloudinary.com/skq4sow9/image/upload/v12345/enhanced.png"
+
+
+# --------------------------------------------------------------------------
+# 6. Vercel Serverless Function Routing & Rewrite Resiliency
+# --------------------------------------------------------------------------
+
+def test_direct_routes_accessible(client):
+    """Verify /health, /api/health, /openapi.json, /, and /api direct routes return 200 OK."""
+    # /health
+    r_health = client.get("/health")
+    assert r_health.status_code == 200
+    assert r_health.json()["status"] == "healthy"
+    assert "KarigarSaathi" in r_health.json()["service"]
+
+    # /api/health
+    r_api_health = client.get("/api/health")
+    assert r_api_health.status_code == 200
+    assert r_api_health.json()["status"] == "healthy"
+
+    # /
+    r_root = client.get("/")
+    assert r_root.status_code == 200
+    assert r_root.json()["status"] == "running"
+
+    # /api
+    r_api = client.get("/api")
+    assert r_api.status_code == 200
+    assert r_api.json()["status"] == "running"
+
+    # /openapi.json
+    r_openapi = client.get("/openapi.json")
+    assert r_openapi.status_code == 200
+    assert "paths" in r_openapi.json()
+
+
+def test_vercel_rewrite_with_matched_path_header(client):
+    """Verify requests rewritten to /api/index.py with x-matched-path header resolve correctly."""
+    # /health via rewrite
+    r_health = client.get("/api/index.py", headers={"x-matched-path": "/health"})
+    assert r_health.status_code == 200
+    assert r_health.json()["status"] == "healthy"
+
+    # /api/health via rewrite
+    r_api_health = client.get("/api/index.py", headers={"x-matched-path": "/api/health"})
+    assert r_api_health.status_code == 200
+    assert r_api_health.json()["status"] == "healthy"
+
+    # / via rewrite
+    r_root = client.get("/api/index.py", headers={"x-matched-path": "/"})
+    assert r_root.status_code == 200
+    assert r_root.json()["status"] == "running"
+
+    # /openapi.json via rewrite
+    r_openapi = client.get("/api/index.py", headers={"x-matched-path": "/openapi.json"})
+    assert r_openapi.status_code == 200
+    assert "paths" in r_openapi.json()
+
+    # /v1/enhancements via rewrite
+    r_enh = client.get("/api/index.py", headers={"x-matched-path": "/v1/enhancements"})
+    assert r_enh.status_code == 200
+    assert r_enh.json()["service"] == "KarigarSaathi AI Image Studio"
+
+
+def test_vercel_rewrite_with_query_param_fallback(client):
+    """Verify requests rewritten to /api/index.py?__path=... resolve when headers are absent."""
+    r_health = client.get("/api/index.py?__path=/health")
+    assert r_health.status_code == 200
+    assert r_health.json()["status"] == "healthy"
+
+    r_openapi = client.get("/api/index.py?__path=/openapi.json")
+    assert r_openapi.status_code == 200
+    assert "paths" in r_openapi.json()
+
+    r_root = client.get("/api/index.py?__path=/")
+    assert r_root.status_code == 200
+    assert r_root.json()["status"] == "running"
+
+
+def test_vercel_rewrite_prefixed_routes_and_entrypoint_fallback(client):
+    """Verify /api/v1/... prefix stripping and raw entrypoint invocation."""
+    # Strip /api prefix for /v1 routes
+    r_prefix = client.get("/api/v1/enhancements")
+    assert r_prefix.status_code == 200
+    assert r_prefix.json()["service"] == "KarigarSaathi AI Image Studio"
+
+    # Raw entrypoint invocation without headers defaults to root rather than 404
+    r_raw = client.get("/api/index.py")
+    assert r_raw.status_code == 200
+    assert r_raw.json()["status"] == "running"

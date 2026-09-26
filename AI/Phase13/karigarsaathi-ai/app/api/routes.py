@@ -158,6 +158,7 @@ class JobResult(BaseModel):
     completed_at: Optional[str] = None
 
 
+@router.get("", response_model=HealthResponse, include_in_schema=False)
 @router.get("/", response_model=HealthResponse, include_in_schema=False)
 async def health_check():
     """Health check endpoint.

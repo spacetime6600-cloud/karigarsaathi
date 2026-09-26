@@ -5,12 +5,17 @@
       "maxDuration": 300,
       "includeFiles": "models/**",
       "excludeFiles": "{tests/**,evaluation/**,storage/**}"
+    },
+    "app/main.py": {
+      "maxDuration": 300,
+      "includeFiles": "models/**",
+      "excludeFiles": "{tests/**,evaluation/**,storage/**}"
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api/index.py?__path=/$1"
     }
   ]
 }
