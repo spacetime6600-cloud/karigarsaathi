@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ROUTES, getSafeReturnUrl } from '@/routes';
@@ -44,18 +44,6 @@ export const CoordinatorLoginPage: React.FC = () => {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
-
-  // Role validation: If already authenticated
-  useEffect(() => {
-    if (isAuthenticated && !authLoading) {
-      const activeRole = userAccount?.role || user?.role;
-      const userIdentifier = userAccount?.email || userAccount?.uid || user?.id;
-      if (activeRole === 'coordinator' && coordinatorApprovalService.isApproved(userIdentifier)) {
-        const target = getSafeReturnUrl(rawReturnUrl, ROUTES.COORDINATOR_DASHBOARD);
-        navigate(target, { replace: true });
-      }
-    }
-  }, [isAuthenticated, authLoading, user?.role, user?.id, userAccount?.role, userAccount?.email, userAccount?.uid, rawReturnUrl, navigate]);
 
   const handleCoordinatorSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,6 +248,22 @@ export const CoordinatorLoginPage: React.FC = () => {
                 Enter your authorized credentials to access regional artisan assistance and review queues.
               </p>
             </div>
+
+            {/* If Coordinator is already logged in */}
+            {isAuthenticated && userAccount?.role === 'coordinator' && (
+              <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                <div className="flex items-center gap-2 text-emerald-950 font-medium">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Signed in as Coordinator: <strong>{userAccount?.displayName || user?.name || 'Coordinator Lead'}</strong></span>
+                </div>
+                <Link
+                  to={ROUTES.COORDINATOR_DASHBOARD}
+                  className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto"
+                >
+                  Go to Coordinator Hub →
+                </Link>
+              </div>
+            )}
 
             {/* If Artisan is logged in, show clear role conflict warning */}
             {isArtisanLoggedIn && (

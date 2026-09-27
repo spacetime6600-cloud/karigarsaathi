@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 import { ROUTES, getSafeReturnUrl } from '@/routes';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck, UserCheck } from 'lucide-react';
 
 export const SignInPage: React.FC = () => {
   const { signInWithEmail, registerArtisan, isAuthenticated, isLoading: authLoading, user, userAccount } = useAuth();
@@ -26,17 +26,6 @@ export const SignInPage: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // If already authenticated, redirect to target or appropriate dashboard
-  useEffect(() => {
-    if (isAuthenticated && !authLoading) {
-      const userRole = userAccount?.role || user?.role;
-      if (!userRole) return;
-      const defaultDest = userRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
-      const target = getSafeReturnUrl(rawReturnUrl, defaultDest);
-      navigate(target, { replace: true });
-    }
-  }, [isAuthenticated, authLoading, user?.role, userAccount?.role, rawReturnUrl, navigate]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +84,22 @@ export const SignInPage: React.FC = () => {
               : t('auth.emailSubtitle')}
           </p>
         </div>
+
+        {/* Active Session Notice with Quick Link */}
+        {isAuthenticated && (
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+            <div className="flex items-center gap-2 text-emerald-950 font-medium">
+              <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Signed in as: <strong>{userAccount?.displayName || user?.name || 'Active User'}</strong></span>
+            </div>
+            <Link
+              to={userAccount?.role === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto"
+            >
+              Go to Workspace →
+            </Link>
+          </div>
+        )}
 
         {/* Mode Selector: 2 Equal Width Centered Tabs */}
         <div className="grid grid-cols-2 gap-1.5 p-1 bg-surface-container rounded-lg text-xs font-bold">
