@@ -181,8 +181,9 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
       isOpen={isOpen}
       onClose={step === 'PROCESSING' ? handleCancelProcessing : onClose}
       title="AI Image Studio — Photograph Enhancement"
+      maxWidth="2xl"
     >
-      <div className="flex flex-col gap-5 text-primary max-w-2xl">
+      <div className="flex flex-col gap-4 sm:gap-5 text-primary w-full min-w-0">
         {/* Step 1: Consent & Rationale */}
         {step === 'CONSENT' && (
           <div className="flex flex-col gap-4">
@@ -194,7 +195,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
             </div>
 
             {/* Preview of Original Photo */}
-            <div className="relative w-full h-56 rounded-xl overflow-hidden bg-slate-900 border border-surface-variant flex items-center justify-center">
+            <div className="relative w-full h-44 sm:h-56 rounded-xl overflow-hidden bg-slate-900 border border-surface-variant flex items-center justify-center">
               <img
                 src={photoItem.rawOriginalUrl || photoItem.url}
                 alt="Selected craft photo"
@@ -307,8 +308,8 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
             )}
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-variant">
-              <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-2 pt-2 border-t border-surface-variant">
+              <Button variant="ghost" size="sm" onClick={onClose} className="w-full sm:w-auto text-xs">
                 Continue with Original
               </Button>
 
@@ -318,7 +319,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                 onClick={() => handleStartEnhancement()}
                 disabled={!isAiEnabled || !isOnline || !consentGranted}
                 leftIcon={<Sparkles className="w-4 h-4" />}
-                className="text-xs font-bold"
+                className="w-full sm:w-auto text-xs font-bold"
               >
                 {enhancementMode === 'basic' ? 'Apply Basic Enhancement' : 'Enhance with AI'}
               </Button>
@@ -384,24 +385,24 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
             />
 
             {/* Decision Actions */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-surface-variant flex-wrap">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-3 border-t border-surface-variant">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleReject}
                 leftIcon={<X className="w-3.5 h-3.5" />}
-                className="text-xs text-on-surface-variant hover:text-error"
+                className="w-full sm:w-auto text-xs text-on-surface-variant hover:text-error order-3 sm:order-1"
               >
                 Decline & Use Original
               </Button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto order-1 sm:order-2">
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => handleStartEnhancement()}
                   leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                  className="text-xs"
+                  className="w-full sm:w-auto text-xs"
                 >
                   Retry
                 </Button>
@@ -411,7 +412,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                   size="sm"
                   onClick={handleApprove}
                   leftIcon={<Check className="w-3.5 h-3.5" />}
-                  className="text-xs font-bold"
+                  className="w-full sm:w-auto text-xs font-bold"
                 >
                   Approve Enhanced Image
                 </Button>
@@ -436,8 +437,8 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
               <span>Your authentic original photo remains 100% intact and ready for use.</span>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-variant flex-wrap">
-              <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-2 pt-2 border-t border-surface-variant">
+              <Button variant="ghost" size="sm" onClick={onClose} className="w-full sm:w-auto text-xs">
                 Continue with Original Photo
               </Button>
 
@@ -450,7 +451,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                     handleStartEnhancement('basic');
                   }}
                   leftIcon={<ShieldCheck className="w-3.5 h-3.5" />}
-                  className="text-xs font-semibold"
+                  className="w-full sm:w-auto text-xs font-semibold"
                 >
                   Try Basic Enhancement (Lightweight)
                 </Button>
@@ -462,7 +463,7 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                   size="sm"
                   onClick={() => handleStartEnhancement()}
                   leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                  className="text-xs font-bold"
+                  className="w-full sm:w-auto text-xs font-bold"
                 >
                   Retry Enhancement
                 </Button>

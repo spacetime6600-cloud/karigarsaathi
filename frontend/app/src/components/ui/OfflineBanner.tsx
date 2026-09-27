@@ -1,10 +1,9 @@
 import React from 'react';
 import { useSync } from '@/app/providers/SyncProvider';
 import { WifiOff, HardDrive, RefreshCw, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export const OfflineBanner: React.FC = () => {
-  const { syncState, totalPending, failedCount, isOnline, triggerSync, retryFailed } = useSync();
+  const { syncState, totalPending, failedCount, isOnline, triggerSync, retryFailed, clearFailed } = useSync();
 
   if (syncState === 'saved' && isOnline) return null;
 
@@ -32,29 +31,32 @@ export const OfflineBanner: React.FC = () => {
 
       <div className="flex items-center gap-3">
         {syncState === 'failed' && (
-          <button
-            type="button"
-            onClick={() => retryFailed()}
-            className="inline-flex items-center gap-1 font-bold text-error hover:underline"
-          >
-            <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => retryFailed()}
+              className="inline-flex items-center gap-1 font-bold text-error hover:underline cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
+            </button>
+            <button
+              type="button"
+              onClick={() => clearFailed()}
+              className="inline-flex items-center gap-1 font-semibold text-on-surface-variant hover:text-error hover:underline text-xs cursor-pointer ml-1"
+            >
+              Dismiss
+            </button>
+          </div>
         )}
         {syncState === 'pending' && isOnline && (
           <button
             type="button"
             onClick={triggerSync}
-            className="inline-flex items-center gap-1 font-bold text-secondary hover:underline"
+            className="inline-flex items-center gap-1 font-bold text-secondary hover:underline cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Sync Now
           </button>
         )}
-        <Link
-          to="/dev/states"
-          className="text-on-surface-variant hover:text-primary underline text-[11px]"
-        >
-          Recovery States Sandbox
-        </Link>
       </div>
     </aside>
   );

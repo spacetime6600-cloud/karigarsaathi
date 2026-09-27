@@ -154,16 +154,16 @@ export const ReviewFactsPage: React.FC = () => {
             {activeErrors.map((err, idx) => (
               <li
                 key={idx}
-                className="flex items-center justify-between gap-3 text-xs bg-white/70 p-2.5 rounded-xl border border-error/15"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs bg-white/70 p-2.5 rounded-xl border border-error/15"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2 h-2 rounded-full bg-error shrink-0" />
                   <span className="font-medium text-primary">{err.message}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigate(err.stepUrl)}
-                  className="font-bold text-xs text-secondary hover:text-primary flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg bg-surface hover:bg-surface-variant transition-colors"
+                  className="font-bold text-xs text-secondary hover:text-primary flex items-center gap-1 shrink-0 self-end sm:self-auto px-2.5 py-1 rounded-lg bg-surface hover:bg-surface-variant transition-colors"
                 >
                   <span>Fix in {err.stepName}</span>
                   <ExternalLink className="w-3 h-3" />
@@ -545,7 +545,7 @@ export const ReviewFactsPage: React.FC = () => {
               {/* 10. Image Upload Status */}
               <li className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 text-primary">
-                  {draft.images && draft.images.length > 0 && draft.images.every((img) => img.uploadStatus === 'completed') ? (
+                  {draft.images && draft.images.length > 0 && draft.images.every((img) => img.uploadStatus === 'completed' || img.enhancement?.approvalStatus === 'approved') ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                   ) : (
                     <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />

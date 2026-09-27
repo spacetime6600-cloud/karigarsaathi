@@ -9,6 +9,7 @@ describe('Vercel Direct Media Upload Flow Suite', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.stubEnv('VITE_MEDIA_STORAGE_PROVIDER', 'cloudinary');
 
     // Mock URL object URLs for jsdom
     globalThis.URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-preview-url');

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Shield, Trash2, Wifi, WifiOff, ExternalLink } from 'lucide-react';
 
+import { storageUploadQueue } from '@/services/storage/storageUploadQueue';
+
 export const DevStatesPage: React.FC = () => {
   const { user, switchRole } = useAuth();
   const { isOnline, toggleSimulatedOffline } = useSync();
@@ -29,11 +31,19 @@ export const DevStatesPage: React.FC = () => {
     localStorage.setItem(storageKey, String(nextVal));
   };
 
-  const handleResetAllData = () => {
+  const handleResetAllData = async () => {
     storage.clearAll();
     localStorage.clear();
     resetDraft();
-    alert('All local demo storage and test state flags have been cleared.');
+    try {
+      await storageUploadQueue.clearFailed();
+      if (user?.id) {
+        await storageUploadQueue.clearCompleted(user.id);
+      }
+    } catch {
+      // ignore
+    }
+    alert('All local demo storage, upload queues, and test state flags have been cleared.');
     window.location.reload();
   };
 

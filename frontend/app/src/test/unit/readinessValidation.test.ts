@@ -105,6 +105,34 @@ describe('Phase 9 Final Listing-Readiness Validation Gate (10-Point Checklist)',
     expect(result.errors.some((e) => e.field === 'imageUploadStatus')).toBe(true);
   });
 
+  it('4b. Passes when an image has an approved AI enhancement even if initial upload status was pending/failed', () => {
+    const draft: ProductDraft = {
+      ...completeValidDraft,
+      images: [
+        {
+          id: 'img_enhanced',
+          originalPath: '',
+          displayPath: '',
+          fileName: 'enhanced.jpg',
+          contentType: 'image/jpeg',
+          originalSize: 500,
+          displaySize: 500,
+          uploadStatus: 'pending',
+          enhancement: {
+            status: 'succeeded',
+            approvalStatus: 'approved',
+            selectedVariant: 'enhanced',
+            enhancedDownloadURL: 'https://example.com/enhanced.jpg',
+          },
+          createdAt: '2026-08-27T10:00:00.000Z',
+        },
+      ],
+    };
+    const result = validateProductForReadiness(draft);
+    expect(result.isReady).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
   it('5. Fails when title is missing or whitespace only', () => {
     const draft = { ...completeValidDraft, title: '   ' };
     const result = validateProductForReadiness(draft);

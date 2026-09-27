@@ -24,6 +24,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
     triggerSync,
     retryFailed,
     cancelUpload,
+    clearFailed,
     toggleSimulatedOffline,
   } = useSync();
 
@@ -193,14 +194,24 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
           {/* Actions */}
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant">
             {failedCount > 0 && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => retryFailed()}
-                className="text-xs"
-              >
-                Retry All Failed
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => clearFailed()}
+                  className="text-xs text-error hover:bg-error-container/50"
+                >
+                  Clear Failed
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => retryFailed()}
+                  className="text-xs"
+                >
+                  Retry All Failed
+                </Button>
+              </>
             )}
             <Button
               variant="primary"

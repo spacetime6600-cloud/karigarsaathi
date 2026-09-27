@@ -130,26 +130,26 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={title ? 'modal-title' : undefined}
       aria-describedby={description ? 'modal-description' : undefined}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-primary/60 backdrop-blur-xs motion-fade-enter"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 md:p-6 bg-primary/60 backdrop-blur-xs motion-fade-enter overflow-y-auto"
     >
       <div
         ref={modalRef}
         tabIndex={-1}
         className={clsx(
-          'w-full max-h-[92vh] sm:max-h-[88vh] flex flex-col bg-surface-container-lowest rounded-2xl card-shadow-2 border border-surface-variant relative motion-dialog-enter focus:outline-none overflow-hidden',
+          'w-full max-h-[92dvh] sm:max-h-[88vh] flex flex-col bg-surface-container-lowest rounded-2xl card-shadow-2 border border-surface-variant relative motion-dialog-enter focus:outline-none overflow-hidden my-auto',
           maxWidths[maxWidth]
         )}
       >
         {(title || description || showCloseButton) && (
-          <div className="shrink-0 px-5 sm:px-6 pt-5 pb-3.5 border-b border-surface-variant/40 flex items-start justify-between gap-4 bg-surface-container-lowest">
-            <div>
+          <div className="shrink-0 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-3.5 border-b border-surface-variant/40 flex items-start justify-between gap-3 bg-surface-container-lowest">
+            <div className="min-w-0 pr-2">
               {title && (
-                <h2 id="modal-title" className="font-headline-lg text-lg sm:text-xl font-bold text-primary">
+                <h2 id="modal-title" className="font-headline-lg text-base sm:text-lg md:text-xl font-bold text-primary leading-snug">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id="modal-description" className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                <p id="modal-description" className="text-xs sm:text-sm text-on-surface-variant mt-0.5 leading-normal">
                   {description}
                 </p>
               )}
@@ -168,7 +168,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 sm:py-5 overscroll-contain flex flex-col gap-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-3.5 sm:py-5 overscroll-contain flex flex-col gap-4">
           {children}
         </div>
       </div>

@@ -105,8 +105,7 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearFailed = async () => {
-    if (!user?.id) return;
-    await storageUploadQueue.clearFailed(user.id);
+    await storageUploadQueue.clearFailed(user?.id);
     await refreshState();
   };
 

@@ -329,7 +329,7 @@ export const AddPhotographsPage: React.FC = () => {
                   )}
 
                   {/* Actions: AI Enhance and Crop & Adjust */}
-                  <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10">
+                  <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10 flex-wrap justify-end max-w-[calc(100%-24px)]">
                     <button
                       type="button"
                       onClick={() => setAiEnhancingPhotoIndex(draft.coverPhotoIndex || 0)}
@@ -583,7 +583,7 @@ export const AddPhotographsPage: React.FC = () => {
             {/* Aspect Ratio Options */}
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Framing Aspect Ratio</span>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   { id: '1:1', label: '1:1 Square' },
                   { id: '4:3', label: '4:3 Landscape' },
@@ -625,12 +625,12 @@ export const AddPhotographsPage: React.FC = () => {
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-surface-variant/70">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2 pt-2 border-t border-surface-variant/70">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCroppingPhotoIndex(null)}
-                className="text-xs"
+                className="w-full sm:w-auto text-xs"
               >
                 Cancel
               </Button>
@@ -640,7 +640,7 @@ export const AddPhotographsPage: React.FC = () => {
                 onClick={handleApplyCrop}
                 isLoading={isApplyingCrop}
                 leftIcon={<Check className="w-3.5 h-3.5" />}
-                className="text-xs font-bold"
+                className="w-full sm:w-auto text-xs font-bold"
               >
                 Apply Crop & Update
               </Button>

@@ -71,20 +71,21 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
     <div className={clsx('flex flex-col gap-4', className)}>
       {/* View Mode Toggle Controls */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 p-1 bg-surface-container-high rounded-xl border border-surface-variant">
+        <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-1.5 p-1 bg-surface-container-high rounded-xl border border-surface-variant w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setViewMode('original')}
             aria-pressed={viewMode === 'original'}
             className={clsx(
-              'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 touch-target',
+              'px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 touch-target',
               viewMode === 'original'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-primary hover:bg-surface'
             )}
           >
-            <ImageIcon className="w-3.5 h-3.5" />
-            <span>Original Only</span>
+            <ImageIcon className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden xs:inline sm:inline">Original Only</span>
+            <span className="xs:hidden sm:hidden">Original</span>
           </button>
 
           <button
@@ -92,14 +93,15 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
             onClick={() => setViewMode('split')}
             aria-pressed={viewMode === 'split'}
             className={clsx(
-              'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 touch-target',
+              'px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 touch-target',
               viewMode === 'split'
                 ? 'bg-secondary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-primary hover:bg-surface'
             )}
           >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>Split Comparison</span>
+            <Sliders className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden xs:inline sm:inline">Split Comparison</span>
+            <span className="xs:hidden sm:hidden">Split</span>
           </button>
 
           <button
@@ -107,14 +109,15 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
             onClick={() => setViewMode('enhanced')}
             aria-pressed={viewMode === 'enhanced'}
             className={clsx(
-              'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 touch-target',
+              'px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 touch-target',
               viewMode === 'enhanced'
                 ? 'bg-primary text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-primary hover:bg-surface'
             )}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Enhanced Only</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            <span className="hidden xs:inline sm:inline">Enhanced Only</span>
+            <span className="xs:hidden sm:hidden">Enhanced</span>
           </button>
         </div>
 
@@ -132,7 +135,7 @@ export const ImageComparisonViewer: React.FC<ImageComparisonViewerProps> = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onTouchMove={handleTouchMove}
-        className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-slate-900 border border-surface-variant select-none cursor-ew-resize shadow-inner"
+        className="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden bg-slate-900 border border-surface-variant select-none cursor-ew-resize shadow-inner"
         tabIndex={viewMode === 'split' ? 0 : undefined}
         onKeyDown={handleKeyDown}
         role={viewMode === 'split' ? 'slider' : 'region'}
