@@ -87,7 +87,12 @@ class MediaStorageService {
    */
   public getBackendBaseUrl(): string {
     const configured = import.meta.env.VITE_AI_SERVICE_URL;
-    if (configured) return configured;
+    if (configured) {
+      if (configured.includes('karigarsaathi-ai-image.onrender.com')) {
+        return 'https://karigarsaathi-ibof-three.vercel.app';
+      }
+      return configured;
+    }
 
     if (typeof window !== 'undefined' && window.location) {
       const hostname = window.location.hostname;
@@ -115,11 +120,18 @@ class MediaStorageService {
 
   /**
    * Check if direct-to-Cloudinary upload is enabled.
-   * Disabled by default to keep live production traffic on Render proxy.
+   * Auto-enables on Vercel backend to respect serverless 4.5MB payload limits.
    */
   public isDirectUploadEnabled(): boolean {
     const flag = import.meta.env.VITE_DIRECT_MEDIA_UPLOAD;
-    return flag === 'true' || flag === true;
+    if (flag !== undefined && flag !== '') {
+      return flag === 'true' || flag === true;
+    }
+    const baseUrl = this.getBackendBaseUrl();
+    if (baseUrl.includes('vercel.app')) {
+      return true;
+    }
+    return false;
   }
 
   /**

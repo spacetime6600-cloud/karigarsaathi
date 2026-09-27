@@ -95,7 +95,12 @@ class AIEnhancementService {
    */
   public getServiceBaseUrl(): string {
     const configuredUrl = import.meta.env.VITE_AI_SERVICE_URL;
-    if (configuredUrl) return configuredUrl;
+    if (configuredUrl) {
+      if (configuredUrl.includes('karigarsaathi-ai-image.onrender.com')) {
+        return 'https://karigarsaathi-ibof-three.vercel.app';
+      }
+      return configuredUrl;
+    }
 
     // Dynamically resolve hostname for remote clients (e.g. 10.5.0.2:3001 -> 10.5.0.2:8000)
     if (typeof window !== 'undefined' && window.location) {
