@@ -1,8 +1,9 @@
 /**
- * KarigarSaathi â€” Voice and Multilingual Auto-Catalogue Service Layer
- * Typed client integration for the Python FastAPI Voice & Multilingual Auto-Catalogue microservice (:8001).
- * Supports speech recording, Faster Whisper transcription, transcript correction,
- * zero-hallucination fact extraction, bilingual catalogue generation, and privacy deletion.
+ * KarigarSaathi — Voice and Multilingual Auto-Catalogue Service Layer
+ * Typed client integration for the Python FastAPI Voice & Multilingual Auto-Catalogue microservice.
+ * Powered by Sarvam AI (Saaras STT & Mayura Translation).
+ * Supports speech recording, transcript review/correction, zero-hallucination fact extraction,
+ * bilingual catalogue generation, and privacy deletion.
  */
 
 import { auth } from '@/config/firebase';
@@ -16,7 +17,8 @@ export interface VoiceHealthResponse {
   status: string;
   service: string;
   model_ready: boolean;
-  whisper_model?: string;
+  speech_engine?: string;
+  speech_model?: string;
   supported_languages?: string[];
 }
 
@@ -70,8 +72,9 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Resolves the host base URL for the Voice Auto-Catalogue microservice (port 8001).
-   * Automatically adapts localhost -> current hostname when accessing over LAN.
+   * Resolves the host base URL for the Voice Auto-Catalogue backend.
+   * In production (Vercel or any non-localhost host), strictly uses the public HTTPS backend.
+   * In local development, defaults to port 8001 on localhost.
    */
   public getHostBaseUrl(): string {
     const configured = import.meta.env.VITE_VOICE_CATALOGUE_SERVICE_URL;
@@ -80,6 +83,16 @@ class VoiceCatalogueService {
         return configured.replace('localhost', window.location.hostname).replace(/\/api\/v1\/?$/, '');
       }
       return configured.replace(/\/api\/v1\/?$/, '');
+    }
+
+    // Never fall back to localhost on deployed production instances (Vercel, HTTPS, etc.)
+    const isProduction =
+      import.meta.env.PROD ||
+      (typeof window !== 'undefined' &&
+        (window.location.hostname.includes('vercel.app') || window.location.protocol === 'https:'));
+
+    if (isProduction) {
+      return 'https://karigarsaathi-ai-voice.onrender.com';
     }
 
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
@@ -97,7 +110,49 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Safe fetch wrapper that handles network disconnects and connection refused cleanly.
+   * Sanitizes error messages from backend responses, mapping them to friendly, actionable guidance.
+   * Never exposes raw internal errors (e.g. urlopen error [Errno 111]).
+   */
+  public extractErrorMessage(errJson: unknown, defaultMsg: string = 'An error occurred'): string {
+    const obj = errJson && typeof errJson === 'object' ? (errJson as Record<string, unknown>) : null;
+    const errObj = obj?.error && typeof obj.error === 'object' ? (obj.error as Record<string, unknown>) : null;
+    const raw =
+      obj?.detail ||
+      errObj?.message ||
+      obj?.message ||
+      (typeof errJson === 'string' ? errJson : '');
+
+    if (!raw) return defaultMsg;
+
+    const str = String(raw);
+
+    if (str.includes('urlopen error') || str.includes('Connection refused') || str.includes('Ollama unreachable')) {
+      return 'Voice backend could not reach the translation service. Please verify server connectivity or try again.';
+    }
+    if (str.includes('SARVAM_KEY_MISSING')) {
+      return 'Sarvam API key is not configured on the voice server. Please configure SARVAM_API_KEY on the Render service.';
+    }
+    if (str.includes('SARVAM_KEY_INVALID')) {
+      return 'Invalid or expired Sarvam API key. Please check SARVAM_API_KEY in server environment.';
+    }
+    if (str.includes('SARVAM_INSUFFICIENT_CREDITS')) {
+      return 'Insufficient Sarvam API credits. Please replenish credits in your Sarvam account.';
+    }
+    if (str.includes('SARVAM_RATE_LIMITED')) {
+      return 'Sarvam API rate limit exceeded. Please wait a moment and retry.';
+    }
+    if (str.includes('SARVAM_NETWORK_TIMEOUT')) {
+      return 'Sarvam AI request timed out. Please try again.';
+    }
+    if (str.includes('SARVAM_NETWORK_ERROR')) {
+      return 'Unable to reach Sarvam AI services. Please verify internet connectivity or retry.';
+    }
+
+    return str;
+  }
+
+  /**
+   * Safe fetch wrapper that handles network disconnects and Render wake-up cleanly.
    */
   private async safeFetch(url: string, init?: RequestInit): Promise<Response> {
     try {
@@ -106,9 +161,14 @@ class VoiceCatalogueService {
       if (err instanceof Error && err.name === 'AbortError') {
         throw err;
       }
+      const isRender = url.includes('onrender.com');
+      const message = isRender
+        ? 'Voice service is starting up on Render (free tier cold start can take 30–50s). Please wait a moment and retry.'
+        : 'Voice service unavailable. Please check that the voice service is reachable and retry.';
+
       throw new VoiceCatalogueError({
         errorCode: 'SERVICE_UNAVAILABLE',
-        message: 'Voice service unavailable. Please check that the local AI Voice microservice is running on port 8001.',
+        message,
         retryable: true,
         details: { url, error: err instanceof Error ? err.message : String(err) },
       });
@@ -132,9 +192,10 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Checks microservice health and model readiness.
+   * Checks microservice health and model readiness without spending any Sarvam credits.
+   * Handles waking Render services with a reasonable timeout.
    */
-  public async checkHealth(timeoutMs = 4000): Promise<VoiceHealthResponse> {
+  public async checkHealth(timeoutMs = 12000): Promise<VoiceHealthResponse> {
     if (!this.isVoiceEnabled()) {
       return {
         status: 'disabled',
@@ -157,10 +218,11 @@ class VoiceCatalogueService {
       clearTimeout(timer);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
-    } catch {
+    } catch (err) {
       clearTimeout(timer);
+      const isTimeout = err instanceof Error && err.name === 'AbortError';
       return {
-        status: 'unreachable',
+        status: isTimeout ? 'starting' : 'unreachable',
         service: 'KarigarSaathi Voice Studio',
         model_ready: false,
       };
@@ -193,9 +255,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Failed to create voice catalogue session (${response.status})`);
+      } catch {
+        errDetail = `Failed to create voice catalogue session (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Failed to create voice catalogue session (${response.status})`,
+        message: errDetail,
         retryable: true,
       });
     }
@@ -233,14 +303,14 @@ class VoiceCatalogueService {
       let errDetail = '';
       try {
         const errJson = await response.json();
-        errDetail = errJson.detail || '';
+        errDetail = this.extractErrorMessage(errJson, `Failed to upload audio recording (${response.status})`);
       } catch {
-        // ignore
+        errDetail = `Failed to upload audio recording (${response.status})`;
       }
 
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: errDetail || `Failed to upload audio recording (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -249,7 +319,7 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Triggers Faster Whisper speech transcription for an uploaded session.
+   * Triggers Sarvam Saaras AI speech transcription for an uploaded session.
    */
   public async processAudio(params: {
     sessionId: string;
@@ -272,14 +342,14 @@ class VoiceCatalogueService {
       let errDetail = '';
       try {
         const errJson = await response.json();
-        errDetail = errJson.detail || '';
+        errDetail = this.extractErrorMessage(errJson, `Speech transcription failed (${response.status})`);
       } catch {
-        // ignore
+        errDetail = `Speech transcription failed (${response.status})`;
       }
 
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: errDetail || `Speech transcription failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -309,9 +379,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Failed to update transcript (${response.status})`);
+      } catch {
+        errDetail = `Failed to update transcript (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Failed to update transcript (${response.status})`,
+        message: errDetail,
         retryable: true,
       });
     }
@@ -350,14 +428,14 @@ class VoiceCatalogueService {
       let errDetail = '';
       try {
         const errJson = await response.json();
-        errDetail = errJson.detail || '';
+        errDetail = this.extractErrorMessage(errJson, `Catalogue generation failed (${response.status})`);
       } catch {
-        // ignore
+        errDetail = `Catalogue generation failed (${response.status})`;
       }
 
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: errDetail || `Catalogue generation failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -426,7 +504,7 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Direct stateless transcription endpoint.
+   * Direct stateless transcription endpoint via Sarvam Saaras AI.
    */
   public async transcribeDirect(params: {
     audioBlob: Blob;
@@ -449,9 +527,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Direct transcription failed (${response.status})`);
+      } catch {
+        errDetail = `Direct transcription failed (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Direct transcription failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -488,9 +574,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Direct catalogue generation failed (${response.status})`);
+      } catch {
+        errDetail = `Direct catalogue generation failed (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Direct catalogue generation failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -499,13 +593,13 @@ class VoiceCatalogueService {
   }
 
   /**
-   * Translates confirmed source transcript via phase14-sarvam (Ollama /api/generate).
-   * Uses /pipeline/translate-only which applies correct language routing:
+   * Translates confirmed/edited source transcript via Sarvam AI translation API.
+   * Uses /pipeline/translate-only which applies faithful craft language routing:
    *   hi -> preserve Hindi + produce English
    *   en -> preserve English + produce Hindi
    *   or/bn/te -> regional -> English -> Hindi
    *
-   * Returns both hindi_output and english_output so the UI can display both.
+   * Returns both hindi_output and english_output so the UI can display and edit both.
    */
   public async translateWithSarvam(params: {
     correctedTranscript: string;
@@ -535,9 +629,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Translation request failed (${response.status})`);
+      } catch {
+        errDetail = `Translation request failed (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Translation request failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }
@@ -573,9 +675,17 @@ class VoiceCatalogueService {
     });
 
     if (!response.ok) {
+      let errDetail = '';
+      try {
+        const errJson = await response.json();
+        errDetail = this.extractErrorMessage(errJson, `Translation request failed (${response.status})`);
+      } catch {
+        errDetail = `Translation request failed (${response.status})`;
+      }
+
       throw new VoiceCatalogueError({
         errorCode: `HTTP_${response.status}`,
-        message: `Translation request failed (${response.status})`,
+        message: errDetail,
         retryable: response.status >= 500,
       });
     }

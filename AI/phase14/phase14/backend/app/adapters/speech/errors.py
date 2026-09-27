@@ -19,6 +19,7 @@ class TranscriptionError(HTTPException):
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=message,
         )
+        self.message = message
         self.error_code = error_code
         self.retryable = retryable
 

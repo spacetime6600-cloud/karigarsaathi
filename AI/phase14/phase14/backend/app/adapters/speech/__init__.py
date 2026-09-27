@@ -6,7 +6,10 @@ from typing import Optional, Tuple, List, Dict, Any
 
 import numpy as np
 
-from faster_whisper import WhisperModel
+try:
+    from faster_whisper import WhisperModel
+except ImportError:
+    WhisperModel = None
 
 from backend.app.core.config import settings
 from backend.app.adapters.speech.base import (
@@ -322,11 +325,11 @@ from backend.app.adapters.speech.sarvam import SarvamSpeechAdapter
 
 def get_speech_adapter() -> SpeechAdapter:
     """Factory to instantiate the configured speech transcription adapter."""
-    engine_pref = getattr(settings, "speech_engine", "faster-whisper").lower()
+    engine_pref = getattr(settings, "speech_engine", "sarvam").lower()
 
-    if engine_pref in ("sarvam", "saaras"):
-        logger.info("Initializing Sarvam / Saaras speech transcription adapter")
-        return SarvamSpeechAdapter()
+    if engine_pref in ("whisper", "faster-whisper"):
+        logger.info("Initializing Faster Whisper speech transcription adapter")
+        return FasterWhisperSpeechAdapter()
 
-    logger.info("Initializing Faster Whisper speech transcription adapter")
-    return FasterWhisperSpeechAdapter()
+    logger.info("Initializing Sarvam / Saaras speech transcription adapter")
+    return SarvamSpeechAdapter()

@@ -56,13 +56,36 @@ async def test_full_session_workflow():
         assert res.status_code == 200
         assert res.json()["status"] == "uploaded"
 
-        # 3. Process Audio (Faster Whisper)
-        res = await client.post(
-            f"/api/v1/catalogue-sessions/{session_id}/process",
-            headers={"Authorization": "Bearer mock_firebase_artisan_user"},
+        # 3. Process Audio (Mocked Sarvam/Whisper STT - zero live API calls)
+        from unittest.mock import patch, AsyncMock
+        from backend.app.adapters.speech.base import TranscriptionResult, TranscriptSegment
+
+        mock_result = TranscriptionResult(
+            status="completed",
+            detected_language="hi",
+            detected_language_confidence=0.95,
+            original_text="यह एक हथकरघा साड़ी है",
+            corrected_text="यह एक हथकरघा साड़ी है",
+            confidence=0.95,
+            segments=[
+                TranscriptSegment(
+                    id=0,
+                    text="यह एक हथकरघा साड़ी है",
+                    start=0.0,
+                    end=1.0,
+                    confidence=0.95,
+                )
+            ],
+            low_confidence_segments=[],
+            language="hi",
         )
-        assert res.status_code == 200
-        assert res.json()["status"] == "awaiting_transcript_review"
+        with patch("backend.app.api.v1.router.speech_adapter.transcribe", new=AsyncMock(return_value=mock_result)):
+            res = await client.post(
+                f"/api/v1/catalogue-sessions/{session_id}/process",
+                headers={"Authorization": "Bearer mock_firebase_artisan_user"},
+            )
+            assert res.status_code == 200
+            assert res.json()["status"] == "awaiting_transcript_review"
 
         # 4. Correct Transcript
         sample_transcript = "यह पारंपरिक हथकरघा जामदानी रेशम साड़ी है। इसमें प्राकृतिक रंगों का प्रयोग हुआ है और लंबाई 5.5 मीटर है।"

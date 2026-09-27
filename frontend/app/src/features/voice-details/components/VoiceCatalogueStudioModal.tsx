@@ -137,6 +137,16 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
   const [dataDeletedNotice, setDataDeletedNotice] = useState(false);
   const [overwriteWarningModal, setOverwriteWarningModal] = useState(false);
 
+  const refreshHealth = async () => {
+    setServiceHealth({ status: 'starting', service: 'KarigarSaathi Voice Studio', model_ready: false });
+    try {
+      const health = await voiceCatalogueService.checkHealth(15000);
+      setServiceHealth(health);
+    } catch {
+      setServiceHealth({ status: 'unreachable', service: 'KarigarSaathi Voice Studio', model_ready: false });
+    }
+  };
+
   // Load diagnostics and service health on open
   useEffect(() => {
     if (isOpen) {
@@ -155,9 +165,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
         }
       });
 
-      voiceCatalogueService.checkHealth().then((health) => {
-        setServiceHealth(health);
-      });
+      refreshHealth();
     } else {
       cleanupResources();
     }
@@ -344,7 +352,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
     setErrorMessage(null);
   };
 
-  // Submit Audio for Faster Whisper Transcription
+  // Submit Audio for Sarvam Saaras Transcription
   const handleSubmitAudioForTranscription = async () => {
     if (!audioBlob || audioBlob.size < 50) {
       setErrorMessage('No valid audio data recorded. Please record or upload a non-empty audio clip.');
@@ -370,7 +378,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
         filename: audioFileName,
       });
 
-      // 3. Process Transcription with Faster Whisper
+      // 3. Process Transcription with Sarvam Saaras AI
       const transResult = await voiceCatalogueService.processAudio({
         sessionId: session.session_id,
       });
@@ -388,13 +396,13 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
       const msg =
         err instanceof VoiceCatalogueError
           ? err.message
-          : 'Speech transcription failed. Please check microservice connectivity on port 8001 or type description.';
+          : 'Speech transcription failed. Please check voice service connectivity or type description.';
       setErrorMessage(msg);
       setStep('recording');
     }
   };
 
-  // Translate confirmed source transcript via phase14-sarvam (Ollama /api/generate)
+  // Translate confirmed source transcript via Sarvam AI translation API
   const handleTranslateToEnglish = async (sourceTextOverride?: string) => {
     const textToTranslate = (typeof sourceTextOverride === 'string' ? sourceTextOverride : editableTranscript).trim();
     if (!textToTranslate) return;
@@ -429,7 +437,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
       const msg =
         err instanceof VoiceCatalogueError
           ? err.message
-          : 'Translation request failed. Please check that the Phase 14 microservice is running on port 8001.';
+          : 'Translation request failed. Please check voice service connectivity or retry.';
       setErrorMessage(msg);
     } finally {
       if (!controller.signal.aborted) {
@@ -464,7 +472,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
       const msg =
         err instanceof VoiceCatalogueError
           ? err.message
-          : 'Catalogue generation failed. Please verify the AI service on port 8001.';
+          : 'Catalogue generation failed. Please try again.';
       setErrorMessage(msg);
       setStep('input_choice');
     }
@@ -591,7 +599,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
             </div>
             <div>
               <span className="font-bold text-primary text-xs sm:text-sm block">Multilingual AI Catalogue Engine</span>
-              <span className="text-[11px] text-on-surface-variant">Local Speech-to-Text & Regional Vernacular Translation</span>
+              <span className="text-[11px] text-on-surface-variant">Sarvam Saaras Speech-to-Text & Mayura Translation</span>
             </div>
           </div>
           <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
@@ -604,18 +612,28 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
             {serviceHealth?.status === 'ok' || serviceHealth?.status === 'ready' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-[11px] font-bold">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                Engine Online
+                Sarvam AI Online
               </span>
             ) : serviceHealth?.status === 'starting' ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 text-[11px] font-bold">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                Engine Starting
-              </span>
+              <button
+                type="button"
+                onClick={refreshHealth}
+                title="Click to check if service has finished waking up"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 hover:bg-amber-500/20 text-[11px] font-bold transition-colors cursor-pointer"
+              >
+                <RefreshCw className="w-3 h-3 text-amber-600 animate-spin" />
+                Starting Voice Service (Render Waking)
+              </button>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 text-[11px] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                Voice Service Unavailable
-              </span>
+              <button
+                type="button"
+                onClick={refreshHealth}
+                title="Click to retry connecting to the voice service"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 hover:bg-amber-500/20 text-[11px] font-semibold transition-colors cursor-pointer"
+              >
+                <RefreshCw className="w-3 h-3 text-amber-700" />
+                Voice Service Offline (Retry)
+              </button>
             )}
           </div>
         </div>
@@ -843,19 +861,19 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                 </label>
               </div>
               <p className="text-[11px] leading-relaxed">
-                Speech audio is transcribed via local Faster Whisper on your microservice. Raw audio is stored in
+                Speech audio is transcribed via Sarvam Saaras AI. Raw audio is processed in
                 isolated session storage and can be deleted at any time.
               </p>
             </div>
 
-            {/* Odia Speech Recognition Guidance */}
+            {/* Odia Speech Recognition Info */}
             {selectedLanguage === 'or' && inputMode === 'voice' && (
               <div className="p-3.5 bg-secondary/10 rounded-2xl border border-secondary/20 flex items-start gap-2.5 text-xs text-on-surface animate-in fade-in">
                 <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
                 <div className="flex-1 flex flex-col gap-0.5">
-                  <span className="font-bold text-secondary">Odia (ଓଡ଼ିଆ) Voice Input Guidance</span>
+                  <span className="font-bold text-secondary">Odia (ଓଡ଼ିଆ) Voice Input Supported</span>
                   <p className="text-[11px] text-on-surface-variant leading-relaxed">
-                    Standard Whisper models do not include native Odia speech recognition. For the highest fidelity with Odia crafts, please use the <strong>"Type Text"</strong> tab to describe your product in Odia script, or record speech in Hindi, Bengali, or English.
+                    Sarvam Saaras AI natively supports Odia craft voice descriptions. You can speak naturally in Odia, or use the <strong>"Type Description"</strong> tab to type directly.
                   </p>
                 </div>
               </div>
@@ -1035,7 +1053,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                           : selectedLanguage === 'or'
                           ? 'Odia'
                           : 'English'}
-                        . Our Faster Whisper AI will transcribe your speech and extract verified facts.
+                        . Our Sarvam Saaras AI will transcribe your speech and extract verified facts.
                       </p>
                     </div>
                   </div>
@@ -1169,7 +1187,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
             <div className="flex flex-col gap-1">
               <p className="font-bold text-base text-primary">
                 {step === 'transcribing'
-                  ? 'Transcribing Speech with Faster Whisper on Port 8001...'
+                  ? 'Transcribing Speech with Sarvam Saaras AI...'
                   : 'Extracting Verified Facts & Generating Bilingual Copy...'}
               </p>
               <p className="text-xs text-on-surface-variant">

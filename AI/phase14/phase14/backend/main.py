@@ -36,9 +36,15 @@ cors_origin_list = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
 ]
-for local_origin in ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"]:
-    if local_origin not in cors_origin_list:
-        cors_origin_list.append(local_origin)
+for required_origin in [
+    "https://karigarsaathi.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+]:
+    if required_origin not in cors_origin_list:
+        cors_origin_list.append(required_origin)
 
 app.add_middleware(
     CORSMiddleware,
@@ -57,12 +63,12 @@ async def health():
     try:
         from backend.app.api.v1.router import speech_adapter
         model_ready = speech_adapter is not None
-        engine_name = getattr(speech_adapter, "engine_name", "faster-whisper")
+        engine_name = getattr(speech_adapter, "engine_name", "sarvam")
         speech_model = getattr(speech_adapter, "model_name", "saaras:v3")
     except Exception:
         model_ready = False
-        engine_name = "unknown"
-        speech_model = "unknown"
+        engine_name = "sarvam"
+        speech_model = "saaras:v3"
 
     return {
         "status": "ok",

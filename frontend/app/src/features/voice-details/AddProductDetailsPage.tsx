@@ -585,7 +585,7 @@ export const AddProductDetailsPage: React.FC = () => {
               <Badge variant="indigo">Phase 14</Badge>
             </div>
             <p className="text-xs text-on-surface-variant">
-              Describe your craft by speaking in Hindi, Bengali, Odia, or English. Faster Whisper AI will transcribe your voice and extract fact-grounded catalogue specifications.
+              Describe your craft by speaking in Hindi, Bengali, Odia, or English. Sarvam Saaras AI will transcribe your voice and extract fact-grounded catalogue specifications.
             </p>
 
             <Button

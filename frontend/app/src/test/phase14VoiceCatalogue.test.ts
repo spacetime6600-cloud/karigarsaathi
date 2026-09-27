@@ -60,7 +60,7 @@ describe('Phase 14 — Voice & Multilingual Auto-Catalogue Integration', () => {
       expect(result.selected_language).toBe('hi');
     });
 
-    it('processes speech audio and returns Faster Whisper transcription segments', async () => {
+    it('processes speech audio and returns Sarvam Saaras transcription segments', async () => {
       const mockTranscription = {
         session_id: 'session-uuid-1234',
         status: 'awaiting_transcript_review',

@@ -107,7 +107,8 @@ class SarvamSpeechAdapter(SpeechAdapter):
                 data = response.json()
                 transcript = data.get("transcript", "").strip()
                 detected_lang_code = data.get("language_code", lang_code or "hi-IN")
-                short_lang = detected_lang_code.split("-")[0]
+                raw_short = detected_lang_code.split("-")[0]
+                short_lang = "or" if raw_short == "od" else raw_short
 
                 segment = TranscriptSegment(
                     id=0,
@@ -135,7 +136,6 @@ class SarvamSpeechAdapter(SpeechAdapter):
                     text=transcript,
                 )
 
-            # Upstream error (400, 401, 402 quota, 429, 500, etc.)
             try:
                 err_json = response.json()
                 err_msg = (
@@ -148,20 +148,44 @@ class SarvamSpeechAdapter(SpeechAdapter):
                     or f"SARVAM_HTTP_{response.status_code}"
                 )
             except Exception:
-                err_msg = response.text or f"HTTP {response.status_code}"
+                err_msg = response.text
                 err_code = f"SARVAM_HTTP_{response.status_code}"
+
+            if response.status_code == 401:
+                err_code = "SARVAM_KEY_INVALID"
+                err_msg = "Invalid or expired Sarvam API key. Please check SARVAM_API_KEY in server environment."
+            elif response.status_code == 402:
+                err_code = "SARVAM_INSUFFICIENT_CREDITS"
+                err_msg = "Insufficient Sarvam API credits or quota exhausted."
+            elif response.status_code == 429:
+                err_code = "SARVAM_RATE_LIMITED"
+                err_msg = "Sarvam API rate limit exceeded. Please retry shortly."
 
             logger.error(
                 f"Sarvam Saaras STT failed ({response.status_code}): {err_msg}"
             )
             raise TranscriptionError(
-                message=f"Sarvam Saaras STT failed ({response.status_code}): {err_msg}",
+                message=err_msg,
                 error_code=err_code,
                 retryable=response.status_code in (429, 500, 502, 503, 504),
             )
 
         except TranscriptionError:
             raise
+        except httpx.TimeoutException as exc:
+            logger.error(f"Sarvam Saaras STT request timed out: {exc}")
+            raise TranscriptionError(
+                message="Sarvam Saaras STT request timed out. Please try again.",
+                error_code="SARVAM_NETWORK_TIMEOUT",
+                retryable=True,
+            ) from exc
+        except httpx.RequestError as exc:
+            logger.error(f"Sarvam Saaras STT network error: {exc}")
+            raise TranscriptionError(
+                message=f"Unable to connect to Sarvam API: {str(exc)}",
+                error_code="SARVAM_NETWORK_ERROR",
+                retryable=True,
+            ) from exc
         except Exception as exc:
             logger.error(f"Sarvam Saaras STT request failed: {exc}")
             raise TranscriptionError(

@@ -15,7 +15,8 @@ from sqlalchemy import select
 
 from backend.app.core.config import settings
 from backend.app.security import create_dev_token, decode_dev_token, verify_session_token
-from backend.app.adapters.speech import FasterWhisperSpeechAdapter, get_speech_adapter
+from backend.app.adapters.speech import get_speech_adapter
+from backend.app.adapters.speech.errors import TranscriptionError
 from backend.app.adapters.speech.base import SpeechTranscriptionRequest
 from backend.app.adapters.catalogue import OpenAILikeCatalogueAdapter
 from backend.app.domain.models import (
@@ -277,7 +278,7 @@ async def process_session(
     with open(audio_path, "rb") as f:
         audio_bytes = f.read()
 
-    # Transcribe via Faster Whisper
+    # Transcribe via Sarvam Saaras AI
     session.status = SessionStatus.transcribing
     await db.commit()
 
@@ -289,10 +290,27 @@ async def process_session(
                 language_hint=session.selected_language,
             )
         )
+    except TranscriptionError as te:
+        session.status = SessionStatus.transcription_failed
+        await db.commit()
+        status_code = status.HTTP_502_BAD_GATEWAY
+        if "401" in te.error_code or "KEY" in te.error_code:
+            status_code = status.HTTP_401_UNAUTHORIZED
+        elif "402" in te.error_code or "CREDIT" in te.error_code:
+            status_code = status.HTTP_402_PAYMENT_REQUIRED
+        elif "429" in te.error_code or "RATE" in te.error_code:
+            status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        elif "EMPTY" in te.error_code or "FORMAT" in te.error_code:
+            status_code = status.HTTP_400_BAD_REQUEST
+        raise HTTPException(status_code=status_code, detail=te.message)
     except Exception as e:
         session.status = SessionStatus.transcription_failed
         await db.commit()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Transcription failed: {str(e)}")
+        logger.error(f"Speech transcription failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Speech transcription failed: {str(e)}",
+        )
 
     # Save Transcript record
     transcript = Transcript(
@@ -733,16 +751,16 @@ async def pipeline_transcribe_translate(
     """
     Complete pipeline endpoint:
     1. Accept audio + explicitly selected source_language
-    2. Surface blocker if speech recognition unsupported (Odia -> manual entry required)
-    3. Transcribe with Faster Whisper
+    2. Check speech recognition support (Sarvam Saaras supports hi, en, bn, te, or)
+    3. Transcribe with Sarvam Saaras AI
     4. If corrected_transcript supplied, use that (artisan review applied)
-    5. Route through phase14-sarvam (Ollama /api/generate):
+    5. Route through Sarvam Translation API:
        - Hindi:   preserve Hindi; produce English
        - English: preserve English; produce Hindi
        - Odia / Bengali / Telugu: -> English -> Hindi
     6. Return original_transcript, corrected_transcript, hindi_output, english_output
     """
-    from backend.app.adapters.translation import OllamaSarvamTranslator, check_speech_support
+    from backend.app.adapters.translation import SarvamTranslator, check_speech_support
 
     if source_language not in ["hi", "en", "or", "bn", "te"]:
         raise HTTPException(
@@ -816,7 +834,7 @@ async def pipeline_transcribe_translate(
         }
 
     try:
-        translator = OllamaSarvamTranslator()
+        translator = SarvamTranslator()
         translation = translator.translate(final_transcript, source_language)
     except Exception as exc:
         logger.error(f"Translation adapter failed: {exc}")
@@ -849,11 +867,11 @@ async def pipeline_translate_only(
     payload: Dict[str, Any] = Body(...),
 ):
     """
-    Translate a corrected/manual transcript through phase14-sarvam with routing rules.
+    Translate a corrected/manual transcript through Sarvam translation API with routing rules.
     Useful after artisan has reviewed and typed/corrected the transcript.
     Body: { "corrected_transcript": "...", "source_language": "hi" }
     """
-    from backend.app.adapters.translation import OllamaSarvamTranslator, check_speech_support
+    from backend.app.adapters.translation import SarvamTranslator, check_speech_support
 
     corrected_transcript = payload.get("corrected_transcript", "").strip()
     source_language = payload.get("source_language", "hi")
@@ -870,9 +888,10 @@ async def pipeline_translate_only(
         )
 
     try:
-        translator = OllamaSarvamTranslator()
+        translator = SarvamTranslator()
         result = translator.translate(corrected_transcript, source_language)
     except Exception as exc:
+        logger.error(f"pipeline_translate_only failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Translation failed: {str(exc)}",

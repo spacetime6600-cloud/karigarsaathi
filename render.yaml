@@ -37,15 +37,15 @@ services:
       - key: APP_ENV
         value: production
       - key: CORS_ORIGINS
-        value: http://localhost:3000,http://localhost:3001
+        value: https://karigarsaathi.vercel.app,http://localhost:3000,http://localhost:3001
+      - key: SPEECH_ENGINE
+        value: sarvam
       - key: SARVAM_API_KEY
         sync: false
-      - key: WHISPER_MODEL
-        value: base
-      - key: WHISPER_DEVICE
-        value: cpu
-      - key: WHISPER_COMPUTE_TYPE
-        value: int8
+      - key: SARVAM_MODEL
+        value: saaras:v3
+      - key: SARVAM_TRANSLATE_MODEL
+        value: mayura:v1
 
   - type: web
     name: karigarsaathi-ai-pricing

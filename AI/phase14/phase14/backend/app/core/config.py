@@ -15,9 +15,11 @@ class Settings(BaseSettings):
     )
 
     # Speech Provider (sarvam / faster-whisper)
-    speech_engine: str = Field(default="faster-whisper", alias="SPEECH_ENGINE")
+    speech_engine: str = Field(default="sarvam", alias="SPEECH_ENGINE")
     sarvam_api_key: Optional[SecretStr] = Field(default=None, alias="SARVAM_API_KEY")
     sarvam_model: str = Field(default="saaras:v3", alias="SARVAM_MODEL")
+    sarvam_base_url: str = Field(default="https://api.sarvam.ai", alias="SARVAM_BASE_URL")
+    sarvam_translate_model: str = Field(default="mayura:v1", alias="SARVAM_TRANSLATE_MODEL")
 
     # Application
     app_env: str = Field(default="development", alias="APP_ENV")
@@ -57,7 +59,10 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = Field(default=60, alias="LLM_TIMEOUT_SECONDS")
 
     # CORS
-    cors_origins: str = Field(default="http://localhost:5173,http://127.0.0.1:5173", alias="CORS_ORIGINS")
+    cors_origins: str = Field(
+        default="https://karigarsaathi.vercel.app,http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,http://localhost:5173",
+        alias="CORS_ORIGINS",
+    )
 
     # Audio
     max_audio_size_mb: int = Field(default=50, alias="MAX_AUDIO_SIZE_MB")

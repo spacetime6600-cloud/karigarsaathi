@@ -188,10 +188,10 @@ class OpenAILikeCatalogueAdapter(CatalogueAdapter):
                 "target_language": target_language,
             }
 
-        # Try OllamaSarvamTranslator (native phase14-sarvam via Ollama /api/generate) for free-form speech
+        # Try SarvamTranslator via official Sarvam Translate API for free-form speech
         try:
-            from backend.app.adapters.translation import OllamaSarvamTranslator
-            translator = OllamaSarvamTranslator()
+            from backend.app.adapters.translation import SarvamTranslator
+            translator = SarvamTranslator()
             res = translator.translate(text, source_language)
             out_text = res.get("english_output") if target_language == "en" else res.get("hindi_output")
             if out_text:
