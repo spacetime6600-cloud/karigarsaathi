@@ -17,6 +17,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
+import { formatDateSafe } from '@/utils/formatDate';
 
 export const CoordinatorEnquiryDetailPage: React.FC = () => {
   const { enquiryId } = useParams<{ enquiryId: string }>();
@@ -137,7 +138,7 @@ export const CoordinatorEnquiryDetailPage: React.FC = () => {
             <span className="font-bold text-primary block">
               Requested: {enquiry.quantityRequested || 1} units
             </span>
-            <span className="text-[11px] text-on-surface-variant">{enquiry.receivedAt || 'Recent'}</span>
+            <span className="text-[11px] text-on-surface-variant">{formatDateSafe(enquiry.receivedAt)}</span>
           </div>
         </div>
 
@@ -161,7 +162,7 @@ export const CoordinatorEnquiryDetailPage: React.FC = () => {
         <div className="p-4 sm:p-5 rounded-2xl bg-white border border-surface-variant/80 shadow-xs flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-primary">{enquiry.buyerName}</span>
-            <span className="text-[11px] text-on-surface-variant">{enquiry.receivedAt || 'Recent'}</span>
+            <span className="text-[11px] text-on-surface-variant">{formatDateSafe(enquiry.receivedAt)}</span>
           </div>
           <p className="text-xs sm:text-sm text-primary leading-relaxed">
             {enquiry.message || enquiry.initialMessage}
@@ -178,7 +179,7 @@ export const CoordinatorEnquiryDetailPage: React.FC = () => {
               <span className="font-bold text-secondary">
                 {rep.sender === 'coordinator' ? 'Cluster Coordinator (Assistant)' : 'Artisan Reply'}
               </span>
-              <span className="text-[11px] text-on-surface-variant">{rep.timestamp || 'Just now'}</span>
+              <span className="text-[11px] text-on-surface-variant">{formatDateSafe(rep.timestamp)}</span>
             </div>
             <p className="text-xs sm:text-sm text-primary leading-relaxed">{rep.text}</p>
             {rep.priceQuote && (

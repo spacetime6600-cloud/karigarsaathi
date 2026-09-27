@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { ShieldCheck, ArrowRight, CheckSquare, Square, AlertCircle, Sparkles } from 'lucide-react';
+import { ShieldCheck, ArrowRight, CheckSquare, Square, AlertCircle, Lock } from 'lucide-react';
 import { resolveProductImageUrl } from '@/services/media/imageUrlResolver';
 
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800';
@@ -229,7 +229,7 @@ export const ApprovePublicInfoPage: React.FC = () => {
         <div className="lg:col-span-4 flex flex-col gap-4">
           <Card className="p-5 bg-white rounded-2xl border border-surface-variant/80 card-shadow flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-secondary" />
+              <Lock className="w-4 h-4 text-secondary" />
               <h3 className="font-bold text-sm text-primary">
                 Privacy Protection
               </h3>

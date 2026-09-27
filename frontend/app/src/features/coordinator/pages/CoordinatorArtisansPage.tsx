@@ -16,7 +16,7 @@ import {
   Loader2,
   AlertTriangle,
   ArrowRight,
-  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
 import { demoDataService } from '@/services/demo/demoDataService';
@@ -99,8 +99,8 @@ export const CoordinatorArtisansPage: React.FC = () => {
               Assigned Artisans
             </h2>
             {(demoDataService.isSeeded() || coordinatorUid.startsWith('demo_')) && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
-                <Sparkles className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FFDDB5]/80 text-[#2A1800] border border-[#FFB955]/70">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#633F00]" />
                 Demo Data Active
               </span>
             )}

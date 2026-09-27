@@ -185,11 +185,15 @@ export const router = createBrowserRouter([
         ],
       },
 
-      // Reviewer Sandbox / Recovery Trigger Harness (Direct URL only)
-      {
-        path: '/dev/states',
-        element: <DevStatesPage />,
-      },
+      // Reviewer Sandbox / Recovery Trigger Harness (Development only, excluded from production)
+      ...(import.meta.env.DEV
+        ? [
+            {
+              path: '/dev/states',
+              element: <DevStatesPage />,
+            },
+          ]
+        : []),
 
       // Catch-All 404 Page
       {

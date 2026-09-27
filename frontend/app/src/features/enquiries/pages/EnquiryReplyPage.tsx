@@ -23,6 +23,7 @@ import {
   Loader2,
   ExternalLink,
 } from 'lucide-react';
+import { formatDateSafe, formatDateShortSafe } from '@/utils/formatDate';
 
 export const EnquiryReplyPage: React.FC = () => {
   const { enquiryId } = useParams<{ enquiryId: string }>();
@@ -220,9 +221,7 @@ export const EnquiryReplyPage: React.FC = () => {
               <span>Received:</span>
               <span className="font-mono flex items-center gap-1 font-medium text-primary">
                 <Clock className="w-3 h-3" />
-                {enquiry.receivedAt && isNaN(Date.parse(enquiry.receivedAt))
-                  ? enquiry.receivedAt
-                  : new Date(enquiry.receivedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {formatDateSafe(enquiry.receivedAt)}
               </span>
             </div>
           </Card>
@@ -321,7 +320,7 @@ export const EnquiryReplyPage: React.FC = () => {
                     <p>{enquiry.message || enquiry.initialMessage}</p>
                   </div>
                   <span className="text-[10px] text-on-surface-variant ml-1 flex items-center gap-1 font-mono">
-                    <Clock className="w-2.5 h-2.5" /> {enquiry.buyerName} • {new Date(enquiry.receivedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <Clock className="w-2.5 h-2.5" /> {enquiry.buyerName} • {formatDateShortSafe(enquiry.receivedAt)}
                   </span>
                 </div>
               </div>
@@ -339,7 +338,7 @@ export const EnquiryReplyPage: React.FC = () => {
                       )}
                     </div>
                     <span className="text-[10px] text-on-surface-variant mr-1 flex items-center gap-1 font-mono">
-                      <Clock className="w-2.5 h-2.5" /> You • {rep.timestamp}
+                      <Clock className="w-2.5 h-2.5" /> You • {formatDateShortSafe(rep.timestamp)}
                     </span>
                   </div>
                 </div>

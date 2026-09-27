@@ -138,7 +138,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
       aria-label="Artisan Account Menu"
       tabIndex={-1}
       onKeyDown={handleKeyDown}
-      className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3"
+      className="fixed left-3 right-3 top-[60px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3 max-h-[min(480px,calc(100dvh-80px))] overflow-y-auto overscroll-contain"
     >
       {/* User Profile Summary */}
       <div className="flex items-center gap-3 pb-3 border-b border-surface-variant/80">
@@ -568,7 +568,7 @@ export const ArtisanTopNavigation: React.FC = () => {
             ref={mobileMenuRef}
             role="dialog"
             aria-label="Mobile Navigation Menu"
-            className="md:hidden mt-1.5 p-3 rounded-[18px] glass-menu border border-surface-variant/60 shadow-xl flex flex-col gap-2.5 animate-in slide-in-from-top-2 duration-150 motion-reduce:animate-none"
+            className="md:hidden mt-2 p-3.5 rounded-[22px] glass-menu border border-surface-variant/70 shadow-xl flex flex-col gap-3 animate-in slide-in-from-top-2 duration-150 motion-reduce:animate-none max-h-[calc(100dvh-76px)] overflow-y-auto overscroll-contain pb-[max(16px,env(safe-area-inset-bottom))]"
           >
             {/* Primary Nav Links */}
             <div className="grid grid-cols-3 gap-1.5">

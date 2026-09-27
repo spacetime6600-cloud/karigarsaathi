@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSync } from '@/app/providers/SyncProvider';
 import { BuyerEnquiry } from '@/types';
 import { MessageSquare, ArrowRight, ChevronRight, WifiOff, Package } from 'lucide-react';
+import { formatDateShortSafe } from '@/utils/formatDate';
 import { clsx } from 'clsx';
 
 export interface BuyerEnquiryPopoverProps {
@@ -72,9 +73,9 @@ export const BuyerEnquiryPopover: React.FC<BuyerEnquiryPopoverProps> = ({
       tabIndex={-1}
       onKeyDown={handleKeyDown}
       className={clsx(
-        'absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-[380px] max-w-[390px]',
+        'fixed left-3 right-3 top-[60px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[380px] sm:max-w-[390px]',
         'glass-menu rounded-2xl p-0 shadow-xl z-50 border border-surface-variant/90 motion-popover-enter',
-        'flex flex-col overflow-hidden max-h-[460px]',
+        'flex flex-col overflow-hidden max-h-[min(480px,calc(100dvh-80px))] overscroll-contain',
         className
       )}
     >
@@ -153,10 +154,7 @@ export const BuyerEnquiryPopover: React.FC<BuyerEnquiryPopoverProps> = ({
                       {enq.buyerName}
                     </span>
                     <span className="text-[10px] text-on-surface-variant shrink-0 font-mono">
-                      {new Date(enq.receivedAt).toLocaleDateString('en-IN', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {formatDateShortSafe(enq.receivedAt || enq.createdAt)}
                     </span>
                   </div>
 

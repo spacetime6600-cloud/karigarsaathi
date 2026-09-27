@@ -17,7 +17,7 @@ import {
   Trash2,
   ArrowRight,
   Upload,
-  Sparkles,
+  Wand2,
   Sun,
   Crop,
   Star,
@@ -274,7 +274,7 @@ export const AddPhotographsPage: React.FC = () => {
             {/* Primary Large Image Preview */}
             {draft.photos.length > 0 ? (
               <div className="flex flex-col gap-3">
-                <div className="relative w-full min-h-[300px] sm:min-h-[380px] max-h-[460px] h-[55vw] sm:h-[420px] rounded-2xl overflow-hidden bg-radial from-slate-900 via-slate-900 to-slate-950 border border-surface-variant/80 flex items-center justify-center p-3 sm:p-4 shadow-inner">
+                <div className="relative w-full min-h-[300px] sm:min-h-[380px] max-h-[460px] h-[55vw] sm:h-[420px] rounded-2xl overflow-hidden bg-neutral-900 border border-surface-variant/80 flex items-center justify-center p-3 sm:p-4 shadow-inner">
                   <img
                     key={activeCoverPhoto.url}
                     src={activeCoverPhoto.url}
@@ -290,8 +290,8 @@ export const AddPhotographsPage: React.FC = () => {
                     </div>
 
                     {activeCoverPhoto?.approvalStatus === 'approved' && activeCoverPhoto?.selectedVariant === 'enhanced' && (
-                      <div className="bg-amber-500/95 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 fill-white" />
+                      <div className="bg-amber-600/95 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1">
+                        <Check className="w-3 h-3 text-white" />
                         <span>AI Enhanced (Approved)</span>
                       </div>
                     )}
@@ -318,11 +318,11 @@ export const AddPhotographsPage: React.FC = () => {
                         className={clsx(
                           'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1',
                           activeCoverPhoto.selectedVariant === 'enhanced'
-                            ? 'bg-amber-500 text-white shadow-xs'
+                            ? 'bg-secondary text-white shadow-xs'
                             : 'text-white/80 hover:text-white hover:bg-white/10'
                         )}
                       >
-                        <Sparkles className="w-3 h-3" />
+                        <Wand2 className="w-3 h-3" />
                         Enhanced
                       </button>
                     </div>
@@ -335,7 +335,7 @@ export const AddPhotographsPage: React.FC = () => {
                       onClick={() => setAiEnhancingPhotoIndex(draft.coverPhotoIndex || 0)}
                       className="bg-secondary/95 backdrop-blur-sm hover:bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-secondary shadow-xs flex items-center gap-1.5 cursor-pointer transition-all hover:shadow-sm"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <Wand2 className="w-3.5 h-3.5 text-amber-200" />
                       <span>Enhance with AI</span>
                     </button>
 
@@ -376,8 +376,8 @@ export const AddPhotographsPage: React.FC = () => {
                           </div>
                         )}
                         {isEnhanced && (
-                          <div className="absolute top-1 right-1 bg-amber-500 text-white rounded-full p-0.5 shadow-xs" title="AI Enhanced">
-                            <Sparkles className="w-2.5 h-2.5 fill-white" />
+                          <div className="absolute top-1 right-1 bg-amber-600 text-white rounded-full p-0.5 shadow-xs" title="AI Enhanced">
+                            <Check className="w-2.5 h-2.5 text-white" />
                           </div>
                         )}
                         <div className="absolute bottom-1 inset-x-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-xs p-0.5 rounded-md">
@@ -391,7 +391,7 @@ export const AddPhotographsPage: React.FC = () => {
                             title="Enhance with AI"
                             className="bg-white/90 text-secondary hover:bg-secondary hover:text-white rounded-md p-1 transition-colors"
                           >
-                            <Sparkles className="w-3 h-3" />
+                            <Wand2 className="w-3 h-3" />
                           </button>
                           <button
                             type="button"
@@ -505,7 +505,7 @@ export const AddPhotographsPage: React.FC = () => {
         <div className="lg:col-span-4 flex flex-col gap-4">
           <Card className="p-5 bg-white rounded-2xl border border-surface-variant/80 card-shadow flex flex-col gap-3.5">
             <h3 className="font-bold text-xs uppercase tracking-wider text-primary flex items-center gap-1.5 border-b border-surface-variant/70 pb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-secondary" />
+              <Camera className="w-3.5 h-3.5 text-secondary" />
               <span>Photography Guidelines</span>
             </h3>
 

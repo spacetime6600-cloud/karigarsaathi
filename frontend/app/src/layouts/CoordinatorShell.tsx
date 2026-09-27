@@ -256,7 +256,7 @@ export const CoordinatorShell: React.FC = () => {
                   ref={accountMenuRef}
                   role="menu"
                   aria-label="Coordinator Account Menu"
-                  className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3"
+                  className="fixed left-3 right-3 top-[56px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3 max-h-[min(480px,calc(100dvh-76px))] overflow-y-auto overscroll-contain"
                 >
                   {/* Coordinator Summary */}
                   <div className="flex items-center gap-3 pb-3 border-b border-surface-variant/80">
@@ -329,7 +329,7 @@ export const CoordinatorShell: React.FC = () => {
             ref={mobileMenuRef}
             role="dialog"
             aria-label="Mobile Navigation Menu"
-            className="md:hidden p-4 bg-[#FFFDF9]/98 backdrop-blur-md border-b border-[#001D36]/10 shadow-lg flex flex-col gap-1.5 animate-in slide-in-from-top-2 duration-150"
+            className="md:hidden p-4 bg-[#FFFDF9]/98 backdrop-blur-md border-b border-[#001D36]/10 shadow-lg flex flex-col gap-1.5 animate-in slide-in-from-top-2 duration-150 max-h-[calc(100dvh-64px)] overflow-y-auto overscroll-contain pb-[max(16px,env(safe-area-inset-bottom))]"
           >
             {navItems.map((item) => {
               const Icon = item.icon;

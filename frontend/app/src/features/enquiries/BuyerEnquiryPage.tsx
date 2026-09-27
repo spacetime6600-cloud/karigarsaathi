@@ -25,30 +25,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { clsx } from 'clsx';
-
-const formatDateSafe = (dateStr?: string): string => {
-  if (!dateStr) return '';
-  const parsed = new Date(dateStr);
-  if (isNaN(parsed.getTime())) {
-    return dateStr;
-  }
-  return parsed.toLocaleString('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-};
-
-const formatDateShortSafe = (dateStr?: string): string => {
-  if (!dateStr) return '';
-  const parsed = new Date(dateStr);
-  if (isNaN(parsed.getTime())) {
-    return dateStr;
-  }
-  return parsed.toLocaleDateString('en-IN', {
-    month: 'short',
-    day: 'numeric',
-  });
-};
+import { formatDateSafe, formatDateShortSafe } from '@/utils/formatDate';
 
 export const BuyerEnquiryPage: React.FC = () => {
   const { enquiryId } = useParams<{ enquiryId?: string }>();
@@ -594,7 +571,7 @@ export const BuyerEnquiryPage: React.FC = () => {
                       </div>
                       <span className="text-[10px] text-on-surface-variant mr-1 flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" />
-                        You • {rep.timestamp}
+                        You • {formatDateSafe(rep.timestamp)}
                       </span>
                     </div>
                   </div>

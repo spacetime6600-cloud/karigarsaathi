@@ -20,7 +20,6 @@ import {
   Users,
   MessageSquareQuote,
   ShoppingBag,
-  Sparkles,
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
 
@@ -141,9 +140,9 @@ export const CoordinatorOverviewPage: React.FC = () => {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#A13F1C] bg-[#A13F1C]/10 px-2.5 py-1 rounded-full">
               Assigned Field Overview
             </span>
-            {(demoDataService.isSeeded() || coordinatorUid.startsWith('demo_') || true) && (
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#001D36]/70 bg-[#001D36]/[0.05] px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-[#FFB955]" />
+            {(demoDataService.isSeeded() || coordinatorUid.startsWith('demo_')) && (
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#001D36]/75 bg-[#001D36]/[0.05] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#001D36]/10">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#001D36]/70" />
                 Demo Data Active
               </span>
             )}

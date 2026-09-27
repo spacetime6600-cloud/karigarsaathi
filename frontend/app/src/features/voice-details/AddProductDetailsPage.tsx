@@ -17,7 +17,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import {
   ArrowRight,
-  Sparkles,
+  Lightbulb,
+  CheckCircle2,
   MicOff,
   X,
   Mic,
@@ -235,7 +236,7 @@ export const AddProductDetailsPage: React.FC = () => {
                     disabled={isSuggesting}
                     className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
                   >
-                    <Sparkles className="w-3 h-3" /> Suggest Title
+                    <Lightbulb className="w-3 h-3" /> Suggest Title
                   </button>
                 </div>
                 <Input
@@ -252,7 +253,7 @@ export const AddProductDetailsPage: React.FC = () => {
                 <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/20 flex flex-col gap-2 animate-in fade-in">
                   <div className="flex items-center justify-between text-[11px] font-bold text-secondary">
                     <span className="flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5" /> Mock suggestion (Offline Rule-Based)
+                      <Lightbulb className="w-3.5 h-3.5" /> Suggestion (Craft Guide)
                     </span>
                     <Badge variant="indigo">Optional</Badge>
                   </div>
@@ -293,7 +294,7 @@ export const AddProductDetailsPage: React.FC = () => {
                     disabled={isSuggesting}
                     className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
                   >
-                    <Sparkles className="w-3 h-3" /> Suggest Description
+                    <Lightbulb className="w-3 h-3" /> Suggest Description
                   </button>
                 </div>
                 <TextArea
@@ -310,7 +311,7 @@ export const AddProductDetailsPage: React.FC = () => {
                 <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/20 flex flex-col gap-2 animate-in fade-in">
                   <div className="flex items-center justify-between text-[11px] font-bold text-secondary">
                     <span className="flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5" /> Mock suggestion (Offline Rule-Based)
+                      <Lightbulb className="w-3.5 h-3.5" /> Suggestion (Craft Guide)
                     </span>
                     <Badge variant="indigo">Optional</Badge>
                   </div>
@@ -455,7 +456,7 @@ export const AddProductDetailsPage: React.FC = () => {
                 disabled={isSuggesting}
                 className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
               >
-                <Sparkles className="w-3 h-3" /> Suggest Tags
+                <Lightbulb className="w-3 h-3" /> Suggest Tags
               </button>
             </div>
 
@@ -576,7 +577,7 @@ export const AddProductDetailsPage: React.FC = () => {
           <Card className="p-5 bg-white rounded-2xl border border-surface-variant/80 card-shadow flex flex-col gap-3.5">
             <div className="flex items-center justify-between border-b border-surface-variant/70 pb-2.5">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-secondary" />
+                <Mic className="w-4 h-4 text-secondary" />
                 <h3 className="font-bold text-sm text-primary">
                   Voice Assistant (AI Auto-Catalogue)
                 </h3>
@@ -614,7 +615,7 @@ export const AddProductDetailsPage: React.FC = () => {
               <div className="p-3 bg-surface-container-low rounded-xl flex flex-col gap-1 text-xs border border-surface-variant/70 animate-in fade-in">
                 <div className="flex items-center justify-between text-secondary font-bold">
                   <span className="flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> Transcript
+                    <CheckCircle2 className="w-3.5 h-3.5 text-secondary" /> Transcript
                   </span>
                   <span className="font-mono text-[10px]">
                     {Math.round((draft.voiceConfidence || 0.94) * 100)}% Match
@@ -626,7 +627,7 @@ export const AddProductDetailsPage: React.FC = () => {
 
             {extractedNotice && (
               <div className="p-3 bg-success-container rounded-xl text-on-success-container text-xs flex items-center gap-2 border border-green-300">
-                <Sparkles className="w-4 h-4 text-success shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                 <span>Craft details extracted! Fields have been auto-populated.</span>
               </div>
             )}

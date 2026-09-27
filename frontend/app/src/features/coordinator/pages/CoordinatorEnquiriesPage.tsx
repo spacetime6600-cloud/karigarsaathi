@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { ROUTES } from '@/routes';
 import { clsx } from 'clsx';
+import { formatDateShortSafe } from '@/utils/formatDate';
 
 export const CoordinatorEnquiriesPage: React.FC = () => {
   const { user, userAccount } = useAuth();
@@ -219,7 +220,7 @@ export const CoordinatorEnquiriesPage: React.FC = () => {
                     <span>• Artisan: <strong>{enq.artisanName}</strong></span>
                     <span>• Qty: <strong>{enq.quantityRequested || 1} units</strong></span>
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {enq.receivedAt || 'Recent'}
+                      <Clock className="w-3 h-3" /> {formatDateShortSafe(enq.receivedAt)}
                     </span>
                   </div>
                 </div>

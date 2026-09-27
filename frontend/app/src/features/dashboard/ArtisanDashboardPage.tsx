@@ -41,7 +41,7 @@ import {
   Clock,
   X,
   Loader2,
-  Sparkles,
+  ShieldCheck,
   QrCode,
   IndianRupee,
   Globe2,
@@ -55,6 +55,7 @@ import {
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
 import { ROUTES } from '@/routes';
+import { formatRelativeTimeSafe } from '@/utils/formatDate';
 
 const LOW_STOCK_THRESHOLD = 2;
 
@@ -67,28 +68,7 @@ function formatINR(val: number): string {
 }
 
 function formatRelativeTime(dateString?: string): string {
-  if (!dateString) return 'Recently';
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Recently';
-    const diffMs = Date.now() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    if (diffMins < 1) return 'Just now';
-    if (diffMins === 1) return '1 min ago';
-    if (diffMins < 60) return `${diffMins} mins ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours === 1) return '1 hour ago';
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString('en-IN', {
-      month: 'short',
-      day: 'numeric',
-    });
-  } catch {
-    return 'Recently';
-  }
+  return formatRelativeTimeSafe(dateString);
 }
 
 function getProductThumbnailUrl(product: ProductRecord): string | null {
@@ -384,8 +364,8 @@ export const ArtisanDashboardPage: React.FC = () => {
               Namaste, {greetingName}
             </h1>
             {isDemoMode && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FFDDB5] text-[#2A1800] border border-[#FFB955]">
-                <Sparkles className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FFDDB5]/80 text-[#2A1800] border border-[#FFB955]/70">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#633F00]" />
                 Demonstration Fixture Data
               </span>
             )}
@@ -839,7 +819,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             </div>
 
             {/* Segmented Filter Tabs */}
-            <div className="flex items-center gap-1 bg-[#FFF9EF] p-1 rounded-xl border border-[#001D36]/10 self-start md:self-auto overflow-x-auto max-w-full">
+            <div className="flex items-center gap-1 bg-[#FFF9EF] p-1 rounded-xl border border-[#001D36]/10 w-full sm:w-auto overflow-x-auto scrollbar-none shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveFilter('all')}

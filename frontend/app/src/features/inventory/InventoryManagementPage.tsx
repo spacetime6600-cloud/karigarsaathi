@@ -34,6 +34,7 @@ import { passportManager } from '@/services/passport/passportManager';
 import { storage } from '@/services/storage/localStorage';
 import { ROUTES } from '@/routes';
 import { resolveProductCoverUrl, handleImageFallback } from '@/services/media/imageUrlResolver';
+import { formatDateShortSafe } from '@/utils/formatDate';
 
 type InventoryTab = 'all' | 'draft' | 'ready' | 'published' | 'archived';
 
@@ -507,7 +508,7 @@ export const InventoryManagementPage: React.FC = () => {
                     <div className="flex items-center justify-between text-[10.5px] text-on-surface-variant pt-1">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-secondary" />
-                        {new Date(product.updatedAt || product.createdAt).toLocaleDateString()}
+                        {formatDateShortSafe(product.updatedAt || product.createdAt)}
                       </span>
                       {product.duplicatedFrom && (
                         <span className="flex items-center gap-1 text-secondary font-medium">

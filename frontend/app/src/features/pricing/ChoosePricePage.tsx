@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { ArrowRight, AlertTriangle, Calculator, Sparkles, Check } from 'lucide-react';
+import { ArrowRight, AlertTriangle, Calculator, Check } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export const ChoosePricePage: React.FC = () => {
@@ -146,7 +146,7 @@ export const ChoosePricePage: React.FC = () => {
         <div className="lg:col-span-6 flex flex-col gap-5">
           <Card className="p-5 sm:p-6 bg-white rounded-2xl border border-surface-variant/80 card-shadow flex flex-col gap-4">
             <div className="flex items-center gap-2 border-b border-surface-variant/70 pb-2.5">
-              <Sparkles className="w-4 h-4 text-secondary" />
+              <Calculator className="w-4 h-4 text-secondary" />
               <h2 className="font-bold text-base text-primary">
                 Fair-Trade Pricing Tiers
               </h2>

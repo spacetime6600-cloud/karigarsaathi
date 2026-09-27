@@ -244,7 +244,7 @@
   .analytics-dashboard-grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: clamp(20px, 1.8vw, 26px);
+    gap: clamp(16px, 1.8vw, 24px);
   }
 
   .analytics-module-card {
@@ -253,7 +253,7 @@
     border: 1px solid rgba(0, 29, 54, 0.10);
     border-radius: 16px;
     box-shadow: 0 1px 3px rgba(0, 29, 54, 0.03);
-    padding: clamp(24px, 2vw, 30px);
+    padding: clamp(18px, 4vw, 28px);
     transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
