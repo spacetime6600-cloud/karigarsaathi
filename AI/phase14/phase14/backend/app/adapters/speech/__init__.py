@@ -4,7 +4,10 @@ import asyncio
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 try:
     from faster_whisper import WhisperModel
