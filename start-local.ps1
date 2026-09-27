@@ -38,13 +38,14 @@ function Wait-ForUrl([string]$Url, [int]$TimeoutSeconds = 15) {
 }
 
 Write-Host "=================================================================" -ForegroundColor Cyan
-Write-Host "   KARIGAR SAATHI — LOCAL DEVELOPMENT STACK LAUNCHER" -ForegroundColor Cyan
+Write-Host "   KARIGAR SAATHI -- LOCAL DEVELOPMENT STACK LAUNCHER" -ForegroundColor Cyan
 Write-Host "=================================================================" -ForegroundColor Cyan
 
 # 1. Firebase Emulators (:9099, :8085, :9199, :4000)
 if (-not (Test-PortListening 9099)) {
     Write-Host "[1/5] Starting Firebase Emulators (Auth :9099, Firestore :8085, Storage :9199)..." -ForegroundColor Yellow
-    $fbProcess = Start-Process npx -WorkingDirectory $ScriptDir -ArgumentList @('firebase', 'emulators:start', '--project', 'demo-karigarsaathi', '--only', 'auth,firestore,storage') -PassThru -WindowStyle Minimized
+    $npxCmd = if (Get-Command npx.cmd -ErrorAction SilentlyContinue) { 'npx.cmd' } else { 'npx' }
+    $fbProcess = Start-Process $npxCmd -WorkingDirectory $ScriptDir -ArgumentList @('firebase', 'emulators:start', '--project', 'demo-karigarsaathi', '--only', 'auth,firestore,storage') -PassThru -WindowStyle Minimized
     $Pids["firebase"] = $fbProcess.Id
     if (Wait-ForUrl "http://127.0.0.1:4000" 12) {
         Write-Host "      Firebase Emulators Ready (UI: http://127.0.0.1:4000)" -ForegroundColor Green
