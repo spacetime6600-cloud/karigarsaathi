@@ -215,6 +215,21 @@ class StorageUploadQueueManager {
   }
 
   /**
+   * Cancel and remove all queued items associated with a specific image ID.
+   */
+  async cancelItemsForImage(ownerUid: string, imageId: string): Promise<void> {
+    const items = await this.getQueueForUser(ownerUid);
+    const matching = items.filter((i) => i.imageId === imageId);
+    for (const item of matching) {
+      this.inFlightOperations.delete(item.operationId);
+      await idbDelete(STORES.UPLOAD_QUEUE, item.operationId);
+    }
+    if (matching.length > 0) {
+      this.notifyListeners();
+    }
+  }
+
+  /**
    * Remove completed items to clean up local storage.
    */
   async clearCompleted(ownerUid: string): Promise<void> {
@@ -229,13 +244,19 @@ class StorageUploadQueueManager {
   /**
    * Remove failed items to clean up local queue.
    */
-  async clearFailed(ownerUid: string): Promise<void> {
-    const items = await this.getQueueForUser(ownerUid);
-    const failed = items.filter((i) => i.status === 'failed');
+  async clearFailed(ownerUid?: string): Promise<void> {
+    const all = await idbGetAll<QueuedUploadItem>(STORES.UPLOAD_QUEUE);
+    const targetUid = ownerUid || this.activeOwnerUid;
+    const failed = targetUid
+      ? all.filter((i) => i.ownerUid === targetUid && i.status === 'failed')
+      : all.filter((i) => i.status === 'failed');
     for (const item of failed) {
+      this.inFlightOperations.delete(item.operationId);
       await idbDelete(STORES.UPLOAD_QUEUE, item.operationId);
     }
-    this.notifyListeners();
+    if (failed.length > 0) {
+      this.notifyListeners();
+    }
   }
 
   /**

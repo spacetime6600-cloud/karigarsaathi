@@ -31,7 +31,7 @@ export function validateProductForReadiness(draft: ProductDraft): ReadinessValid
 
   // 1. At least one successfully uploaded product photograph exists
   const hasPhotos = (draft.photos && draft.photos.length > 0) ||
-    (draft.images && draft.images.some((img) => img.uploadStatus === 'completed'));
+    (draft.images && draft.images.some((img) => img.uploadStatus === 'completed' || img.enhancement?.approvalStatus === 'approved'));
 
   if (!hasPhotos) {
     errors.push({
@@ -57,9 +57,13 @@ export function validateProductForReadiness(draft: ProductDraft): ReadinessValid
 
   // 3. No required image upload is pending or failed
   if (draft.images && draft.images.length > 0) {
-    const hasIncompleteUploads = draft.images.some(
-      (img) => img.uploadStatus === 'pending' || img.uploadStatus === 'failed'
-    );
+    const hasIncompleteUploads = draft.images.some((img) => {
+      // If an image has an approved AI enhancement, it has a valid approved display asset and is not blocked
+      if (img.enhancement?.approvalStatus === 'approved') {
+        return false;
+      }
+      return img.uploadStatus === 'pending' || img.uploadStatus === 'failed';
+    });
     if (hasIncompleteUploads) {
       errors.push({
         field: 'imageUploadStatus',

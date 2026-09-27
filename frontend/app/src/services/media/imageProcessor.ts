@@ -152,6 +152,7 @@ export interface UploadPhotographOptions {
   file: File;
   crop?: CropCoordinates;
   onProgress?: (percent: number) => void;
+  directUpload?: boolean;
 }
 
 /**
@@ -163,6 +164,7 @@ export async function uploadPhotograph({
   file,
   crop,
   onProgress,
+  directUpload,
 }: UploadPhotographOptions): Promise<{ imageRecord: ProductImageRecord; photoItem: PhotographItem }> {
   // 1. Validate file
   const validation = validateImageFile(file);
@@ -244,6 +246,8 @@ export async function uploadPhotograph({
   }
 
   try {
+    const isDirect = directUpload ?? mediaStorageService.isDirectUploadEnabled();
+
     // 5a. Upload original
     const originalResult = await mediaStorageService.upload({
       file,
@@ -255,6 +259,7 @@ export async function uploadPhotograph({
       mimeType: file.type,
       customStoragePath: originalPath,
       idempotencyKey: `idemp_${ownerId}_${productId}_${imageId}_original`,
+      directUpload: isDirect,
       onProgress: (pct) => onProgress?.(Math.round(pct * 0.5)),
     });
     const originalDownloadURL = originalResult.downloadUrl;
@@ -270,6 +275,7 @@ export async function uploadPhotograph({
       mimeType: 'image/webp',
       customStoragePath: displayPath,
       idempotencyKey: `idemp_${ownerId}_${productId}_${imageId}_display`,
+      directUpload: isDirect,
       onProgress: (pct) => onProgress?.(50 + Math.round(pct * 0.5)),
     });
     const displayDownloadURL = displayResult.downloadUrl;
@@ -326,12 +332,20 @@ export async function uploadPhotograph({
 
     return { imageRecord, photoItem };
   } catch (err) {
+    const isDirect = directUpload ?? mediaStorageService.isDirectUploadEnabled();
     const errorMsg = err instanceof Error ? err.message : String(err);
-    const errorCode = (err as { code?: string })?.code || '';
+    const errorCode =
+      (err as { code?: string; errorCode?: string })?.code ||
+      (err as { errorCode?: string })?.errorCode ||
+      '';
     const isPermissionError =
       errorCode === 'storage/unauthorized' ||
       errorCode === 'storage/canceled' ||
       errorCode === 'storage/invalid-argument' ||
+      errorCode === 'AUTHENTICATION_REQUIRED' ||
+      errorCode === 'OWNERSHIP_MISMATCH' ||
+      (err as { status?: number })?.status === 401 ||
+      (err as { status?: number })?.status === 403 ||
       errorMsg.includes('permission-denied') ||
       errorMsg.includes('PERMISSION_DENIED') ||
       errorMsg.includes('unauthorized') ||
@@ -342,9 +356,38 @@ export async function uploadPhotograph({
         storagePath: originalPath,
         ownerId,
       });
-      throw new Error(
+      const permErr = new Error(
         `Upload permission denied: ${errorMsg}. Please verify you are signed in to your artisan account.`
-      );
+      ) as Error & { status?: number; retryable?: boolean; errorCode?: string };
+      permErr.status = (err as { status?: number })?.status || 403;
+      permErr.retryable = false;
+      permErr.errorCode = errorCode || 'PERMISSION_DENIED';
+      throw permErr;
+    }
+
+    if (isDirect) {
+      logger.error('STORAGE', 'Direct photo upload or verification failed', err, {
+        productId,
+        imageId,
+        ownerId,
+      });
+      const uploadErr = (err instanceof Error ? err : new Error(errorMsg)) as Error & {
+        status?: number;
+        retryable?: boolean;
+        errorCode?: string;
+      };
+      if ((err as { retryable?: boolean })?.retryable !== undefined) {
+        uploadErr.retryable = (err as { retryable?: boolean }).retryable;
+      } else {
+        uploadErr.retryable = true;
+      }
+      if ((err as { status?: number })?.status !== undefined) {
+        uploadErr.status = (err as { status?: number }).status;
+      }
+      if (errorCode) {
+        uploadErr.errorCode = errorCode;
+      }
+      throw uploadErr;
     }
 
     logger.warn('STORAGE', 'Network error during photo upload; falling back to durable queue', {

@@ -918,13 +918,13 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                 {audioBlob && !isRecording ? (
                   /* Audio Review / Playback View */
                   <div className="flex flex-col items-center gap-4 w-full animate-in fade-in">
-                    <div className="p-4 bg-success-container/30 rounded-2xl border border-success/20 w-full flex items-center justify-between">
+                    <div className="p-4 bg-success-container/30 rounded-2xl border border-success/20 w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <button
                           type="button"
                           onClick={handleTogglePlayback}
                           aria-label={isPlayingAudio ? 'Pause audio' : 'Play audio'}
-                          className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:bg-primary/90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+                          className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:bg-primary/90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] shrink-0"
                         >
                           {isPlayingAudio ? (
                             <Pause className="w-5 h-5 text-white" />
@@ -941,12 +941,13 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                         <Button
                           variant="tertiary"
                           size="sm"
                           onClick={handleDiscardAudio}
                           leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                          className="w-full sm:w-auto text-xs"
                         >
                           Re-record
                         </Button>
@@ -955,6 +956,7 @@ export const VoiceCatalogueStudioModal: React.FC<VoiceCatalogueStudioModalProps>
                           size="sm"
                           onClick={handleSubmitAudioForTranscription}
                           leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                          className="w-full sm:w-auto text-xs font-bold"
                         >
                           Transcribe & Extract Facts
                         </Button>

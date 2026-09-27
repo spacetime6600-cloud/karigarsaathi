@@ -190,7 +190,7 @@ export const AddProductDetailsPage: React.FC = () => {
   return (
     <div className="w-full flex flex-col gap-6 animate-in fade-in duration-200">
       {/* Step Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex flex-col gap-1">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight">
             {t('productCreation.step2Title')}
@@ -206,7 +206,7 @@ export const AddProductDetailsPage: React.FC = () => {
           size="md"
           onClick={() => setIsVoiceStudioOpen(true)}
           leftIcon={<Mic className="w-4 h-4 text-primary" />}
-          className="shrink-0 shadow-sm"
+          className="w-full sm:w-auto shrink-0 shadow-sm"
         >
           AI Voice & Multi-Catalogue Studio
         </Button>

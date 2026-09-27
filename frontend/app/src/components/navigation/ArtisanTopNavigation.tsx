@@ -571,7 +571,7 @@ export const ArtisanTopNavigation: React.FC = () => {
             className="md:hidden mt-1.5 p-3 rounded-[18px] glass-menu border border-surface-variant/60 shadow-xl flex flex-col gap-2.5 animate-in slide-in-from-top-2 duration-150 motion-reduce:animate-none"
           >
             {/* Primary Nav Links */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               {navLinks.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -581,7 +581,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={({ isActive }) =>
                       clsx(
-                        'flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold transition-colors touch-target select-none active:scale-[0.98]',
+                        'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-xl text-[11px] sm:text-xs font-semibold transition-colors touch-target select-none active:scale-[0.98] text-center',
                         isActive
                           ? 'bg-primary text-white font-bold'
                           : 'bg-primary/[0.04] text-primary hover:bg-primary/[0.08]'
@@ -589,7 +589,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                     }
                   >
                     <Icon className="w-4 h-4 shrink-0" />
-                    <span>{item.label}</span>
+                    <span className="truncate">{item.label}</span>
                   </NavLink>
                 );
               })}

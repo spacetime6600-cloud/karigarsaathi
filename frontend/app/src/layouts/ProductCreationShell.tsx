@@ -89,29 +89,29 @@ export const ProductCreationShell: React.FC = () => {
       <OfflineBanner />
 
       {/* Transactional Top Header */}
-      <header className="sticky top-0 z-50 bg-[#FBF8F3]/90 backdrop-blur-md border-b border-surface-variant/70 shadow-xs px-4 sm:px-8 lg:px-12 h-15 sm:h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 bg-[#FBF8F3]/90 backdrop-blur-md border-b border-surface-variant/70 shadow-xs px-3 sm:px-8 lg:px-12 h-14 sm:h-16 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             onClick={handleBack}
             aria-label="Go back"
-            className="flex items-center justify-center min-w-[44px] min-h-[44px] text-primary hover:bg-surface-container rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-target"
+            className="flex items-center justify-center min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] text-primary hover:bg-surface-container rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-target shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center min-w-0">
             <Link
               to="/artisan/dashboard"
-              className="font-display text-lg sm:text-xl font-bold text-primary hover:text-secondary transition-colors min-h-0 leading-none"
+              className="font-display text-base sm:text-xl font-bold text-primary hover:text-secondary transition-colors min-h-0 leading-none truncate"
             >
               KarigarSaathi
             </Link>
-            <span className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider mt-1 leading-none whitespace-nowrap">
+            <span className="hidden sm:block text-[10px] text-on-surface-variant font-medium uppercase tracking-wider mt-1 leading-none whitespace-nowrap">
               Add New Product Listing
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Truthful Sync Status Indicator */}
           <SyncStatusIndicator />
 
@@ -120,22 +120,23 @@ export const ProductCreationShell: React.FC = () => {
             onClick={handleSaveDraft}
             disabled={isSaving}
             aria-label="Save draft progress"
-            className="flex items-center gap-1.5 text-primary hover:text-secondary border border-surface-variant hover:border-secondary/40 bg-white/80 rounded-full px-3 sm:px-4 py-1.5 text-xs font-bold transition-all touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60"
+            className="flex items-center gap-1.5 text-primary hover:text-secondary border border-surface-variant hover:border-secondary/40 bg-white/80 rounded-full px-2.5 sm:px-4 py-1.5 text-xs font-bold transition-all touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60 shrink-0"
           >
             {isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 text-secondary animate-spin" />
-                <span>Saving...</span>
+                <span className="hidden xs:inline">Saving...</span>
               </>
             ) : savedToast ? (
               <>
                 <Check className="w-4 h-4 text-success" />
-                <span className="text-success">Saved!</span>
+                <span className="text-success hidden xs:inline">Saved!</span>
               </>
             ) : (
               <>
                 <Save className="w-4 h-4 text-secondary" />
-                <span>Save Draft</span>
+                <span className="hidden sm:inline">Save Draft</span>
+                <span className="sm:hidden hidden xs:inline">Save</span>
               </>
             )}
           </button>
@@ -144,14 +145,14 @@ export const ProductCreationShell: React.FC = () => {
           <button
             onClick={() => toggleHelp()}
             aria-label={isPlaying ? 'Stop audio assistance' : 'Listen to instructions'}
-            className="flex items-center gap-1.5 text-primary hover:bg-surface-container rounded-full px-3 py-1.5 text-xs font-bold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="flex items-center gap-1.5 text-primary hover:bg-surface-container rounded-full px-2 sm:px-3 py-1.5 text-xs font-bold transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0"
           >
             {isPlaying ? (
               <VolumeX className="w-4 h-4 text-secondary animate-pulse" />
             ) : (
               <Volume2 className="w-4 h-4 text-primary" />
             )}
-            <span className="hidden sm:inline">
+            <span className="hidden md:inline">
               {isPlaying ? 'Playing...' : 'Listen'}
             </span>
           </button>

@@ -153,9 +153,9 @@ describe('StorageUploadQueue — Durable Offline Queue & Idempotency', () => {
     const vi = (await import('vitest')).vi;
 
     const mockUpload = vi.spyOn(mediaStorageService, 'upload').mockImplementationOnce(() => {
-      const err = new Error('Media upload failed (502) [AuthorizationRequired]: Invalid Signature');
-      (err as any).status = 502;
-      (err as any).retryable = false;
+      const err = new Error('Media upload failed (502) [AuthorizationRequired]: Invalid Signature') as Error & { status?: number; retryable?: boolean };
+      err.status = 502;
+      err.retryable = false;
       return Promise.reject(err);
     });
 
@@ -183,9 +183,9 @@ describe('StorageUploadQueue — Durable Offline Queue & Idempotency', () => {
     let uploadAttempts = 0;
     const mockUpload = vi.spyOn(mediaStorageService, 'upload').mockImplementation(() => {
       uploadAttempts++;
-      const err = new Error('Media upload failed (500): Server error');
-      (err as any).status = 500;
-      (err as any).retryable = true;
+      const err = new Error('Media upload failed (500): Server error') as Error & { status?: number; retryable?: boolean };
+      err.status = 500;
+      err.retryable = true;
       return Promise.reject(err);
     });
 

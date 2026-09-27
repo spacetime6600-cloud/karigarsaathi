@@ -287,7 +287,7 @@ export const ApprovePublicInfoPage: React.FC = () => {
               {failedReadinessErrors.map((err, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-surface-container rounded-xl border border-surface-variant flex items-center justify-between gap-3 text-xs"
+                  className="p-3 bg-surface-container rounded-xl border border-surface-variant flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs"
                 >
                   <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export const ApprovePublicInfoPage: React.FC = () => {
                       navigate(err.stepUrl);
                     }}
                     rightIcon={<ArrowRight className="w-3 h-3" />}
-                    className="shrink-0 text-[11px] py-1 px-2.5 font-bold"
+                    className="shrink-0 self-end sm:self-auto text-[11px] py-1 px-2.5 font-bold"
                   >
                     Fix in {err.stepName}
                   </Button>

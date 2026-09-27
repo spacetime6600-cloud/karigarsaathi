@@ -13,6 +13,7 @@ import { validateProductForReadiness } from '@/domain/products/validation';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { draftRecoveryService, ConflictCheckResult } from '@/services/storage/draftRecoveryService';
 import { logger } from '@/services/logging/logger';
+import { storageUploadQueue } from '@/services/storage/storageUploadQueue';
 
 export type AutosaveStatus = 'idle' | 'saving' | 'saved' | 'offline_saved' | 'error';
 
@@ -215,6 +216,54 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     }
   }, [user?.id, draft.artisanId, draft.ownerId, draft.id]);
+
+  // Synchronize completed background uploads with draft image records
+  useEffect(() => {
+    const unsubscribe = storageUploadQueue.subscribe((items) => {
+      if (!items || items.length === 0) return;
+      setDraft((prev) => {
+        if (!prev.images || prev.images.length === 0) return prev;
+        let hasChanges = false;
+        const updatedImages = prev.images.map((img) => {
+          const completedQueueItem = items.find(
+            (item) => item.imageId === img.id && item.status === 'completed'
+          );
+          if (completedQueueItem && img.uploadStatus !== 'completed') {
+            hasChanges = true;
+            return {
+              ...img,
+              uploadStatus: 'completed' as const,
+              displayDownloadURL: completedQueueItem.downloadUrl || img.displayDownloadURL,
+            };
+          }
+          return img;
+        });
+
+        if (!hasChanges) return prev;
+        isDirtyRef.current = true;
+        return {
+          ...prev,
+          images: updatedImages,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // Auto-clean stale failed uploads when all draft images are verified or approved
+  useEffect(() => {
+    const hasApprovedPhotos =
+      (draft.images && draft.images.length > 0 && draft.images.every((img) => img.uploadStatus === 'completed' || img.enhancement?.approvalStatus === 'approved')) ||
+      (draft.photos && draft.photos.length > 0 && draft.photos.every((p) => p.approvalStatus === 'approved'));
+
+    if (hasApprovedPhotos) {
+      storageUploadQueue.clearFailed(user?.id).catch(() => {});
+    }
+  }, [draft.images, draft.photos, user?.id]);
 
   // Main Save Draft method (Manual or Triggered)
   const saveDraft = useCallback(async (): Promise<ProductRecord> => {
@@ -498,7 +547,11 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
         updatedAt: new Date().toISOString(),
       };
     });
-  }, []);
+
+    if (user?.id) {
+      storageUploadQueue.cancelItemsForImage(user.id, id).catch(() => {});
+    }
+  }, [user?.id]);
 
   const setCoverPhoto = useCallback((index: number) => {
     isDirtyRef.current = true;
@@ -578,6 +631,8 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateImageEnhancement = useCallback(
     (photoId: string, enhancementData: Partial<PhotographItem>) => {
       isDirtyRef.current = true;
+      const isApproved = enhancementData.approvalStatus === 'approved';
+
       setDraft((prev) => {
         const updatedPhotos = prev.photos.map((photo) => {
           if (photo.id !== photoId) return photo;
@@ -590,7 +645,7 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
           };
 
           if (
-            enhancementData.approvalStatus === 'approved' &&
+            isApproved &&
             enhancementData.selectedVariant === 'enhanced' &&
             enhancementData.enhancedUrl
           ) {
@@ -616,6 +671,13 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
           return {
             ...img,
+            uploadStatus: isApproved ? ('completed' as const) : img.uploadStatus,
+            displayDownloadURL:
+              isApproved && enhancementData.enhancedUrl
+                ? enhancementData.enhancedUrl
+                : img.displayDownloadURL,
+            originalDownloadURL:
+              img.originalDownloadURL || (isApproved && enhancementData.enhancedUrl ? enhancementData.enhancedUrl : img.originalDownloadURL),
             enhancement: {
               ...currentEnhancement,
               jobId: enhancementData.jobId || currentEnhancement.jobId,
@@ -641,8 +703,15 @@ export const ProductDraftProvider: React.FC<{ children: React.ReactNode }> = ({ 
           updatedAt: new Date().toISOString(),
         };
       });
+
+      // Clear any pending/failed background upload queue items for this image when approved
+      if (isApproved && user?.id) {
+        storageUploadQueue.cancelItemsForImage(user.id, photoId).catch((err) => {
+          logger.warn('STORAGE', 'Failed to clear queue items for approved image', { error: String(err) });
+        });
+      }
     },
-    []
+    [user?.id]
   );
 
   const clearSaveError = useCallback(() => {
