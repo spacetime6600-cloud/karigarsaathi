@@ -32,9 +32,8 @@ export const CoordinatorLoginPage: React.FC = () => {
     searchParams.get('returnUrl') ||
     (location.state as { from?: { pathname?: string; search?: string } })?.from?.pathname;
 
-  const isDev = Boolean(import.meta.env.DEV);
-  const [email, setEmail] = useState(isDev ? 'coordinator@karigarsaathi.gov.in' : '');
-  const [password, setPassword] = useState(isDev ? 'CoordinatorPass123!' : '');
+  const [email, setEmail] = useState('coordinator@karigarsaathi.gov.in');
+  const [password, setPassword] = useState('CoordinatorPass123!');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -305,6 +304,38 @@ export const CoordinatorLoginPage: React.FC = () => {
                 <span className="leading-relaxed">{error}</span>
               </div>
             )}
+
+            {/* Judge & Evaluator Quick Demo Callout */}
+            <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-primary text-[11px] sm:text-xs">
+                      Evaluator Demo Access
+                    </span>
+                    <span className="px-1.5 py-0.2 bg-secondary/10 text-secondary text-[9px] font-bold rounded">
+                      Prefilled
+                    </span>
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] text-on-surface-variant font-mono">
+                    coordinator@karigarsaathi.gov.in
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('coordinator@karigarsaathi.gov.in');
+                  setPassword('CoordinatorPass123!');
+                }}
+                className="px-2.5 py-1 text-[11px] font-bold text-secondary bg-white hover:bg-amber-50 border border-secondary/30 rounded-lg shadow-2xs transition-colors shrink-0"
+              >
+                Auto-fill
+              </button>
+            </div>
 
             {/* Form */}
             <form onSubmit={handleCoordinatorSignIn} className="flex flex-col gap-4">

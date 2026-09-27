@@ -175,4 +175,46 @@ describe('Public Sign-In Selection & Role Entry Suite', () => {
     expect(regLink).toBeInTheDocument();
     expect(regLink).toHaveAttribute('href', '/coordinator/register');
   });
+
+  it('9. Prefills coordinator credentials by default for evaluator direct sign-in', () => {
+    render(
+      <MemoryRouter initialEntries={['/coordinator/login']}>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/coordinator/login" element={<CoordinatorLoginPage />} />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const emailInput = screen.getByLabelText(/Coordinator Email Address/i) as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(/^Password/i) as HTMLInputElement;
+
+    expect(emailInput.value).toBe('coordinator@karigarsaathi.gov.in');
+    expect(passwordInput.value).toBe('CoordinatorPass123!');
+    expect(screen.getByText(/Evaluator Demo Access/i)).toBeInTheDocument();
+  });
+
+  it('10. Prefills artisan credentials by default for evaluator direct sign-in', () => {
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/login" element={<SignInPage />} />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const emailInput = screen.getByLabelText(/Email Address/i) as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(/^Password/i) as HTMLInputElement;
+
+    expect(emailInput.value).toBe('artisan_a@karigarsaathi.local');
+    expect(passwordInput.value).toBe('KarigarPass123!');
+    expect(screen.getByText(/Evaluator Demo Access/i)).toBeInTheDocument();
+  });
 });

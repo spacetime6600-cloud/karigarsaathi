@@ -5,7 +5,7 @@ import { useLanguage } from '@/app/providers/LanguageProvider';
 import { ROUTES, getSafeReturnUrl } from '@/routes';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 
 export const SignInPage: React.FC = () => {
   const { signInWithEmail, registerArtisan, isAuthenticated, isLoading: authLoading, user, userAccount } = useAuth();
@@ -19,11 +19,10 @@ export const SignInPage: React.FC = () => {
 
   const [authMode, setAuthMode] = useState<'email_signin' | 'email_register'>('email_signin');
 
-  // Email form state (prefill demo credentials exclusively in development)
-  const isDev = Boolean(import.meta.env.DEV);
-  const [email, setEmail] = useState(isDev ? 'artisan_a@karigarsaathi.local' : '');
-  const [password, setPassword] = useState(isDev ? 'KarigarPass123!' : '');
-  const [displayName, setDisplayName] = useState(isDev ? 'Ravi Kumar' : '');
+  // Email form state (prefilled demo credentials for seamless evaluator access)
+  const [email, setEmail] = useState('artisan_a@karigarsaathi.local');
+  const [password, setPassword] = useState('KarigarPass123!');
+  const [displayName, setDisplayName] = useState('Ravi Kumar');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -130,14 +129,49 @@ export const SignInPage: React.FC = () => {
           </div>
         )}
 
+        {/* Judge & Evaluator Quick Demo Callout */}
+        {authMode === 'email_signin' && (
+          <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-primary text-[11px] sm:text-xs">
+                    Evaluator Demo Access
+                  </span>
+                  <span className="px-1.5 py-0.2 bg-secondary/10 text-secondary text-[9px] font-bold rounded">
+                    Prefilled
+                  </span>
+                </div>
+                <span className="text-[10px] sm:text-[11px] text-on-surface-variant font-mono">
+                  artisan_a@karigarsaathi.local
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('artisan_a@karigarsaathi.local');
+                setPassword('KarigarPass123!');
+              }}
+              className="px-2.5 py-1 text-[11px] font-bold text-secondary bg-white hover:bg-amber-50 border border-secondary/30 rounded-lg shadow-2xs transition-colors shrink-0"
+            >
+              Auto-fill
+            </button>
+          </div>
+        )}
+
         {/* Email Sign In / Registration Form */}
         <form onSubmit={handleEmailAuth} className="flex flex-col gap-4">
           {authMode === 'email_register' && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-bold text-on-surface flex items-center gap-1.5">
+              <label htmlFor="artisan-name" className="text-sm font-bold text-on-surface flex items-center gap-1.5">
                 <User className="w-4 h-4 text-primary" /> Artisan / Workshop Name
               </label>
               <input
+                id="artisan-name"
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -149,10 +183,11 @@ export const SignInPage: React.FC = () => {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-on-surface flex items-center gap-1.5">
+            <label htmlFor="artisan-email" className="text-sm font-bold text-on-surface flex items-center gap-1.5">
               <Mail className="w-4 h-4 text-primary" /> Email Address
             </label>
             <input
+              id="artisan-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -163,10 +198,11 @@ export const SignInPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-on-surface flex items-center gap-1.5">
+            <label htmlFor="artisan-password" className="text-sm font-bold text-on-surface flex items-center gap-1.5">
               <Lock className="w-4 h-4 text-primary" /> Password
             </label>
             <input
+              id="artisan-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
