@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import { DailySalesBucket } from '@/domain/analytics';
 import { IndianRupee, Package, Calendar } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -18,6 +19,7 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
   buckets,
   currencySymbol = '₹',
 }) => {
+  const { t } = useLanguage();
   const [metricType, setMetricType] = useState<'value' | 'units'>('value');
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const chartRef = useRef<SVGSVGElement>(null);
@@ -108,10 +110,10 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-variant/40">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-primary tracking-tight">
-            Sales overview
+            {t('dashboard.salesOverview')}
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
-            Confirmed sales performance (Last 30 days)
+            {t('dashboard.confirmedPerformance')}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
             )}
           >
             <IndianRupee className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Sales value</span>
+            <span>{t('dashboard.salesValue')}</span>
           </button>
 
           <button
@@ -148,7 +150,7 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
             )}
           >
             <Package className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Units sold</span>
+            <span>{t('dashboard.unitsSold')}</span>
           </button>
         </div>
       </div>
@@ -311,7 +313,9 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
                 {currencySymbol}{formatINR(activeBucket.salesValue)}
               </span>
               <span className="text-white/90">
-                {activeBucket.unitsSold} {activeBucket.unitsSold === 1 ? 'unit' : 'units'} sold
+                {activeBucket.unitsSold === 1
+                  ? t('dashboard.unitSoldSummary')
+                  : t('dashboard.unitsSoldSummary', { count: activeBucket.unitsSold })}
               </span>
             </div>
           </div>
@@ -321,7 +325,10 @@ export const SalesOverviewChart: React.FC<SalesOverviewChartProps> = ({
       {/* Summary Narrative Footer */}
       <div className="pt-2 border-t border-surface-variant/40 flex items-center justify-between text-xs text-on-surface-variant">
         <p>
-          <strong className="text-primary font-bold">{totalUnits}</strong> {totalUnits === 1 ? 'unit' : 'units'} sold over the last 30 days totaling <strong className="text-primary font-bold">{currencySymbol}{formatINR(totalValue)}</strong>.
+          {t('dashboard.salesSummaryFooter', {
+            count: totalUnits,
+            total: `${currencySymbol}${formatINR(totalValue)}`,
+          })}
         </p>
       </div>
     </div>

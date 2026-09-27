@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import { ProductRecord } from '@/domain/products';
 import { priceHistoryService, ProductPriceInsight } from '@/services/api/priceHistoryService';
 import { TrendingUp, TrendingDown, Tag, Sparkles } from 'lucide-react';
@@ -28,6 +29,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
   products,
   currencySymbol = '₹',
 }) => {
+  const { t } = useLanguage();
   const activeProducts = useMemo(() => products.filter((p) => p.status !== 'archived'), [products]);
   const [selectedProductId, setSelectedProductId] = useState<string>(() => {
     return activeProducts[0]?.id || '';
@@ -123,10 +125,10 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/8">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
-            Your product price history
+            {t('dashboard.priceHistoryTitle')}
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
-            Step-line changes across recorded catalogue pricing
+            {t('dashboard.stepLineChanges')}
           </p>
         </div>
 
@@ -134,7 +136,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
         {activeProducts.length > 0 && (
           <div className="relative self-start sm:self-auto min-w-[200px] max-w-[280px]">
             <label htmlFor="product-price-select" className="sr-only">
-              Select product for price history
+              {t('dashboard.selectProductAria')}
             </label>
             <select
               id="product-price-select"
@@ -158,7 +160,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 p-4 rounded-2xl bg-[#FFF9EF]/70 border border-[#001D36]/8">
             {/* Current Price as the strongest number */}
             <div className="flex flex-col">
-              <span className="text-xs font-medium text-on-surface-variant">Current listed price</span>
+              <span className="text-xs font-medium text-on-surface-variant">{t('dashboard.currentListedPrice')}</span>
               <span className="text-3xl sm:text-4xl font-bold text-primary font-sans tracking-tight mt-0.5 leading-none">
                 {currencySymbol}{formatINR(priceInsight.currentPrice)}
               </span>
@@ -167,14 +169,14 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
             {/* Last updated and previous change as smaller supporting facts */}
             <div className="flex items-center gap-5 sm:gap-6 flex-wrap text-xs text-on-surface-variant">
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-on-surface-variant/75">Last updated</span>
+                <span className="text-[11px] font-medium text-on-surface-variant/75">{t('dashboard.lastUpdated')}</span>
                 <span className="font-semibold text-primary mt-0.5">
                   {formatDate(priceInsight.lastChangeDate)}
                 </span>
               </div>
 
               <div className="flex flex-col">
-                <span className="text-[11px] font-medium text-on-surface-variant/75">Previous change</span>
+                <span className="text-[11px] font-medium text-on-surface-variant/75">{t('dashboard.previousChange')}</span>
                 <div className="flex items-center gap-1 mt-0.5">
                   {priceInsight.hasPriceHistory && priceInsight.priceDifference !== null ? (
                     priceInsight.priceDifference > 0 ? (
@@ -188,11 +190,11 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
                         -{currencySymbol}{formatINR(Math.abs(priceInsight.priceDifference))} ({priceInsight.percentChange}%)
                       </span>
                     ) : (
-                      <span className="font-bold text-on-surface-variant">No change</span>
+                      <span className="font-bold text-on-surface-variant">{t('dashboard.noChange')}</span>
                     )
                   ) : (
                     <span className="text-on-surface-variant/80 font-medium">
-                      Initial listed price
+                      {t('dashboard.initialListedPrice')}
                     </span>
                   )}
                 </div>
@@ -259,7 +261,7 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
                       fill="#633F00"
                       fontWeight="bold"
                     >
-                      AI suggested baseline: {currencySymbol}{formatINR(priceInsight.aiSuggestedPrice!)}
+                      {t('dashboard.aiSuggestedBaseline', { price: `${currencySymbol}${formatINR(priceInsight.aiSuggestedPrice!)}` })}
                     </text>
                   </g>
                 )}
@@ -342,7 +344,10 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
                 <Tag className="w-4 h-4" />
               </div>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Price history will appear after recorded price changes. Current listed price: <strong className="text-primary font-bold">{currencySymbol}{formatINR(priceInsight.currentPrice)}</strong> (listed {formatDate(priceInsight.lastChangeDate)}).
+                {t('dashboard.priceHistoryNotice', {
+                  price: `${currencySymbol}${formatINR(priceInsight.currentPrice)}`,
+                  date: formatDate(priceInsight.lastChangeDate),
+                })}
               </p>
             </div>
           )}
@@ -352,14 +357,16 @@ export const ProductPriceHistoryChart: React.FC<ProductPriceHistoryChartProps> =
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FFF9EF] border border-[#FFDDB5] text-xs text-[#2A1800]">
               <Sparkles className="w-4 h-4 text-[#FFB955] shrink-0" />
               <span>
-                <strong>AI-suggested range:</strong> Generated from verified raw material and labour breakdown ({currencySymbol}{formatINR(priceInsight.costBreakdownTotal || 0)} base cost).
+                {t('dashboard.aiSuggestedRange', {
+                  price: `${currencySymbol}${formatINR(priceInsight.costBreakdownTotal || 0)}`,
+                })}
               </span>
             </div>
           )}
         </div>
       ) : (
         <div className="p-8 text-center text-xs text-on-surface-variant">
-          No product selected for price history inspection.
+          {t('dashboard.noProductSelected')}
         </div>
       )}
     </div>

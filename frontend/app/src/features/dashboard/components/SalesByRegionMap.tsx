@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useId } from 'react';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import { RegionSalesData } from '@/domain/analytics';
 import { VERIFIED_INDIA_MAP_PATHS } from '@/data/indiaMapPaths';
 import { MapPin, RotateCcw, Package, IndianRupee } from 'lucide-react';
@@ -19,6 +20,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
   regionalSales,
   currencySymbol = '₹',
 }) => {
+  const { t } = useLanguage();
   const [metric, setMetric] = useState<'units' | 'value'>('units');
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
@@ -80,10 +82,10 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-surface-variant/40">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-primary tracking-tight">
-            Where your buyers are
+            {t('dashboard.whereBuyersAre')}
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
-            Regional distribution across Indian states & UTs
+            {t('dashboard.regionalDistributionDesc')}
           </p>
         </div>
 
@@ -105,7 +107,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
             )}
           >
             <Package className="w-3 h-3" />
-            <span>Units</span>
+            <span>{t('dashboard.unitsSold')}</span>
           </button>
 
           <button
@@ -120,7 +122,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
             )}
           >
             <IndianRupee className="w-3 h-3" />
-            <span>Value</span>
+            <span>{t('dashboard.salesValue')}</span>
           </button>
         </div>
       </div>
@@ -188,7 +190,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
         {/* Regional Ranking List (5 cols) */}
         <div className="md:col-span-5 flex flex-col gap-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-primary">
-            <span>Top Buyer Destinations</span>
+            <span>{t('dashboard.topBuyerRegions')}</span>
             {selectedCode && (
               <button
                 type="button"
@@ -196,7 +198,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
                 className="inline-flex items-center gap-1 text-[11px] font-semibold text-secondary hover:underline"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>All regions</span>
+                <span>{t('dashboard.resetSelection')}</span>
               </button>
             )}
           </div>
@@ -226,7 +228,7 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
 
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-[11px] font-bold text-primary">
-                        {metric === 'units' ? `${r.unitsSold} units` : `${currencySymbol}${formatINR(r.salesValue)}`}
+                        {metric === 'units' ? t('dashboard.unitsCount', { count: r.unitsSold }) : `${currencySymbol}${formatINR(r.salesValue)}`}
                       </span>
                       <span className="text-[10px] text-on-surface-variant/70 bg-white px-1.5 py-0.5 rounded-md border border-surface-variant/40">
                         {r.sharePercent}%
@@ -237,17 +239,17 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
               })
             ) : (
               <div className="p-4 text-center text-xs text-on-surface-variant bg-surface rounded-xl border border-surface-variant/40">
-                No recorded regional buyer destinations in this period.
+                {t('dashboard.noRegionalDestinations')}
               </div>
             )}
 
             {/* Unknown or Outside-India destinations accounting */}
             {unknownDestinations && unknownDestinations.unitsSold > 0 && (
               <div className="flex items-center justify-between p-2 rounded-xl text-[11px] bg-surface-container-low/50 text-on-surface-variant border border-dashed border-surface-variant/60">
-                <span>Location unspecified</span>
+                <span>{t('dashboard.locationUnspecified')}</span>
                 <span className="font-semibold text-primary">
                   {metric === 'units'
-                    ? `${unknownDestinations.unitsSold} units`
+                    ? t('dashboard.unitsCount', { count: unknownDestinations.unitsSold })
                     : `${currencySymbol}${formatINR(unknownDestinations.salesValue)}`}
                 </span>
               </div>
@@ -259,23 +261,26 @@ export const SalesByRegionMap: React.FC<SalesByRegionMapProps> = ({
       {/* Legend & Summary */}
       <div className="pt-2 border-t border-surface-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-on-surface-variant">
         <div className="flex items-center gap-2 text-[11px]">
-          <span className="font-semibold text-primary">Map key:</span>
+          <span className="font-semibold text-primary">{t('dashboard.mapKey')}</span>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#EDF4FF] border border-[#001D36]/20" />
             <span className="text-[10px]">0</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#AFC9EA] border border-[#001D36]/20" />
-            <span className="text-[10px]">Moderate</span>
+            <span className="text-[10px]">{t('dashboard.mapModerate')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#17324D] border border-[#001D36]/20" />
-            <span className="text-[10px]">Highest</span>
+            <span className="text-[10px]">{t('dashboard.mapHighest')}</span>
           </div>
         </div>
 
         <span className="text-[11px]">
-          Total: <strong className="text-primary font-bold">{totalUnits}</strong> units ({currencySymbol}{formatINR(totalValue)})
+          {t('dashboard.totalMapSummary', {
+            count: totalUnits,
+            total: `${currencySymbol}${formatINR(totalValue)}`,
+          })}
         </span>
       </div>
     </div>

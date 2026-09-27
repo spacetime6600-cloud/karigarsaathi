@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useSync } from '@/app/providers/SyncProvider';
 import { productRepository, enquiryRepository } from '@/repositories';
@@ -98,6 +99,7 @@ function getProductThumbnailUrl(product: ProductRecord): string | null {
 
 export const ArtisanDashboardPage: React.FC = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const { t } = useLanguage();
   const { resetDraft, loadDraft } = useProductDraft();
   const { syncState, failedCount, retryFailed } = useSync();
   const navigate = useNavigate();
@@ -361,17 +363,17 @@ export const ArtisanDashboardPage: React.FC = () => {
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="font-sans text-3xl sm:text-4xl lg:text-[40px] font-bold text-primary tracking-tight leading-tight">
-              Namaste, {greetingName}
+              {t('dashboard.greeting', { name: greetingName })}
             </h1>
             {isDemoMode && (
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FFDDB5]/80 text-[#2A1800] border border-[#FFB955]/70">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#633F00]" />
-                Demonstration Fixture Data
+                {t('dashboard.demoDataBadge')}
               </span>
             )}
           </div>
           <p className="text-base sm:text-lg text-[#001D36]/75 font-normal leading-normal">
-            Your craft, your customers, your progress. Manage your products, stock and enquiries.
+            {t('dashboard.tagline')}
           </p>
         </div>
 
@@ -382,7 +384,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             className="px-4 py-2.5 rounded-xl border border-[#001D36]/15 hover:border-[#001D36]/30 bg-[#FFFDF9] hover:bg-primary/[0.04] text-primary text-sm font-semibold flex items-center gap-2 transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] shadow-2xs"
           >
             <MessageSquare className="w-4 h-4 text-secondary" />
-            <span>Check enquiries</span>
+            <span>{t('dashboard.checkEnquiries')}</span>
           </Link>
 
           <button
@@ -391,7 +393,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             className="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-hover text-white text-sm font-semibold flex items-center gap-2 shadow-xs transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
           >
             <Plus className="w-4 h-4" />
-            <span>Add product</span>
+            <span>{t('dashboard.addProduct')}</span>
           </button>
         </div>
       </section>
@@ -402,10 +404,10 @@ export const ArtisanDashboardPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/10">
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-primary tracking-tight">
-                Sales overview
+                {t('dashboard.salesOverview')}
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
-                Confirmed sales performance (Last 30 days)
+                {t('dashboard.confirmedPerformance')}
               </p>
             </div>
           </div>
@@ -420,17 +422,17 @@ export const ArtisanDashboardPage: React.FC = () => {
               {/* Small editorial eyebrow */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold w-fit select-none">
                 <TrendingUp className="w-3.5 h-3.5 text-secondary" />
-                <span>Your sales insights will appear here</span>
+                <span>{t('dashboard.insightsEyebrow')}</span>
               </div>
 
               {/* Heading: 26–32px semibold deep navy */}
               <h2 className="text-2xl sm:text-[28px] lg:text-[30px] font-semibold text-primary tracking-tight leading-snug mt-3 sm:mt-3.5">
-                Start recording confirmed craft sales
+                {t('dashboard.startRecordingSales')}
               </h2>
 
               {/* Explanatory text */}
               <p className="text-sm sm:text-[15px] text-[#001D36]/75 leading-relaxed font-normal mt-2">
-                When buyers respond to your verified Craft Passports and confirm orders through direct enquiries or marketplace exports, sales trends, regional distribution and price comparisons will automatically populate here.
+                {t('dashboard.salesIntroDesc')}
               </p>
             </div>
 
@@ -450,7 +452,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-primary tracking-tight">
-                  Units sold
+                  {t('dashboard.unitsSold')}
                 </h3>
                 <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10">
                   <Package className="w-4 h-4" aria-hidden="true" />
@@ -485,10 +487,10 @@ export const ArtisanDashboardPage: React.FC = () => {
                         0%
                       </span>
                     )}
-                    <span>vs prev 30 days</span>
+                    <span>{t('dashboard.vsPrev30Days')}</span>
                   </>
                 ) : (
-                  <span>No previous-period comparison</span>
+                  <span>{t('dashboard.noPrevComparison')}</span>
                 )}
               </div>
             </div>
@@ -499,7 +501,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-primary tracking-tight">
-                  Recorded sales value
+                  {t('dashboard.recordedSalesValue')}
                 </h3>
                 <div className="w-9 h-9 rounded-xl bg-primary/5 text-secondary flex items-center justify-center border border-primary/10">
                   <IndianRupee className="w-4 h-4" aria-hidden="true" />
@@ -534,10 +536,10 @@ export const ArtisanDashboardPage: React.FC = () => {
                         0%
                       </span>
                     )}
-                    <span>vs prev 30 days</span>
+                    <span>{t('dashboard.vsPrev30Days')}</span>
                   </>
                 ) : (
-                  <span>No previous-period comparison</span>
+                  <span>{t('dashboard.noPrevComparison')}</span>
                 )}
               </div>
             </div>
@@ -548,7 +550,7 @@ export const ArtisanDashboardPage: React.FC = () => {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-primary tracking-tight">
-                  New enquiries
+                  {t('dashboard.newEnquiries')}
                 </h3>
                 <div className="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center border border-secondary/15">
                   <MessageSquare className="w-4 h-4" aria-hidden="true" />
@@ -561,13 +563,13 @@ export const ArtisanDashboardPage: React.FC = () => {
                 </span>
                 <p className="text-xs sm:text-sm text-on-surface-variant font-medium mt-2">
                   {summaryMetrics.newEnquiriesCount === 0
-                    ? 'No unread enquiries'
+                    ? t('dashboard.noUnreadEnquiries')
                     : summaryMetrics.newEnquiriesCount === 1
-                    ? '1 unread enquiry'
-                    : `${summaryMetrics.newEnquiriesCount} unread enquiries`}
+                    ? t('dashboard.oneUnreadEnquiry')
+                    : t('dashboard.unreadEnquiries', { count: summaryMetrics.newEnquiriesCount })}
                 </p>
                 <span className="text-[11px] text-on-surface-variant/70 block mt-0.5">
-                  Received during this period
+                  {t('dashboard.receivedThisPeriod')}
                 </span>
               </div>
             </div>
@@ -579,7 +581,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-secondary hover:text-secondary-hover transition-colors group"
                 aria-label={`View ${summaryMetrics.newEnquiriesCount} new buyer enquiries`}
               >
-                <span>View enquiries</span>
+                <span>{t('dashboard.viewEnquiries')}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
@@ -591,10 +593,10 @@ export const ArtisanDashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-primary tracking-tight">
-                    Live products
+                    {t('dashboard.liveProducts')}
                   </h3>
                   <p className="text-xs text-on-surface-variant/75 mt-0.5">
-                    Current inventory snapshot
+                    {t('dashboard.currentSnapshot')}
                   </p>
                 </div>
                 <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10">
@@ -623,7 +625,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     {inventoryCounts.totalActive}
                   </span>
                   <span className="text-[11px] font-medium text-on-surface-variant mt-0.5">
-                    {inventoryCounts.totalActive === 1 ? 'Product' : 'Products'}
+                    {inventoryCounts.totalActive === 1 ? t('dashboard.product_one') : t('dashboard.product_other')}
                   </span>
                 </button>
 
@@ -637,7 +639,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     {inventoryCounts.draftCount}
                   </span>
                   <span className="text-[11px] font-medium text-on-surface-variant mt-0.5">
-                    {inventoryCounts.draftCount === 1 ? 'Draft' : 'Drafts'}
+                    {inventoryCounts.draftCount === 1 ? t('dashboard.draft_one') : t('dashboard.draft_other')}
                   </span>
                 </button>
 
@@ -651,7 +653,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     {inventoryCounts.lowStockCount}
                   </span>
                   <span className="text-[11px] font-medium text-on-surface-variant mt-0.5 flex items-center gap-1">
-                    Low stock
+                    {t('dashboard.lowStock')}
                     {inventoryCounts.lowStockCount > 0 && (
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                     )}
@@ -694,10 +696,12 @@ export const ArtisanDashboardPage: React.FC = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-rose-950">
-                    Photograph upload incomplete
+                    {t('dashboard.photoUploadIncomplete')}
                   </span>
                   <span className="text-xs text-rose-800">
-                    {failedCount > 0 ? `${failedCount} file(s) pending sync.` : 'Connection interrupted during upload.'} Your authentic original photo is safely stored.
+                    {failedCount > 0
+                      ? t('dashboard.pendingSyncNotice', { count: failedCount })
+                      : t('dashboard.uploadInterrupted')}
                   </span>
                 </div>
               </div>
@@ -712,7 +716,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                 ) : (
                   <RotateCcw className="w-3.5 h-3.5" />
                 )}
-                <span>Retry Upload</span>
+                <span>{t('dashboard.retryUpload')}</span>
               </button>
             </div>
           )}
@@ -726,14 +730,14 @@ export const ArtisanDashboardPage: React.FC = () => {
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-on-surface-variant font-medium">
-                      Continue your latest draft:
+                      {t('dashboard.continueLatestDraft')}
                     </span>
                     <span className="text-sm font-bold text-primary truncate max-w-[280px] sm:max-w-[400px]">
-                      {latestDraft.title || 'Untitled product'}
+                      {latestDraft.title || t('dashboard.untitledProduct')}
                     </span>
                   </div>
                   <span className="text-xs text-on-surface-variant">
-                    Edited {formatRelativeTime(latestDraft.updatedAt || latestDraft.createdAt)}
+                    {t('dashboard.editedTime', { time: formatRelativeTime(latestDraft.updatedAt || latestDraft.createdAt) })}
                   </span>
                 </div>
               </div>
@@ -744,7 +748,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     to="/artisan/inventory?tab=draft"
                     className="text-xs font-semibold text-on-surface-variant hover:text-primary px-2.5 py-1.5 rounded-md hover:bg-black/5 transition-colors"
                   >
-                    View drafts ({inventoryCounts.draftCount})
+                    {t('dashboard.viewDraftsCount', { count: inventoryCounts.draftCount })}
                   </Link>
                 )}
                 <button
@@ -752,7 +756,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                   onClick={() => handleResumeDraft(latestDraft)}
                   className="px-4 py-1.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-lg transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
                 >
-                  Continue
+                  {t('dashboard.continueAction')}
                 </button>
               </div>
             </div>
@@ -767,10 +771,12 @@ export const ArtisanDashboardPage: React.FC = () => {
           <div className="p-5 sm:p-6 border-b border-[#001D36]/8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF9]">
             <div className="flex items-baseline gap-2.5">
               <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
-                Your products
+                {t('dashboard.yourProducts')}
               </h2>
               <span className="text-xs sm:text-sm text-on-surface-variant font-medium">
-                ({inventoryCounts.totalActive} {inventoryCounts.totalActive === 1 ? 'product' : 'products'})
+                {inventoryCounts.totalActive === 1
+                  ? t('dashboard.productCount_one', { count: 1 })
+                  : t('dashboard.productCount_other', { count: inventoryCounts.totalActive })}
               </span>
             </div>
 
@@ -781,14 +787,14 @@ export const ArtisanDashboardPage: React.FC = () => {
                 onClick={handleToggleDemoMode}
                 className="text-[11px] font-semibold text-on-surface-variant hover:text-primary px-2.5 py-1.5 rounded-lg border border-[#001D36]/15 hover:bg-[#FFF9EF] transition-colors"
               >
-                {isDemoMode ? 'Reset to live data' : 'Demo populated data'}
+                {isDemoMode ? t('dashboard.resetLive') : t('dashboard.demoData')}
               </button>
 
               <Link
                 to="/artisan/inventory"
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-secondary hover:text-secondary-hover hover:underline transition-colors self-start sm:self-auto touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955] rounded-md px-1 py-0.5"
               >
-                <span>View inventory</span>
+                <span>{t('dashboard.viewInventory')}</span>
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
@@ -803,7 +809,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products by title, craft, category..."
+                placeholder={t('dashboard.searchPlaceholder')}
                 className="w-full bg-white border border-[#001D36]/15 rounded-xl pl-9 pr-8 py-2 text-sm text-primary placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all shadow-2xs"
                 aria-label="Search products"
               />
@@ -830,7 +836,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
-                All ({inventoryCounts.totalActive})
+                {t('dashboard.filterAll', { count: inventoryCounts.totalActive })}
               </button>
 
               <button
@@ -843,7 +849,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
-                Drafts ({inventoryCounts.draftCount})
+                {t('dashboard.filterDrafts', { count: inventoryCounts.draftCount })}
               </button>
 
               <button
@@ -856,7 +862,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     : 'text-on-surface-variant hover:text-amber-900'
                 )}
               >
-                Needs attention ({inventoryCounts.needsAttentionCount})
+                {t('dashboard.filterNeedsAttention', { count: inventoryCounts.needsAttentionCount })}
                 {inventoryCounts.needsAttentionCount > 0 && (
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 )}
@@ -866,11 +872,11 @@ export const ArtisanDashboardPage: React.FC = () => {
 
           {/* Desktop Table Header */}
           <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-[#FFF9EF]/80 text-xs font-semibold text-on-surface-variant uppercase tracking-wider border-b border-[#001D36]/8">
-            <span className="col-span-5">Product</span>
-            <span className="col-span-2">Price</span>
-            <span className="col-span-2">Stock</span>
-            <span className="col-span-2">Listing status</span>
-            <span className="col-span-1 text-right">Action</span>
+            <span className="col-span-5">{t('dashboard.colProduct')}</span>
+            <span className="col-span-2">{t('dashboard.colPrice')}</span>
+            <span className="col-span-2">{t('dashboard.colStock')}</span>
+            <span className="col-span-2">{t('dashboard.colStatus')}</span>
+            <span className="col-span-1 text-right">{t('dashboard.colAction')}</span>
           </div>
 
           {/* Product List Content */}
@@ -898,15 +904,15 @@ export const ArtisanDashboardPage: React.FC = () => {
                     <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
                       <Search className="w-6 h-6" />
                     </div>
-                    <h3 className="text-base font-bold text-primary">No products match your search</h3>
+                    <h3 className="text-base font-bold text-primary">{t('dashboard.noMatchTitle')}</h3>
                     <p className="text-xs sm:text-sm text-on-surface-variant max-w-sm">
-                      Try searching with a different craft technique, material, or clear your query.
+                      {t('dashboard.noMatchDesc')}
                     </p>
                     <button
                       onClick={() => setSearchQuery('')}
                       className="mt-2 text-xs font-bold text-secondary hover:underline px-3 py-1.5"
                     >
-                      Clear search
+                      {t('dashboard.clearSearch')}
                     </button>
                   </>
                 ) : activeFilter !== 'all' ? (
@@ -915,16 +921,18 @@ export const ArtisanDashboardPage: React.FC = () => {
                       <Package className="w-6 h-6" />
                     </div>
                     <h3 className="text-base font-bold text-primary">
-                      No {activeFilter === 'drafts' ? 'drafts' : 'items needing attention'} recorded
+                      {activeFilter === 'drafts'
+                        ? t('dashboard.noDraftsRecorded')
+                        : t('dashboard.noAttentionRecorded')}
                     </h3>
                     <p className="text-xs sm:text-sm text-on-surface-variant max-w-sm">
-                      All your craft listings are active and in healthy stock.
+                      {t('dashboard.healthyStock')}
                     </p>
                     <button
                       onClick={() => setActiveFilter('all')}
                       className="mt-2 text-xs font-bold text-secondary hover:underline px-3 py-1.5"
                     >
-                      View all products
+                      {t('dashboard.viewAllProducts')}
                     </button>
                   </>
                 ) : (
@@ -933,16 +941,16 @@ export const ArtisanDashboardPage: React.FC = () => {
                       <Package className="w-6 h-6" />
                     </div>
                     <h3 className="text-base sm:text-lg font-bold text-primary">
-                      Your first product starts here.
+                      {t('dashboard.firstProductTitle')}
                     </h3>
                     <p className="text-xs sm:text-sm text-on-surface-variant max-w-md">
-                      Add a photo and a few details to create your catalogue and generate verifiable Craft Passports.
+                      {t('dashboard.firstProductDesc')}
                     </p>
                     <button
                       onClick={handleStartNewProduct}
                       className="mt-2 px-5 py-2.5 bg-secondary hover:bg-secondary-hover text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-colors"
                     >
-                      Add your first product
+                      {t('dashboard.addFirstProduct')}
                     </button>
                   </>
                 )}
@@ -959,7 +967,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                     ? `₹${product.price.toLocaleString('en-IN')}`
                     : '—';
                 const craftSubtitle =
-                  product.craftType || product.category || 'Handloom Craft';
+                  product.craftType || product.category || t('dashboard.handloomCraft');
                 const locationText = product.state || product.origin || '';
 
                 return (
@@ -988,7 +996,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                           onClick={() => handleEditProduct(product)}
                           className="text-left font-semibold text-sm sm:text-base text-primary group-hover:text-secondary transition-colors truncate focus:outline-none focus-visible:underline"
                         >
-                          {product.title || 'Untitled Craft'}
+                          {product.title || t('dashboard.untitledCraft')}
                         </button>
                         <span className="text-xs text-on-surface-variant truncate mt-0.5">
                           {craftSubtitle}
@@ -1007,8 +1015,8 @@ export const ArtisanDashboardPage: React.FC = () => {
                             isLow ? 'text-amber-700 font-bold' : 'text-on-surface-variant'
                           )}
                         >
-                          {product.stockQuantity ?? 0} units
-                          {isLow && ' (Low stock)'}
+                          {t('dashboard.unitsCount', { count: product.stockQuantity ?? 0 })}
+                          {isLow && ` ${t('dashboard.lowStockBracket')}`}
                         </span>
                       </div>
 
@@ -1019,7 +1027,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                           onClick={() => handleEditProduct(product)}
                           className="px-3 py-1 bg-white border border-surface-variant rounded-lg text-xs font-bold text-primary hover:border-primary transition-colors"
                         >
-                          Edit
+                          {t('dashboard.editAction')}
                         </button>
                       </div>
                     </div>
@@ -1031,11 +1039,11 @@ export const ArtisanDashboardPage: React.FC = () => {
 
                     <div className="hidden md:flex col-span-2 items-center gap-1.5 text-xs text-primary">
                       <span className={clsx('font-medium', isLow && 'text-amber-800 font-bold')}>
-                        {product.stockQuantity ?? 0} units
+                        {t('dashboard.unitsCount', { count: product.stockQuantity ?? 0 })}
                       </span>
                       {isLow && (
                         <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                          <AlertTriangle className="w-2.5 h-2.5" /> Low
+                          <AlertTriangle className="w-2.5 h-2.5" /> {t('dashboard.lowStockBadge')}
                         </span>
                       )}
                     </div>
@@ -1053,8 +1061,8 @@ export const ArtisanDashboardPage: React.FC = () => {
                             fromLabel: 'Artisan Dashboard',
                             sourceRole: 'artisan',
                           }}
-                          title="View public Craft Passport"
-                          aria-label={`View Passport for ${product.title}`}
+                          title={t('dashboard.viewPassportAria')}
+                          aria-label={`${t('dashboard.viewPassportAria')}: ${product.title || t('dashboard.untitledCraft')}`}
                           className="p-1.5 text-secondary hover:bg-secondary/10 border border-secondary/30 rounded-lg transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
                         >
                           <QrCode className="w-4 h-4" />
@@ -1065,7 +1073,7 @@ export const ArtisanDashboardPage: React.FC = () => {
                         onClick={() => handleEditProduct(product)}
                         className="px-3 py-1.5 bg-white hover:bg-surface-container-low border border-surface-variant hover:border-primary rounded-lg text-xs font-bold text-primary transition-colors touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
                       >
-                        Edit
+                        {t('dashboard.editAction')}
                       </button>
                     </div>
                   </div>
@@ -1084,25 +1092,26 @@ interface StatusBadgeProps {
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+  const { t } = useLanguage();
   switch (status) {
     case 'ready':
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 select-none">
           <CheckCircle2 className="w-3 h-3 text-blue-600" />
-          <span>Ready</span>
+          <span>{t('dashboard.statusReady')}</span>
         </span>
       );
     case 'published':
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 select-none">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-          <span>Published</span>
+          <span>{t('dashboard.statusPublished')}</span>
         </span>
       );
     case 'archived':
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-600 border border-stone-200 select-none">
-          <span>Archived</span>
+          <span>{t('dashboard.statusArchived')}</span>
         </span>
       );
     case 'draft':
@@ -1110,7 +1119,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-surface-variant/70 select-none">
           <Clock className="w-3 h-3 text-on-surface-variant/70" />
-          <span>Draft</span>
+          <span>{t('dashboard.statusDraft')}</span>
         </span>
       );
   }

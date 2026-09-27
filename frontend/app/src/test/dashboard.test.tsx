@@ -151,4 +151,35 @@ describe('Artisan Dashboard — Clean, Practical Seller Workspace with Sales Ins
 
     expect(container.textContent).toContain('No digitized craft items cataloged yet');
   });
+
+  it('renders all dashboard metrics, titles, and table headers in Hindi when selectedLanguage is hi', async () => {
+    storage.set('selectedLanguage', 'hi');
+    await renderDashboard();
+
+    // Welcome & tagline
+    expect(container.textContent).toContain('नमस्ते');
+    expect(container.textContent).toContain('Ravi Kumar');
+    expect(container.textContent).toContain('आपका शिल्प, आपके ग्राहक, आपकी प्रगति');
+
+    // Action buttons & empty state
+    expect(container.textContent).toContain('पूछताछ देखें');
+    expect(container.textContent).toContain('उत्पाद जोड़ें');
+    expect(container.textContent).toContain('पुष्ट शिल्प बिक्री दर्ज करना शुरू करें');
+
+    // Metrics
+    expect(container.textContent).toContain('बेची गई इकाइयां');
+    expect(container.textContent).toContain('दर्ज बिक्री मूल्य');
+    expect(container.textContent).toContain('नई पूछताछ');
+    expect(container.textContent).toContain('लाइव उत्पाद');
+
+    // Products table header & tabs
+    expect(container.textContent).toContain('आपके उत्पाद');
+    expect(container.textContent).toContain('इन्वेंटरी देखें');
+    expect(container.textContent).toContain('उत्पाद');
+    expect(container.textContent).toContain('मूल्य');
+    expect(container.textContent).toContain('स्टॉक');
+    expect(container.textContent).toContain('स्थिति');
+    expect(container.textContent).toContain('कार्रवाई');
+    expect(container.textContent).toContain('संपादित करें');
+  });
 });

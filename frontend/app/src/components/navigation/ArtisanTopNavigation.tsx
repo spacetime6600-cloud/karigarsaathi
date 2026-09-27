@@ -35,7 +35,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
   navigate,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
 
   // Outside click listener
@@ -139,7 +139,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
     <div
       ref={menuRef}
       role="menu"
-      aria-label="Artisan Account Menu"
+      aria-label={t('nav.accountMenu')}
       tabIndex={-1}
       onKeyDown={handleKeyDown}
       className="fixed left-3 right-3 top-[60px] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72 max-w-[calc(100vw-24px)] glass-menu rounded-2xl p-4 shadow-xl z-50 motion-popover-enter flex flex-col gap-3 max-h-[min(480px,calc(100dvh-80px))] overflow-y-auto overscroll-contain"
@@ -150,14 +150,14 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
           {user?.name?.charAt(0) || 'A'}
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="font-bold text-sm text-primary truncate">{user?.name || 'Artisan'}</span>
-          <span className="text-xs text-on-surface-variant truncate">{user?.workshopName || 'Artisan Workshop'}</span>
+          <span className="font-bold text-sm text-primary truncate">{user?.name || t('nav.userRole')}</span>
+          <span className="text-xs text-on-surface-variant truncate">{user?.workshopName || t('nav.workshopDefault')}</span>
         </div>
       </div>
 
       {/* Sync Status Info */}
       <div className="flex items-center justify-between py-1 text-xs text-on-surface-variant">
-        <span>Sync State:</span>
+        <span>{t('nav.syncState')}:</span>
         <SyncStatusIndicator />
       </div>
 
@@ -165,7 +165,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
       <div className="flex flex-col gap-1.5 p-2 rounded-xl bg-surface-container/60 border border-surface-variant/40">
         <div className="flex items-center justify-between text-xs font-bold text-primary">
           <span className="flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-secondary" /> Language ({currentLanguageMeta.name})
+            <Globe className="w-3.5 h-3.5 text-secondary" /> {t('nav.language')} ({currentLanguageMeta.name})
           </span>
           <button
             role="menuitem"
@@ -173,10 +173,10 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
             onClick={handleLanguageClick}
             className="text-[11px] font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
           >
-            All options →
+            {t('nav.allOptions')}
           </button>
         </div>
-        <div className="grid grid-cols-5 gap-1 pt-1" role="radiogroup" aria-label="Quick language selector">
+        <div className="grid grid-cols-5 gap-1 pt-1" role="radiogroup" aria-label={t('nav.quickLangSelector')}>
           {supportedLanguages.map((lang) => {
             const isSelected = lang.code === language;
             return (
@@ -209,7 +209,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
         className="flex items-center gap-2 p-2 rounded-xl hover:bg-surface-container text-xs font-semibold text-primary transition-colors text-left touch-target active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
       >
         <Shield className="w-4 h-4 text-on-surface-variant" />
-        <span>Coordinator Portal View</span>
+        <span>{t('nav.coordinatorView')}</span>
       </button>
 
       {/* Sign Out */}
@@ -221,7 +221,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
           className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-error-container/60 hover:bg-error-container text-error text-xs font-bold transition-colors touch-target active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
         >
           <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <span>{t('nav.signOut')}</span>
         </button>
       </div>
     </div>
@@ -231,7 +231,7 @@ const AccountDropdownMenu: React.FC<AccountDropdownMenuProps> = ({
 export const ArtisanTopNavigation: React.FC = () => {
   const { user, userAccount, signOut, switchRole } = useAuth();
   const { isPlaying, toggleHelp } = useAudioHelp();
-  const { currentLanguageMeta } = useLanguage();
+  const { currentLanguageMeta, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -314,9 +314,9 @@ export const ArtisanTopNavigation: React.FC = () => {
 
   // Primary navigation items
   const navLinks = [
-    { to: '/artisan/dashboard', label: 'Home', icon: Home },
-    { to: '/artisan/inventory', label: 'Inventory', icon: Package },
-    { to: '/artisan/products/new/photos', label: 'New Product', icon: PlusCircle },
+    { to: '/artisan/dashboard', label: t('nav.home'), icon: Home },
+    { to: '/artisan/inventory', label: t('nav.inventory'), icon: Package },
+    { to: '/artisan/products/new/photos', label: t('nav.newProduct'), icon: PlusCircle },
   ];
 
   return (
@@ -373,7 +373,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                 KarigarSaathi
               </span>
               <span className="text-[8.5px] text-on-surface-variant font-medium tracking-wider uppercase mt-0.5">
-                Artisan Workspace
+                {t('nav.artisanWorkspace')}
               </span>
             </Link>
           </div>
@@ -392,8 +392,8 @@ export const ArtisanTopNavigation: React.FC = () => {
               ) : (
                 <Volume2 className="w-3.5 h-3.5 text-primary" />
               )}
-              <span className="hidden xl:inline">{isPlaying ? 'Playing...' : 'Listen'}</span>
-              <span className="xl:hidden">{isPlaying ? 'Stop' : 'Listen'}</span>
+              <span className="hidden xl:inline">{isPlaying ? t('nav.playing') : t('nav.listen')}</span>
+              <span className="xl:hidden">{isPlaying ? t('nav.stop') : t('nav.listen')}</span>
             </button>
 
             {/* Language Selector (English / Hindi / etc.) */}
@@ -421,7 +421,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                 aria-haspopup="dialog"
                 aria-expanded={isEnquiriesOpen}
                 aria-controls="buyer-enquiries-popover"
-                aria-label="Open buyer enquiries"
+                aria-label={t('nav.openEnquiries')}
                 onClick={() => {
                   setIsEnquiriesOpen((prev) => !prev);
                   setIsProfileOpen(false);
@@ -637,7 +637,7 @@ export const ArtisanTopNavigation: React.FC = () => {
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-primary/[0.04] hover:bg-primary/[0.08] text-primary font-semibold text-xs touch-target border border-primary/[0.08] active:scale-[0.98]"
               >
                 {isPlaying ? <VolumeX className="w-4 h-4 text-secondary" /> : <Volume2 className="w-4 h-4" />}
-                <span>{isPlaying ? 'Playing...' : 'Listen'}</span>
+                <span>{isPlaying ? t('nav.playing') : t('nav.listen')}</span>
               </button>
 
               <button
@@ -656,7 +656,7 @@ export const ArtisanTopNavigation: React.FC = () => {
 
             {/* Sync State */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-primary/[0.03] text-xs text-on-surface-variant">
-              <span>Sync Status</span>
+              <span>{t('nav.syncState')}</span>
               <SyncStatusIndicator />
             </div>
 
@@ -675,7 +675,7 @@ export const ArtisanTopNavigation: React.FC = () => {
               className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-error-container/60 text-error font-bold text-xs touch-target active:scale-[0.98]"
             >
               <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
+              <span>{t('nav.signOut')}</span>
             </button>
           </div>
         )}

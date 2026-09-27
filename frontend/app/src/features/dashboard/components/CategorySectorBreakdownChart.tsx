@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import { CategorySalesData, SectorSalesData } from '@/domain/analytics';
 import { Package, IndianRupee } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -20,6 +21,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
   sectors = [],
   currencySymbol = '₹',
 }) => {
+  const { t } = useLanguage();
   // If sector data is populated, default to categories but allow switching or render categories
   const hasSectorData = useMemo(() => sectors.some((s) => s.unitsSold > 0), [sectors]);
   const [viewType, setViewType] = useState<'categories' | 'sectors'>(() => (hasSectorData ? 'categories' : 'categories'));
@@ -51,12 +53,12 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#001D36]/8">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-primary tracking-tight">
-            {viewType === 'sectors' ? 'Buyer sectors' : 'Sales by craft category'}
+            {viewType === 'sectors' ? t('dashboard.buyerSectors') : t('dashboard.salesByCategory')}
           </h2>
           <p className="text-xs text-on-surface-variant mt-0.5">
             {viewType === 'sectors'
-              ? 'Distribution across customer and business types'
-              : 'Performance across product craft disciplines'}
+              ? t('dashboard.customerTypes')
+              : t('dashboard.craftDisciplines')}
           </p>
         </div>
 
@@ -76,7 +78,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
                   viewType === 'categories' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'
                 )}
               >
-                Crafts
+                {t('dashboard.craftsTab')}
               </button>
               <button
                 type="button"
@@ -86,7 +88,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
                   viewType === 'sectors' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'
                 )}
               >
-                Sectors
+                {t('dashboard.sectorsTab')}
               </button>
             </div>
           )}
@@ -105,7 +107,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
                 'p-1 text-xs font-semibold rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]',
                 metric === 'units' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'
               )}
-              title="Units sold"
+              title={t('dashboard.unitsSold')}
             >
               <Package className="w-3.5 h-3.5" />
             </button>
@@ -117,7 +119,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
                 'p-1 text-xs font-semibold rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]',
                 metric === 'value' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant'
               )}
-              title="Sales value"
+              title={t('dashboard.salesValue')}
             >
               <IndianRupee className="w-3.5 h-3.5" />
             </button>
@@ -141,7 +143,7 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
                   </span>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="font-bold text-primary">
-                      {metric === 'units' ? `${item.unitsSold} units` : `${currencySymbol}${formatINR(item.salesValue)}`}
+                      {metric === 'units' ? t('dashboard.unitsCount', { count: item.unitsSold }) : `${currencySymbol}${formatINR(item.salesValue)}`}
                     </span>
                     <span className="text-[10px] text-on-surface-variant/75 w-8 text-right font-medium">
                       {item.sharePercent}%
@@ -166,16 +168,16 @@ export const CategorySectorBreakdownChart: React.FC<CategorySectorBreakdownChart
           })
         ) : (
           <div className="p-6 text-center text-xs text-on-surface-variant bg-[#FFF9EF]/80 rounded-xl border border-[#001D36]/8 my-auto">
-            No craft category sales recorded in this period.
+            {t('dashboard.noCategorySales')}
           </div>
         )}
       </div>
 
       {/* Footer Total */}
       <div className="pt-3 border-t border-[#001D36]/8 flex items-center justify-between text-xs text-on-surface-variant">
-        <span>Total accounting:</span>
+        <span>{t('dashboard.totalAccounting')}</span>
         <span className="font-bold text-primary font-sans">
-          {totalUnits} units ({currencySymbol}{formatINR(totalValue)})
+          {t('dashboard.unitsCount', { count: totalUnits })} ({currencySymbol}{formatINR(totalValue)})
         </span>
       </div>
     </div>
