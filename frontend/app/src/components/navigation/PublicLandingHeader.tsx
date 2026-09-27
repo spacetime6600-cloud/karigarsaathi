@@ -3,12 +3,17 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogIn, Info, ShoppingBag, Star, Home, Volume2, VolumeX } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
+import { useAuth } from '@/app/providers/AuthProvider';
+import { ROUTES } from '@/routes';
 
 export const PublicLandingHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { isPlaying, toggleHelp } = useAudioHelp();
+  const { isAuthenticated, user, userAccount } = useAuth();
+  const activeRole = userAccount?.role || user?.role;
+  const workspaceUrl = activeRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -139,13 +144,23 @@ export const PublicLandingHeader: React.FC = () => {
               <span className="text-[11px] font-bold">{isPlaying ? 'Playing...' : 'Listen'}</span>
             </button>
 
-            <Link
-              to="/sign-in"
-              className="public-header__signin flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full active:scale-[0.98] transition-all duration-150 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Sign in</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to={workspaceUrl}
+                className="public-header__signin flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full active:scale-[0.98] transition-all duration-150 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{activeRole === 'coordinator' ? 'Coordinator Hub' : 'Workspace'}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/sign-in"
+                className="public-header__signin flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full active:scale-[0.98] transition-all duration-150 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign in</span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -169,13 +184,23 @@ export const PublicLandingHeader: React.FC = () => {
           </Link>
 
           <div className="flex items-center gap-2 relative z-10">
-            <Link
-              to="/sign-in"
-              className="public-header__signin flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full transition-colors touch-target"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Sign in</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to={workspaceUrl}
+                className="public-header__signin flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full transition-colors touch-target"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Workspace</span>
+              </Link>
+            ) : (
+              <Link
+                to="/sign-in"
+                className="public-header__signin flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full transition-colors touch-target"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign in</span>
+              </Link>
+            )}
 
             <button
               ref={mobileMenuButtonRef}
@@ -224,14 +249,25 @@ export const PublicLandingHeader: React.FC = () => {
             })}
 
             <div className="pt-2 border-t border-[#001D36]/10 flex flex-col gap-2">
-              <Link
-                to="/sign-in"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="public-header__signin w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-xs touch-target"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Sign in</span>
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  to={workspaceUrl}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="public-header__signin w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-xs touch-target"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{activeRole === 'coordinator' ? 'Coordinator Hub' : 'Go to Workspace'}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="public-header__signin w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-bold text-xs touch-target"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign in</span>
+                </Link>
+              )}
             </div>
           </div>
         )}

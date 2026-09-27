@@ -24,11 +24,12 @@ import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
 import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 import { ROUTES } from '@/routes';
+import { supportedLanguages } from '@/i18n';
 import { clsx } from 'clsx';
 
 export const CoordinatorShell: React.FC = () => {
   const { user, signOut, switchRole } = useAuth();
-  const { currentLanguageMeta } = useLanguage();
+  const { language, setLanguage, currentLanguageMeta } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -225,7 +226,10 @@ export const CoordinatorShell: React.FC = () => {
             {/* Language Preference */}
             <button
               type="button"
-              onClick={() => navigate(ROUTES.LANGUAGE)}
+              onClick={() => {
+                const returnUrl = encodeURIComponent(location.pathname + location.search);
+                navigate(`${ROUTES.LANGUAGE}?returnUrl=${returnUrl}`, { state: { from: location.pathname + location.search } });
+              }}
               aria-label={`Change language: current ${currentLanguageMeta.name}`}
               className="flex items-center gap-1.5 h-8 px-2.5 text-xs font-semibold text-[#001D36] bg-[#001D36]/[0.04] hover:bg-[#001D36]/[0.08] rounded-full border border-[#001D36]/[0.08] touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
@@ -266,6 +270,50 @@ export const CoordinatorShell: React.FC = () => {
                     <div className="flex flex-col min-w-0">
                       <span className="font-bold text-sm text-primary truncate">{user?.name || 'Priya Sharma'}</span>
                       <span className="text-xs text-secondary font-semibold truncate">Regional Coordinator Lead</span>
+                    </div>
+                  </div>
+
+                  {/* Quick In-Place Language Switcher */}
+                  <div className="flex flex-col gap-1.5 p-2 rounded-xl bg-surface-container/60 border border-surface-variant/40">
+                    <div className="flex items-center justify-between text-xs font-bold text-primary">
+                      <span className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-secondary" /> Language / भाषा
+                      </span>
+                      <button
+                        role="menuitem"
+                        type="button"
+                        onClick={() => {
+                          setIsAccountMenuOpen(false);
+                          const returnUrl = encodeURIComponent(location.pathname + location.search);
+                          navigate(`${ROUTES.LANGUAGE}?returnUrl=${returnUrl}`, { state: { from: location.pathname + location.search } });
+                        }}
+                        className="text-[11px] font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+                      >
+                        All options →
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-5 gap-1 pt-1" role="radiogroup" aria-label="Quick language selector">
+                      {supportedLanguages.map((lang) => {
+                        const isSelected = lang.code === language;
+                        return (
+                          <button
+                            key={lang.code}
+                            role="radio"
+                            type="button"
+                            aria-checked={isSelected}
+                            onClick={() => setLanguage(lang.code)}
+                            className={clsx(
+                              'py-1 px-1 rounded-lg text-[11px] font-bold transition-all text-center touch-target',
+                              isSelected
+                                ? 'bg-primary text-white shadow-xs'
+                                : 'bg-white/80 hover:bg-white text-on-surface-variant hover:text-primary border border-surface-variant/50'
+                            )}
+                            title={`${lang.name} (${lang.englishName})`}
+                          >
+                            {lang.name}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 

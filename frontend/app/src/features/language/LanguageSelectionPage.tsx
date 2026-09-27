@@ -1,35 +1,86 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { useAuth } from '@/app/providers/AuthProvider';
 import { supportedLanguages } from '@/i18n';
 import { SupportedLanguage } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { CheckCircle2, Circle, Info, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Circle, Info, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ROUTES, getSafeReturnUrl } from '@/routes';
 import { clsx } from 'clsx';
 
 export const LanguageSelectionPage: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
+  const { isAuthenticated, user, userAccount } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+
+  const rawReturnUrl =
+    searchParams.get('returnUrl') ||
+    (location.state as { from?: string } | null)?.from;
+
+  const activeRole = userAccount?.role || user?.role;
+  const defaultWorkspace =
+    activeRole === 'coordinator'
+      ? ROUTES.COORDINATOR_DASHBOARD
+      : ROUTES.ARTISAN_DASHBOARD;
+
+  const targetReturnUrl = isAuthenticated
+    ? getSafeReturnUrl(rawReturnUrl, defaultWorkspace)
+    : getSafeReturnUrl(rawReturnUrl, ROUTES.SIGN_IN);
 
   const handleSelectLanguage = (code: SupportedLanguage) => {
     setLanguage(code);
   };
 
   const handleContinue = () => {
-    navigate('/sign-in');
+    navigate(targetReturnUrl);
   };
 
+  const titleText =
+    t('language.title') !== 'language.title'
+      ? t('language.title')
+      : t('language.chooseTitle');
+
+  const subtitleText =
+    t('language.subtitle') !== 'language.subtitle'
+      ? t('language.subtitle')
+      : t('language.chooseSubtitle');
+
   return (
-    <div className="w-full max-w-[600px] flex flex-col gap-6 mx-auto animate-in fade-in duration-200">
+    <div className="w-full max-w-[600px] flex flex-col gap-4 mx-auto animate-in fade-in duration-200">
+      {/* Top Contextual Navigation */}
+      <div className="w-full flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => navigate(targetReturnUrl)}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-full border border-white/20 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>
+            {isAuthenticated
+              ? `Back to ${activeRole === 'coordinator' ? 'Coordinator Hub' : 'Artisan Workspace'}`
+              : 'Back'}
+          </span>
+        </button>
+
+        {isAuthenticated && (
+          <span className="text-[11px] font-semibold text-white/90 bg-black/25 px-2.5 py-1 rounded-full border border-white/15">
+            Active: {userAccount?.displayName || user?.name || (activeRole === 'coordinator' ? 'Coordinator' : 'Artisan')}
+          </span>
+        )}
+      </div>
+
       <Card className="p-6 md:p-10 flex flex-col gap-6 bg-surface-container-lowest rounded-xl card-shadow border border-surface-variant">
         {/* Title & Subtitle */}
         <div className="text-center flex flex-col gap-2">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-on-surface tracking-tight">
-            {t('language.title')}
+            {titleText}
           </h2>
           <p className="text-sm md:text-base text-on-surface-variant">
-            {t('language.subtitle')}
+            {subtitleText}
           </p>
         </div>
 
@@ -88,9 +139,9 @@ export const LanguageSelectionPage: React.FC = () => {
           size="lg"
           onClick={handleContinue}
           rightIcon={<ArrowRight className="w-5 h-5" />}
-          className="w-full font-bold text-base min-h-[56px] rounded-lg mt-2"
+          className="w-full font-bold text-base min-h-[56px] rounded-lg mt-2 bg-secondary hover:bg-secondary/90 text-white"
         >
-          {t('common.continue')}
+          {isAuthenticated ? 'Save & Continue to Workspace' : t('common.continue')}
         </Button>
       </Card>
     </div>

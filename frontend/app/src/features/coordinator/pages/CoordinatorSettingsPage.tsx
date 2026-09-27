@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { supportedLanguages } from '@/i18n';
+import { clsx } from 'clsx';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -20,8 +22,9 @@ import { ROUTES } from '@/routes';
 
 export const CoordinatorSettingsPage: React.FC = () => {
   const { user, userAccount, signOut, switchRole } = useAuth();
-  const { currentLanguageMeta } = useLanguage();
+  const { language, setLanguage, currentLanguageMeta } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
@@ -101,18 +104,47 @@ export const CoordinatorSettingsPage: React.FC = () => {
             <Globe className="w-5 h-5 text-secondary" />
             <h3 className="font-display text-base font-bold text-primary">Language Preference</h3>
           </div>
-          <span className="text-xs font-bold text-secondary">{currentLanguageMeta.name}</span>
+          <span className="text-xs font-bold text-secondary">{currentLanguageMeta.name} ({currentLanguageMeta.englishName})</span>
         </div>
         <p className="text-xs text-on-surface-variant">
           Select your primary interface language for navigating the coordinator portal and inspecting vernacular artisan voice transcripts.
         </p>
+
+        {/* Quick In-Place Language Selector */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2" role="radiogroup" aria-label="Select interface language">
+          {supportedLanguages.map((lang) => {
+            const isSelected = lang.code === language;
+            return (
+              <button
+                key={lang.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() => setLanguage(lang.code)}
+                className={clsx(
+                  'p-3 rounded-2xl flex flex-col items-center justify-center gap-0.5 border text-center transition-all touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB955]',
+                  isSelected
+                    ? 'border-secondary bg-secondary/10 text-primary font-bold shadow-xs'
+                    : 'border-surface-variant/80 bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant'
+                )}
+              >
+                <span className="text-sm font-bold text-primary">{lang.name}</span>
+                <span className="text-[11px] text-on-surface-variant">{lang.englishName}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <Button
           size="sm"
           variant="secondary"
-          onClick={() => navigate(ROUTES.LANGUAGE)}
-          className="w-fit text-xs font-bold"
+          onClick={() => {
+            const returnUrl = encodeURIComponent(location.pathname + location.search);
+            navigate(`${ROUTES.LANGUAGE}?returnUrl=${returnUrl}`, { state: { from: location.pathname + location.search } });
+          }}
+          className="w-fit text-xs font-bold mt-1"
         >
-          Change Language Settings
+          All Language Options Page →
         </Button>
       </Card>
 

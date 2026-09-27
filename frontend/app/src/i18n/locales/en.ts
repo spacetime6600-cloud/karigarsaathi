@@ -38,6 +38,8 @@ export const en = {
     simulatedNote: 'Simulation active: Any 6 digits will authenticate your session.',
   },
   language: {
+    title: 'Choose your language',
+    subtitle: 'Select your preferred language to continue in KarigarSaathi.',
     chooseTitle: 'Choose your language',
     chooseSubtitle: 'Select your preferred language to continue in KarigarSaathi.',
     languages: {
