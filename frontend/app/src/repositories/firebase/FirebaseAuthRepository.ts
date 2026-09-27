@@ -45,7 +45,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
       role: isCoord ? 'coordinator' : 'artisan',
       displayName: displayName || (isCoord ? 'Cluster Coordinator' : 'Artisan'),
       email: fbUser.email || '',
-      phone: fbUser.phoneNumber || undefined,
+      phone: fbUser.phoneNumber || '',
       preferredLanguage: 'en',
       createdAt: now,
       updatedAt: now,
