@@ -7,7 +7,6 @@ import {
   normalizeTags,
 } from '@/services/suggestions/mockSuggestionService';
 import { productRepository } from '@/services/api/productRepository';
-import { VoiceRecorder } from '@/components/ui/VoiceRecorder';
 import { VoiceCatalogueStudioModal } from '@/features/voice-details/components/VoiceCatalogueStudioModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -18,8 +17,6 @@ import { Badge } from '@/components/ui/Badge';
 import {
   ArrowRight,
   Lightbulb,
-  CheckCircle2,
-  MicOff,
   X,
   Mic,
 } from 'lucide-react';
@@ -29,9 +26,7 @@ export const AddProductDetailsPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [isMicDeniedModalOpen, setIsMicDeniedModalOpen] = useState(false);
   const [isVoiceStudioOpen, setIsVoiceStudioOpen] = useState(false);
-  const [extractedNotice, setExtractedNotice] = useState(false);
 
   // Tag input state
   const [tagInput, setTagInput] = useState('');
@@ -46,18 +41,6 @@ export const AddProductDetailsPage: React.FC = () => {
     field: 'title' | 'description';
     newValue: string;
   }>({ isOpen: false, field: 'title', newValue: '' });
-
-  const handleTranscriptReady = (transcript: string, confidence: number) => {
-    const { confirmed, needsReview } = productRepository.extractFactsFromInput(transcript);
-    updateDraft({
-      voiceTranscript: transcript,
-      voiceConfidence: confidence,
-      confirmedFacts: confirmed,
-      needsReviewFacts: needsReview,
-      title: draft.title || 'Handloom Jamdani Silk Item',
-    });
-    setExtractedNotice(true);
-  };
 
   const handleApplyVoiceStudioSuggestions = (payload: {
     title: string;
@@ -92,8 +75,6 @@ export const AddProductDetailsPage: React.FC = () => {
       confirmedFacts: confirmed,
       needsReviewFacts: needsReview,
     });
-
-    setExtractedNotice(true);
   };
 
   // Mock Suggestions
@@ -582,10 +563,10 @@ export const AddProductDetailsPage: React.FC = () => {
                   Voice Assistant (AI Auto-Catalogue)
                 </h3>
               </div>
-              <Badge variant="indigo">Phase 14</Badge>
+              <Badge variant="indigo">Sarvam Saaras AI</Badge>
             </div>
-            <p className="text-xs text-on-surface-variant">
-              Describe your craft by speaking in Hindi, Bengali, Odia, or English. Sarvam Saaras AI will transcribe your voice and extract fact-grounded catalogue specifications.
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              Describe your craft by speaking in Hindi, Bengali, Odia, Telugu, or English. The studio transcribes your voice and generates fact-grounded bilingual catalogue specifications.
             </p>
 
             <Button
@@ -598,39 +579,20 @@ export const AddProductDetailsPage: React.FC = () => {
               Open AI Voice Studio
             </Button>
 
-            <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-surface-variant/60"></div>
-              <span className="flex-shrink mx-2 text-[10px] uppercase font-bold text-on-surface-variant/60">or quick microphone</span>
-              <div className="flex-grow border-t border-surface-variant/60"></div>
+            <div className="pt-2 border-t border-surface-variant/60 flex flex-col gap-2 text-[11px] text-on-surface-variant">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
+                <span>Microphone recording & audio file upload</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
+                <span>Transcript review with word-level confidence</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
+                <span>Automatic English translation & spec extraction</span>
+              </div>
             </div>
-
-            <VoiceRecorder
-              onTranscriptReady={handleTranscriptReady}
-              onPermissionDenied={() => setIsMicDeniedModalOpen(true)}
-              onOpenStudio={() => setIsVoiceStudioOpen(true)}
-              isSimulatingDenied={localStorage.getItem('simulate_mic_denied') === 'true'}
-            />
-
-            {draft.voiceTranscript && (
-              <div className="p-3 bg-surface-container-low rounded-xl flex flex-col gap-1 text-xs border border-surface-variant/70 animate-in fade-in">
-                <div className="flex items-center justify-between text-secondary font-bold">
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-secondary" /> Transcript
-                  </span>
-                  <span className="font-mono text-[10px]">
-                    {Math.round((draft.voiceConfidence || 0.94) * 100)}% Match
-                  </span>
-                </div>
-                <p className="text-on-surface italic">"{draft.voiceTranscript}"</p>
-              </div>
-            )}
-
-            {extractedNotice && (
-              <div className="p-3 bg-success-container rounded-xl text-on-success-container text-xs flex items-center gap-2 border border-green-300">
-                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                <span>Craft details extracted! Fields have been auto-populated.</span>
-              </div>
-            )}
           </Card>
         </div>
       </div>
@@ -698,43 +660,6 @@ export const AddProductDetailsPage: React.FC = () => {
               className="text-xs font-bold"
             >
               Replace with Suggestion
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Microphone Fallback Modal */}
-      <Modal
-        isOpen={isMicDeniedModalOpen}
-        onClose={() => setIsMicDeniedModalOpen(false)}
-        title={t('voiceDetails.micDeniedTitle')}
-      >
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-3 p-3 bg-warning-container rounded-xl text-on-warning-container text-xs border border-amber-300">
-            <MicOff className="w-5 h-5 shrink-0 text-secondary mt-0.5" />
-            <p>{t('voiceDetails.micDeniedDesc')}</p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                setIsMicDeniedModalOpen(false);
-                setIsVoiceStudioOpen(true);
-              }}
-              leftIcon={<Mic className="w-4 h-4 text-primary" />}
-              className="w-full text-xs font-bold"
-            >
-              Open Studio / Upload Audio File
-            </Button>
-            <Button
-              size="md"
-              variant="tertiary"
-              onClick={() => setIsMicDeniedModalOpen(false)}
-              className="w-full text-xs"
-            >
-              Continue with Manual Typing
             </Button>
           </div>
         </div>
