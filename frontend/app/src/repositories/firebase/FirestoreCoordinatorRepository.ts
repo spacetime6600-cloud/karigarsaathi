@@ -15,9 +15,15 @@ import { CoordinatorAssignment, CoordinatorArtisanProjection } from '@/types';
 import { logger } from '@/services/logging/logger';
 import { removeUndefinedDeep } from '@/utils/firestore';
 import { DEMO_COORDINATOR_ASSIGNMENTS } from '@/services/demo/demoDataService';
+import { coordinatorApprovalService } from '@/services/coordinator/coordinatorApprovalService';
 
 export class FirestoreCoordinatorRepository implements ICoordinatorRepository {
   async getAssignment(coordinatorUid: string, artisanUid: string): Promise<CoordinatorAssignment | null> {
+    if (!coordinatorApprovalService.isApproved(coordinatorUid)) {
+      logger.warn('COORDINATOR', 'Unapproved coordinator attempted to access assignment', { coordinatorUid, artisanUid });
+      return null;
+    }
+
     try {
       const assignmentId = `coord_${coordinatorUid}_${artisanUid}`;
       const docRef = doc(db, 'coordinatorAssignments', assignmentId);
@@ -51,6 +57,11 @@ export class FirestoreCoordinatorRepository implements ICoordinatorRepository {
   }
 
   async listCoordinatorAssignments(coordinatorUid: string): Promise<CoordinatorAssignment[]> {
+    if (!coordinatorApprovalService.isApproved(coordinatorUid)) {
+      logger.warn('COORDINATOR', 'Unapproved coordinator attempted to list assignments', { coordinatorUid });
+      return [];
+    }
+
     try {
       const colRef = collection(db, 'coordinatorAssignments');
       const q = query(
@@ -73,16 +84,25 @@ export class FirestoreCoordinatorRepository implements ICoordinatorRepository {
       if (list.length === 0) {
         const matches = DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === coordinatorUid);
         if (matches.length > 0) return matches;
-        // Default to Priya's demo assignments if generic coordinator
-        return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
+        // Default to Priya's demo assignments ONLY if coordinatorUid is Priya or demo coordinator
+        if (coordinatorUid === 'demo_coord_priya' || coordinatorUid === 'coordinator@karigarsaathi.gov.in') {
+          return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
+        }
+        return [];
       }
 
       return list;
     } catch (err) {
       logger.error('COORDINATOR', 'Failed to list coordinator assignments', err, { coordinatorUid });
+      if (!coordinatorApprovalService.isApproved(coordinatorUid)) {
+        return [];
+      }
       const matches = DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === coordinatorUid);
       if (matches.length > 0) return matches;
-      return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
+      if (coordinatorUid === 'demo_coord_priya' || coordinatorUid === 'coordinator@karigarsaathi.gov.in') {
+        return DEMO_COORDINATOR_ASSIGNMENTS.filter((a) => a.coordinatorUid === 'demo_coord_priya');
+      }
+      return [];
     }
   }
 

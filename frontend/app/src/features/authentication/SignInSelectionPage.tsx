@@ -9,7 +9,6 @@ import {
   Palette,
   ShieldCheck,
   ArrowRight,
-  Sparkles,
   ArrowLeft,
   UserCheck,
 } from 'lucide-react';
@@ -33,24 +32,24 @@ export const SignInSelectionPage: React.FC = () => {
   const activeName = userAccount?.displayName || user?.name || 'User';
 
   return (
-    <div className="w-full max-w-none mx-auto py-6 sm:py-8 px-2 sm:px-4 animate-in fade-in duration-200 flex flex-col items-center">
+    <div className="w-full max-w-4xl mx-auto py-5 sm:py-7 px-3 sm:px-6 animate-in fade-in duration-200 flex flex-col items-center">
       {/* Header Block */}
-      <div className="flex flex-col items-center text-center gap-3 mb-6 sm:mb-8">
+      <div className="flex flex-col items-center text-center gap-2.5 mb-5 sm:mb-7">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md text-[#FFB955] text-xs font-bold border border-white/20 shadow-xs select-none">
-          <Sparkles className="w-3.5 h-3.5" />
+          <ShieldCheck className="w-3.5 h-3.5" />
           <span>KarigarSaathi Access Portal</span>
         </div>
-        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight drop-shadow-sm">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-[42px] font-bold text-white tracking-tight drop-shadow-sm leading-tight">
           Welcome to KarigarSaathi
         </h1>
-        <p className="text-sm sm:text-base text-white/90 max-w-md drop-shadow-xs font-medium">
+        <p className="text-xs sm:text-sm md:text-base text-white/90 max-w-md drop-shadow-xs font-medium">
           Choose how you want to sign in.
         </p>
       </div>
 
       {/* Active session banner if user is already signed in */}
       {isAuthenticated && activeRole && (
-        <Card className="max-w-[780px] mx-auto mb-6 p-4 sm:p-5 bg-[#FFFDF9] border border-secondary/20 rounded-2xl shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Card className="w-full max-w-[720px] mx-auto mb-5 p-4 sm:p-5 bg-[#FFFDF9] border border-secondary/20 rounded-2xl shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-left">
             <div className="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-base shrink-0">
               <UserCheck className="w-5 h-5" />
@@ -93,79 +92,95 @@ export const SignInSelectionPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Two Role Choice Panels: Wide side-by-side on desktop, stacked on mobile */}
+      {/* Two Role Choice Panels: Symmetrical side-by-side on desktop, stacked on mobile */}
       <div className="role-selection">
         {/* Panel 1: Artisan */}
         <div className="role-panel">
-          {/* Top row: Icon and Role Label */}
-          <div className="flex items-center justify-between w-full mb-6 sm:mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-secondary/12 text-secondary flex items-center justify-center shrink-0 border border-secondary/20 shadow-xs">
-              <Palette className="w-6 h-6" aria-hidden="true" />
+          <div>
+            {/* Top row: Icon and Role Label */}
+            <div className="flex items-center justify-between w-full mb-5 sm:mb-6">
+              <div className="w-12 h-12 rounded-xl bg-secondary/12 text-secondary flex items-center justify-center shrink-0 border border-secondary/20 shadow-2xs">
+                <Palette className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-xs font-semibold tracking-wider uppercase select-none">
+                Craft Producer
+              </span>
             </div>
-            <span className="px-3.5 py-1.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-xs sm:text-[13px] font-semibold tracking-wider uppercase select-none">
-              Craft Producer
-            </span>
+
+            {/* Title & Description */}
+            <div className="flex flex-col gap-2 mb-6">
+              <h2 className="font-sans text-xl sm:text-2xl font-bold text-primary tracking-tight leading-tight">
+                Artisan sign in
+              </h2>
+              <p className="font-sans text-xs sm:text-sm font-normal text-on-surface-variant leading-relaxed">
+                Create catalogues, manage your products, and connect with buyers.
+              </p>
+            </div>
           </div>
 
-          {/* Title & Description */}
-          <div className="flex flex-col gap-2.5 sm:gap-3 mb-6">
-            <h2 className="font-sans text-2xl sm:text-[28px] lg:text-[32px] font-semibold text-primary tracking-tight leading-tight">
-              Artisan sign in
-            </h2>
-            <p className="font-sans text-base sm:text-[17px] font-normal text-on-surface-variant leading-relaxed">
-              Create catalogues, manage your products, and connect with buyers.
-            </p>
-          </div>
-
-          {/* Bottom row: Subtle Divider and Action Button */}
-          <div className="pt-6 sm:pt-8 mt-auto flex flex-col border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
+          {/* Bottom row: Divider, Action Button and Secondary Link */}
+          <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.LOGIN)}
-              className="w-full h-14 min-h-[56px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-base shadow-sm hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
-              <span className="whitespace-nowrap font-semibold text-base text-[#FFFDF9]">Continue as Artisan</span>
-              <ArrowRight className="w-[18px] h-[18px] shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
+              <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Artisan</span>
+              <ArrowRight className="w-4 h-4 shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
             </Button>
+            <Link
+              to={ROUTES.LOGIN}
+              className="text-xs font-medium text-secondary hover:underline text-center py-1 transition-colors"
+            >
+              New artisan? Register here →
+            </Link>
           </div>
         </div>
 
         {/* Panel 2: Coordinator */}
         <div className="role-panel">
-          {/* Top row: Icon and Role Label */}
-          <div className="flex items-center justify-between w-full mb-6 sm:mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 shadow-xs">
-              <ShieldCheck className="w-6 h-6" aria-hidden="true" />
+          <div>
+            {/* Top row: Icon and Role Label */}
+            <div className="flex items-center justify-between w-full mb-5 sm:mb-6">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 shadow-2xs">
+                <ShieldCheck className="w-5 h-5 text-primary" aria-hidden="true" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold tracking-wider uppercase select-none">
+                Cluster Agency
+              </span>
             </div>
-            <span className="px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs sm:text-[13px] font-semibold tracking-wider uppercase select-none">
-              Cluster Agency
-            </span>
+
+            {/* Title & Description */}
+            <div className="flex flex-col gap-2 mb-6">
+              <h2 className="font-sans text-xl sm:text-2xl font-bold text-primary tracking-tight leading-tight">
+                Coordinator sign in
+              </h2>
+              <p className="font-sans text-xs sm:text-sm font-normal text-on-surface-variant leading-relaxed">
+                Support assigned artisans, review products, and manage buyer enquiries.
+              </p>
+            </div>
           </div>
 
-          {/* Title & Description */}
-          <div className="flex flex-col gap-2.5 sm:gap-3 mb-6">
-            <h2 className="font-sans text-2xl sm:text-[28px] lg:text-[32px] font-semibold text-primary tracking-tight leading-tight">
-              Coordinator sign in
-            </h2>
-            <p className="font-sans text-base sm:text-[17px] font-normal text-on-surface-variant leading-relaxed">
-              Support assigned artisans, review products, and manage buyer enquiries.
-            </p>
-          </div>
-
-          {/* Bottom row: Subtle Divider and Action Button */}
-          <div className="pt-6 sm:pt-8 mt-auto flex flex-col border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_12%,transparent)]">
+          {/* Bottom row: Divider, Action Button and Secondary Link */}
+          <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.COORDINATOR_LOGIN)}
-              className="w-full h-14 min-h-[56px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-base shadow-sm hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
-              <span className="whitespace-nowrap font-semibold text-base text-[#FFFDF9]">Continue as Coordinator</span>
-              <ArrowRight className="w-[18px] h-[18px] shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
+              <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Coordinator</span>
+              <ArrowRight className="w-4 h-4 shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
             </Button>
+            <Link
+              to={ROUTES.COORDINATOR_REGISTER}
+              className="text-xs font-medium text-secondary hover:underline text-center py-1 transition-colors"
+            >
+              New coordinator? Register for cluster access →
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Return to Homepage Link */}
-      <div className="flex items-center justify-center mt-8 sm:mt-10 text-xs">
+      <div className="flex items-center justify-center mt-6 sm:mt-8 text-xs">
         <Link
           to={ROUTES.HOME}
           className="inline-flex items-center gap-2 text-white/80 hover:text-white font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg px-3 py-1.5"

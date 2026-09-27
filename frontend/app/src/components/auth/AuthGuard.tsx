@@ -2,9 +2,10 @@ import React from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ROUTES } from '@/routes';
-import { Loader2, ShieldAlert, ArrowRight, RefreshCw } from 'lucide-react';
+import { Loader2, ShieldAlert, ArrowRight, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { coordinatorApprovalService } from '@/services/coordinator/coordinatorApprovalService';
 
 interface AuthGuardProps {
   requiredRole?: 'artisan' | 'coordinator';
@@ -12,7 +13,7 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) => {
-  const { isAuthenticated, isLoading, isSigningOut, user, userAccount, switchRole } = useAuth();
+  const { isAuthenticated, isLoading, isSigningOut, user, userAccount, switchRole, signOut } = useAuth();
   const navigate = useNavigate();
 
   // 1. Loading / Signing Out state: wait for auth verification before making routing decisions
@@ -36,7 +37,52 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
     return <Navigate to={ROUTES.SIGN_IN} replace />;
   }
 
-  // 3. Role enforcement: check if the user's active role matches the required role
+  // 3. Coordinator Approval Invariant Enforcement
+  const userIdentifier = userAccount?.email || userAccount?.uid || user?.id;
+  const isApprovedCoordinator = coordinatorApprovalService.isApproved(userIdentifier);
+  const regStatus = coordinatorApprovalService.getRegistrationStatus(userIdentifier);
+
+  if (requiredRole === 'coordinator' && !isApprovedCoordinator) {
+    if (regStatus === 'pending') {
+      return (
+        <div className="max-w-md mx-auto py-16 px-4 animate-in fade-in">
+          <Card className="p-6 md:p-8 text-center flex flex-col items-center gap-4 bg-white border border-surface-variant rounded-2xl shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h2 className="font-display text-xl font-bold text-primary">
+                Registration Pending Approval
+              </h2>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Your coordinator registration is currently pending administrative review. You will receive access once approved by a cluster administrator.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 w-full pt-2">
+              <Button
+                onClick={() => navigate(ROUTES.COORDINATOR_LOGIN)}
+                className="w-full text-xs font-bold bg-secondary text-white"
+              >
+                Return to Coordinator Sign In
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  await signOut();
+                  navigate(ROUTES.SIGN_IN);
+                }}
+                className="w-full text-xs"
+              >
+                Sign Out
+              </Button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+  }
+
+  // 4. Role enforcement: check if the user's active role matches the required role
   const userRole = userAccount?.role || user?.role;
   if (!userRole) {
     return <Navigate to={ROUTES.SIGN_IN} replace />;

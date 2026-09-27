@@ -17,10 +17,10 @@ import {
   Users,
   FileCheck,
   MessageSquareQuote,
-  Sparkles,
 } from 'lucide-react';
 import { auth } from '@/config/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { coordinatorApprovalService } from '@/services/coordinator/coordinatorApprovalService';
 
 export const CoordinatorLoginPage: React.FC = () => {
   const { signInWithEmail, isAuthenticated, isLoading: authLoading, user, userAccount, signOut } = useAuth();
@@ -50,26 +50,55 @@ export const CoordinatorLoginPage: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       const activeRole = userAccount?.role || user?.role;
-      if (activeRole === 'coordinator') {
+      const userIdentifier = userAccount?.email || userAccount?.uid || user?.id;
+      if (activeRole === 'coordinator' && coordinatorApprovalService.isApproved(userIdentifier)) {
         const target = getSafeReturnUrl(rawReturnUrl, ROUTES.COORDINATOR_DASHBOARD);
         navigate(target, { replace: true });
       }
     }
-  }, [isAuthenticated, authLoading, user?.role, userAccount?.role, rawReturnUrl, navigate]);
+  }, [isAuthenticated, authLoading, user?.role, user?.id, userAccount?.role, userAccount?.email, userAccount?.uid, rawReturnUrl, navigate]);
 
   const handleCoordinatorSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
+    const trimmedEmail = email.trim().toLowerCase();
+
+    // Check pre-approval or registration status
+    const regStatus = coordinatorApprovalService.getRegistrationStatus(trimmedEmail);
+    if (regStatus === 'pending') {
+      setError(
+        'Registration Pending: Your coordinator application is currently undergoing administrative review. Coordinator access will be unlocked once approved by a cluster administrator.'
+      );
+      setIsLoading(false);
+      return;
+    }
+    if (regStatus === 'rejected') {
+      setError(
+        'Registration Rejected: Your coordinator application was not approved. Please contact your regional agency administrator.'
+      );
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await signInWithEmail({ email: email.trim(), password });
+      await signInWithEmail({ email: trimmedEmail, password });
 
       const currentRole = userAccount?.role || user?.role || 'coordinator';
-      if (currentRole && currentRole !== 'coordinator') {
-        setError(
-          'Access Restricted: This account is registered as an Artisan. Coordinator access requires authorized cluster agency credentials.'
-        );
+      const isApproved = coordinatorApprovalService.isApproved(trimmedEmail);
+
+      if (!isApproved || currentRole !== 'coordinator') {
+        const postRegStatus = coordinatorApprovalService.getRegistrationStatus(trimmedEmail);
+        if (postRegStatus === 'pending') {
+          setError(
+            'Registration Pending: Your coordinator application is currently undergoing administrative review. Coordinator access will be unlocked once approved by a cluster administrator.'
+          );
+        } else {
+          setError(
+            'Access Restricted: This account does not have field coordinator privileges. If you are an artisan, please sign in through the Artisan portal.'
+          );
+        }
       } else {
         const target = getSafeReturnUrl(rawReturnUrl, ROUTES.COORDINATOR_DASHBOARD);
         navigate(target, { replace: true });
@@ -131,7 +160,7 @@ export const CoordinatorLoginPage: React.FC = () => {
 
             <div className="flex flex-col gap-3 mt-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[#FFB955] text-xs font-bold w-fit border border-white/15">
-                <Sparkles className="w-3.5 h-3.5" /> Authorized Cluster Hub
+                <ShieldCheck className="w-3.5 h-3.5" /> Authorized Cluster Hub
               </span>
               <h1 className="font-display text-3xl sm:text-4xl font-bold leading-tight text-white tracking-tight">
                 Support artisans.
@@ -351,6 +380,20 @@ export const CoordinatorLoginPage: React.FC = () => {
 
             {/* Navigation & Role Switch Links */}
             <div className="flex flex-col gap-3 pt-3 border-t border-surface-variant text-center">
+              {/* New Coordinator Registration Link */}
+              <div className="flex items-center justify-between p-3 bg-amber-50/70 rounded-xl border border-amber-200/70 text-xs">
+                <div className="flex flex-col text-left">
+                  <span className="font-bold text-amber-950">New coordinator?</span>
+                  <span className="text-[11px] text-amber-800">Register your agency for cluster access.</span>
+                </div>
+                <Link
+                  to={ROUTES.COORDINATOR_REGISTER}
+                  className="font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded px-2.5 py-1 bg-white border border-secondary/20 shadow-2xs shrink-0"
+                >
+                  Register →
+                </Link>
+              </div>
+
               <div className="flex items-center justify-between p-2.5 bg-surface-container-low rounded-xl border border-surface-variant text-xs">
                 <span className="font-medium text-primary">Need a different role?</span>
                 <Link

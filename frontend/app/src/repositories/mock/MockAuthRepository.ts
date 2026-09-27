@@ -1,6 +1,7 @@
 import { IAuthRepository } from '@/repositories/interfaces/IAuthRepository';
-import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
+import { UserAccount, RegisterArtisanInput, RegisterCoordinatorInput, SignInInput } from '@/domain/auth';
 import { storage } from '@/services/storage/localStorage';
+import { coordinatorApprovalService, CoordinatorRegistrationRecord } from '@/services/coordinator/coordinatorApprovalService';
 
 export class MockAuthRepository implements IAuthRepository {
   private listeners: Array<(user: UserAccount | null) => void> = [];
@@ -21,23 +22,31 @@ export class MockAuthRepository implements IAuthRepository {
     return user;
   }
 
+  async registerCoordinator(input: RegisterCoordinatorInput): Promise<CoordinatorRegistrationRecord> {
+    return await coordinatorApprovalService.registerCoordinator(input);
+  }
+
   async signIn(input: SignInInput): Promise<UserAccount> {
+    const emailLower = input.email.toLowerCase().trim();
+    const isApprovedCoord = coordinatorApprovalService.isApproved(emailLower);
+
     let uid = 'demo_artisan_ravi';
     let role: 'artisan' | 'coordinator' = 'artisan';
     let displayName = 'Ravi Kumar';
 
-    if (input.email.includes('priya')) {
-      uid = 'demo_coord_priya';
+    if (isApprovedCoord) {
       role = 'coordinator';
-      displayName = 'Priya Sharma';
-    } else if (input.email.includes('vikram')) {
-      uid = 'demo_coord_vikram';
-      role = 'coordinator';
-      displayName = 'Vikramaditya Rathore';
-    } else if (input.email.includes('coordinator')) {
-      uid = 'demo_coord_priya';
-      role = 'coordinator';
-      displayName = 'Priya Sharma';
+      if (emailLower.includes('vikram')) {
+        uid = 'demo_coord_vikram';
+        displayName = 'Vikramaditya Rathore';
+      } else {
+        uid = 'demo_coord_priya';
+        displayName = 'Priya Sharma';
+      }
+    } else if (emailLower.includes('ravi')) {
+      uid = 'demo_artisan_ravi';
+      role = 'artisan';
+      displayName = 'Ravi Kumar';
     }
 
     const user: UserAccount = {

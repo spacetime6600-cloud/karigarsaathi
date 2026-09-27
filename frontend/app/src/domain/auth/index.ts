@@ -19,6 +19,14 @@ export interface RegisterArtisanInput {
   phone?: string;
 }
 
+export interface RegisterCoordinatorInput {
+  email: string;
+  password: string;
+  displayName: string;
+  agencyName?: string;
+  phone?: string;
+}
+
 export interface SignInInput {
   email: string;
   password: string;

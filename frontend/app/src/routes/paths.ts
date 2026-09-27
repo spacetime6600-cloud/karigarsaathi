@@ -32,6 +32,7 @@ export const ROUTES = {
 
   // Coordinator Workspace & Login
   COORDINATOR_LOGIN: '/coordinator/login',
+  COORDINATOR_REGISTER: '/coordinator/register',
   COORDINATOR_DASHBOARD: '/coordinator',
   COORDINATOR_ARTISANS: '/coordinator/artisans',
   COORDINATOR_REVIEWS: '/coordinator/reviews',

@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { ArtisanProfile } from '@/types';
-import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
+import { UserAccount, RegisterArtisanInput, RegisterCoordinatorInput, SignInInput } from '@/domain/auth';
 import { authRepository, artisanProfileRepository } from '@/repositories';
+import { coordinatorApprovalService, CoordinatorRegistrationRecord } from '@/services/coordinator/coordinatorApprovalService';
 import { authService } from '@/services/api/authService';
 import { logger } from '@/services/logging/logger';
 import { ROUTES } from '@/routes';
@@ -17,6 +18,7 @@ interface AuthContextType {
   signIn: (phone: string, otp: string, role?: 'artisan' | 'coordinator') => Promise<void>;
   signInWithEmail: (input: SignInInput) => Promise<void>;
   registerArtisan: (input: RegisterArtisanInput) => Promise<void>;
+  registerCoordinator: (input: RegisterCoordinatorInput) => Promise<CoordinatorRegistrationRecord>;
   signOut: () => Promise<void>;
   switchRole: (role: 'artisan' | 'coordinator') => void;
   retryProfileInit: () => Promise<void>;
@@ -199,6 +201,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const registerCoordinator = async (input: RegisterCoordinatorInput): Promise<CoordinatorRegistrationRecord> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (authRepository.registerCoordinator) {
+        const record = await authRepository.registerCoordinator(input);
+        logger.info('AUTH', 'Coordinator registration submitted (pending approval)', { email: record.email, status: record.status });
+        return record;
+      } else {
+        const record = await coordinatorApprovalService.registerCoordinator(input);
+        logger.info('AUTH', 'Coordinator registration submitted via approval service (pending approval)', { email: record.email, status: record.status });
+        return record;
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Coordinator registration failed';
+      logger.error('AUTH', 'Coordinator registration failed', err);
+      setError(msg);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async () => {
     logger.info('AUTH', 'Initiating user sign out', {
       uid: userAccount?.uid || user?.id || undefined,
@@ -276,6 +301,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signIn,
         signInWithEmail,
         registerArtisan,
+        registerCoordinator,
         signOut,
         switchRole,
         retryProfileInit,

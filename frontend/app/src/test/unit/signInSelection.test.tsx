@@ -139,4 +139,40 @@ describe('Public Sign-In Selection & Role Entry Suite', () => {
     // Verify selection page content and return link
     expect(screen.getByText(/Back to homepage/i)).toBeInTheDocument();
   });
+
+  it('7. Displays "New coordinator? Register for cluster access" link on Sign-In Selection Page', () => {
+    render(
+      <MemoryRouter initialEntries={['/sign-in']}>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/sign-in" element={<SignInSelectionPage />} />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const regLink = screen.getByText(/New coordinator\? Register for cluster access →/i);
+    expect(regLink).toBeInTheDocument();
+    expect(regLink.closest('a')).toHaveAttribute('href', '/coordinator/register');
+  });
+
+  it('8. Displays "New coordinator? Register" link on Coordinator Login Page', () => {
+    render(
+      <MemoryRouter initialEntries={['/coordinator/login']}>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/coordinator/login" element={<CoordinatorLoginPage />} />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const regLink = screen.getByRole('link', { name: /Register →/i });
+    expect(regLink).toBeInTheDocument();
+    expect(regLink).toHaveAttribute('href', '/coordinator/register');
+  });
 });

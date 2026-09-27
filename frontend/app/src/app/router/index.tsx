@@ -13,7 +13,7 @@ import { CoordinatorShell } from '@/layouts/CoordinatorShell';
 // Eagerly loaded public entry pages for instant first paint
 import { LandingPage } from '@/features/landing/LandingPage';
 import { SignInPage, SignInSelectionPage } from '@/features/authentication';
-import { CoordinatorLoginPage } from '@/features/coordinator';
+import { CoordinatorLoginPage, CoordinatorRegisterPage } from '@/features/coordinator';
 
 // Lazy-loaded routes for performance & fast code chunking
 const AboutPage = lazy(() => import('@/features/about/AboutPage').then((m) => ({ default: m.AboutPage })));
@@ -103,6 +103,7 @@ export const router = createBrowserRouter([
           { path: '/login', element: <SignInPage /> },
           { path: '/sign-in', element: <SignInSelectionPage /> },
           { path: '/coordinator/login', element: <CoordinatorLoginPage /> },
+          { path: '/coordinator/register', element: <CoordinatorRegisterPage /> },
         ],
       },
 

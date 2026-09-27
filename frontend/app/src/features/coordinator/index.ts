@@ -1,4 +1,5 @@
 export { CoordinatorLoginPage } from './pages/CoordinatorLoginPage';
+export { CoordinatorRegisterPage } from './pages/CoordinatorRegisterPage';
 export { CoordinatorOverviewPage } from './pages/CoordinatorOverviewPage';
 export { CoordinatorArtisansPage } from './pages/CoordinatorArtisansPage';
 export { CoordinatorArtisanDetailPage } from './pages/CoordinatorArtisanDetailPage';

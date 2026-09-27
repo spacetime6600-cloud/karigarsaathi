@@ -9,13 +9,15 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, getFirebaseConfig, checkIsEmulatorMode } from '@/config/firebase';
 import { IAuthRepository } from '@/repositories/interfaces/IAuthRepository';
-import { UserAccount, RegisterArtisanInput, SignInInput } from '@/domain/auth';
+import { UserAccount, RegisterArtisanInput, RegisterCoordinatorInput, SignInInput } from '@/domain/auth';
 import { logger } from '@/services/logging/logger';
+import { coordinatorApprovalService, CoordinatorRegistrationRecord } from '@/services/coordinator/coordinatorApprovalService';
 
 export class FirebaseAuthRepository implements IAuthRepository {
   private mapFirebaseUser(fbUser: FirebaseUser, role?: 'artisan' | 'coordinator'): UserAccount {
     const emailLower = (fbUser.email || '').toLowerCase();
-    const isCoord = role === 'coordinator' || emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
+    const isApprovedCoordinator = coordinatorApprovalService.isApproved(emailLower) || coordinatorApprovalService.isApproved(fbUser.uid);
+    const isCoord = role === 'coordinator' ? isApprovedCoordinator : isApprovedCoordinator;
     const now = new Date().toISOString();
 
     const isEmulator = checkIsEmulatorMode();
@@ -105,11 +107,18 @@ export class FirebaseAuthRepository implements IAuthRepository {
     }
   }
 
+  async registerCoordinator(input: RegisterCoordinatorInput): Promise<CoordinatorRegistrationRecord> {
+    try {
+      logger.info('AUTH', 'Starting coordinator registration', { email: input.email });
+      return await coordinatorApprovalService.registerCoordinator(input);
+    } catch (err: unknown) {
+      logger.error('AUTH', 'Coordinator registration failed', err);
+      throw this.normalizeError(err);
+    }
+  }
+
   async signIn(input: SignInInput): Promise<UserAccount> {
-    const isCoord =
-      input.email.toLowerCase().includes('coordinator') ||
-      input.email.toLowerCase().includes('priya') ||
-      input.email.toLowerCase().includes('vikram');
+    const isCoord = coordinatorApprovalService.isApproved(input.email);
     try {
       logger.info('AUTH', 'User sign-in attempt', { email: input.email, isCoordinator: isCoord });
 
@@ -228,7 +237,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
 
     try {
       const emailLower = (fbUser.email || '').toLowerCase();
-      const isCoord = emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
+      const isCoord = coordinatorApprovalService.isApproved(emailLower) || coordinatorApprovalService.isApproved(fbUser.uid);
       if (isCoord) {
         return this.mapFirebaseUser(fbUser, 'coordinator');
       }
@@ -252,7 +261,7 @@ export class FirebaseAuthRepository implements IAuthRepository {
       if (fbUser) {
         try {
           const emailLower = (fbUser.email || '').toLowerCase();
-          const isCoord = emailLower.includes('coordinator') || emailLower.includes('priya') || emailLower.includes('vikram');
+          const isCoord = coordinatorApprovalService.isApproved(emailLower) || coordinatorApprovalService.isApproved(fbUser.uid);
           if (isCoord) {
             callback(this.mapFirebaseUser(fbUser, 'coordinator'));
             return;
