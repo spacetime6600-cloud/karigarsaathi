@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import {
   catalogueSuggestionService,
   normalizeTags,
@@ -164,7 +165,7 @@ export const AddProductDetailsPage: React.FC = () => {
   };
 
   const handleContinue = () => {
-    navigate('/artisan/products/new/review');
+    navigate(ROUTES.productStep('review', draft.id));
   };
 
   const activePhoto = draft.photos[draft.coverPhotoIndex] || draft.photos[0];
@@ -599,7 +600,7 @@ export const AddProductDetailsPage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/photos')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('photos', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 

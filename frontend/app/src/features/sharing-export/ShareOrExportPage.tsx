@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { whatsappService } from '@/services/export/whatsappService';
 import { csvExportService } from '@/services/export/csvExportService';
 import { jsonExportService } from '@/services/export/jsonExportService';
@@ -413,21 +414,31 @@ export const ShareOrExportPage: React.FC = () => {
       </div>
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button
-          variant="ghost"
-          onClick={handleCopyLink}
-          leftIcon={copiedLink ? <Check className="w-3.5 h-3.5 text-success" /> : <Share2 className="w-3.5 h-3.5" />}
-          className="text-xs"
-        >
-          {copiedLink ? 'Public Link Copied!' : 'Copy Passport URL'}
-        </Button>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-surface-variant/70">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(ROUTES.productStep('passport', draft.id))}
+            className="text-xs"
+          >
+            {t('common.back')}
+          </Button>
+
+          <Button
+            variant="ghost"
+            onClick={handleCopyLink}
+            leftIcon={copiedLink ? <Check className="w-3.5 h-3.5 text-success" /> : <Share2 className="w-3.5 h-3.5" />}
+            className="text-xs"
+          >
+            {copiedLink ? 'Public Link Copied!' : 'Copy Passport URL'}
+          </Button>
+        </div>
 
         <Button
           size="md"
-          onClick={() => navigate('/artisan/inventory')}
+          onClick={() => navigate(ROUTES.ARTISAN_INVENTORY)}
           leftIcon={<Home className="w-4 h-4" />}
-          className="font-bold text-xs px-6"
+          className="font-bold text-xs px-6 w-full sm:w-auto"
         >
           Return to Inventory Management
         </Button>

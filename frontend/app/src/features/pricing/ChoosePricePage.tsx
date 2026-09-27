@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { pricingService } from '@/services/api/pricingService';
 import { ProductDraft } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -57,14 +58,14 @@ export const ChoosePricePage: React.FC = () => {
     }
 
     setSelectedPrice(finalPrice, selectedTier as ProductDraft['pricingStrategy']);
-    navigate('/artisan/products/new/public-fields');
+    navigate(ROUTES.productStep('public-fields', draft.id));
   };
 
   const handleConfirmBelowCost = () => {
     const finalPrice = Number(customPriceInput);
     setSelectedPrice(finalPrice, 'custom');
     setIsBelowCostModalOpen(false);
-    navigate('/artisan/products/new/public-fields');
+    navigate(ROUTES.productStep('public-fields', draft.id));
   };
 
   return (
@@ -222,7 +223,7 @@ export const ChoosePricePage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/review')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('review', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 

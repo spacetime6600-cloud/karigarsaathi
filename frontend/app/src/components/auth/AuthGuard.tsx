@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ROUTES } from '@/routes';
 import { Loader2, ShieldAlert, ArrowRight, RefreshCw, Clock } from 'lucide-react';
@@ -15,6 +15,7 @@ interface AuthGuardProps {
 export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) => {
   const { isAuthenticated, isLoading, isSigningOut, user, userAccount, switchRole, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 1. Loading / Signing Out state: wait for auth verification before making routing decisions
   if (isLoading || isSigningOut) {
@@ -32,9 +33,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
     );
   }
 
-  // 2. Unauthenticated state: redirect to central sign-in access portal
+  // 2. Unauthenticated state: redirect to central sign-in access portal with returnUrl preserved
   if (!isAuthenticated) {
-    return <Navigate to={ROUTES.SIGN_IN} replace />;
+    const returnPath = location.pathname + location.search;
+    return (
+      <Navigate
+        to={`${ROUTES.SIGN_IN}?returnUrl=${encodeURIComponent(returnPath)}`}
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
   // 3. Coordinator Approval Invariant Enforcement

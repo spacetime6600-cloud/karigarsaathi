@@ -10,16 +10,17 @@ import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
+import { ROUTES } from '@/routes';
 
 const STEP_DEFINITIONS = [
-  { step: 1, slug: 'photos', label: 'Photographs' },
-  { step: 2, slug: 'details', label: 'Product Details' },
-  { step: 3, slug: 'review', label: 'Review Facts' },
-  { step: 4, slug: 'price', label: 'Fair Pricing' },
-  { step: 5, slug: 'public-fields', label: 'Public Fields' },
-  { step: 6, slug: 'approve', label: 'Approve' },
-  { step: 7, slug: 'passport', label: 'Craft Passport' },
-  { step: 8, slug: 'share', label: 'Share & Export' },
+  { step: 1, slug: 'photos', label: 'Photographs', aliases: [] },
+  { step: 2, slug: 'details', label: 'Product Details', aliases: [] },
+  { step: 3, slug: 'review', label: 'Review Facts', aliases: [] },
+  { step: 4, slug: 'price', label: 'Fair Pricing', aliases: ['pricing'] },
+  { step: 5, slug: 'public-fields', label: 'Public Fields', aliases: [] },
+  { step: 6, slug: 'approve', label: 'Approve', aliases: [] },
+  { step: 7, slug: 'passport', label: 'Craft Passport', aliases: ['passport-created'] },
+  { step: 8, slug: 'share', label: 'Share & Export', aliases: [] },
 ];
 
 export const ProductCreationShell: React.FC = () => {
@@ -41,9 +42,11 @@ export const ProductCreationShell: React.FC = () => {
     }
   }, [draftIdParam, draft.id, loadDraft]);
 
-  // Map route to 8-step index
+  // Map route to 8-step index (including known aliases)
   const getStepNumber = (pathname: string): number => {
-    const matched = STEP_DEFINITIONS.find((s) => pathname.includes(`/${s.slug}`));
+    const matched = STEP_DEFINITIONS.find(
+      (s) => pathname.includes(`/${s.slug}`) || (s.aliases && s.aliases.some((a) => pathname.includes(`/${a}`)))
+    );
     return matched ? matched.step : 1;
   };
 
@@ -73,10 +76,15 @@ export const ProductCreationShell: React.FC = () => {
   };
 
   const handleBack = () => {
-    if (currentStep === 1) {
-      navigate('/artisan/dashboard');
+    if (currentStep <= 1) {
+      navigate(ROUTES.ARTISAN_DASHBOARD);
     } else {
-      navigate(-1);
+      const prevDef = STEP_DEFINITIONS[currentStep - 2];
+      if (prevDef) {
+        navigate(ROUTES.productStep(prevDef.slug, draft.id));
+      } else {
+        navigate(ROUTES.ARTISAN_DASHBOARD);
+      }
     }
   };
 

@@ -317,13 +317,13 @@ export const QRCraftPassportCreatedPage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/approve')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('approve', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 
         <Button
           size="md"
-          onClick={() => navigate('/artisan/products/new/share')}
+          onClick={() => navigate(ROUTES.productStep('share', draft.id))}
           rightIcon={<ArrowRight className="w-4 h-4" />}
           className="font-bold text-xs px-6 bg-secondary hover:bg-secondary-hover"
         >

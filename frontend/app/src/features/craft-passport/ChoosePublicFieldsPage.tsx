@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Toggle } from '@/components/ui/Toggle';
@@ -17,7 +18,7 @@ export const ChoosePublicFieldsPage: React.FC = () => {
   const buyerConfidenceScore = Math.min(100, Math.round((publicCount / totalFields) * 115));
 
   const handleContinue = () => {
-    navigate('/artisan/products/new/approve');
+    navigate(ROUTES.productStep('approve', draft.id));
   };
 
   return (
@@ -167,7 +168,7 @@ export const ChoosePublicFieldsPage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/price')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('price', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 

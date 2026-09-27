@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { validateProductForReadiness, ReadinessValidationError } from '@/domain/products/validation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -60,7 +61,7 @@ export const ReviewFactsPage: React.FC = () => {
       await markListingReady();
       setReadySuccess(true);
       setTimeout(() => {
-        navigate('/artisan/products/new/price');
+        navigate(ROUTES.productStep('price', draft.id));
       }, 1200);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unable to persist ready listing to Firestore.';
@@ -71,7 +72,7 @@ export const ReviewFactsPage: React.FC = () => {
   };
 
   const handleContinue = () => {
-    navigate('/artisan/products/new/price');
+    navigate(ROUTES.productStep('price', draft.id));
   };
 
   const activeErrors = submissionErrors || (liveValidation.isReady ? [] : liveValidation.errors);
@@ -574,7 +575,7 @@ export const ReviewFactsPage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/details')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('details', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 

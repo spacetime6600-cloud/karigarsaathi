@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { ROUTES } from '@/routes';
 import { passportManager } from '@/services/passport/passportManager';
 import { enquirySubmissionService } from '@/services/enquiries/enquirySubmissionService';
 import { PublicCraftPassport, PreferredContactMethod } from '@/types';
@@ -193,6 +194,18 @@ export const PublicCraftPassportPage: React.FC = () => {
           <div className="text-[11px] font-mono text-on-surface-variant bg-surface-container px-3 py-1.5 rounded-md border border-surface-variant">
             Slug Reference: {lookupSlug}
           </div>
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full pt-2">
+            <Link to={ROUTES.MARKETPLACE} className="w-full sm:flex-1">
+              <Button size="sm" variant="secondary" className="w-full text-xs font-bold">
+                Explore Marketplace
+              </Button>
+            </Link>
+            <Link to={ROUTES.HOME} className="w-full sm:flex-1">
+              <Button size="sm" variant="ghost" className="w-full text-xs">
+                Return to Home
+              </Button>
+            </Link>
+          </div>
         </Card>
       </div>
     );
@@ -211,6 +224,18 @@ export const PublicCraftPassportPage: React.FC = () => {
             <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
               The requested digital craft certificate could not be located. Please verify the URL or QR code.
             </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full pt-2">
+            <Link to={ROUTES.MARKETPLACE} className="w-full sm:flex-1">
+              <Button size="sm" variant="secondary" className="w-full text-xs font-bold">
+                Explore Marketplace
+              </Button>
+            </Link>
+            <Link to={ROUTES.HOME} className="w-full sm:flex-1">
+              <Button size="sm" variant="ghost" className="w-full text-xs">
+                Return to Home
+              </Button>
+            </Link>
           </div>
         </Card>
       </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import { passportManager, PassportReadinessError } from '@/services/passport/passportManager';
 import { validateProductForReadiness, ReadinessValidationError } from '@/domain/products/validation';
 import { PassportPublicField } from '@/types';
@@ -97,7 +98,7 @@ export const ApprovePublicInfoPage: React.FC = () => {
       });
 
       await saveDraft();
-      navigate('/artisan/products/new/passport', {
+      navigate(ROUTES.productStep('passport', draft.id), {
         state: {
           passportId: result.passportId,
           publicSlug: result.publicSlug,
@@ -243,7 +244,7 @@ export const ApprovePublicInfoPage: React.FC = () => {
 
       {/* Page Actions Footer */}
       <div className="flex items-center justify-between pt-6 border-t border-surface-variant/70">
-        <Button variant="ghost" onClick={() => navigate('/artisan/products/new/public-fields')} className="text-xs">
+        <Button variant="ghost" onClick={() => navigate(ROUTES.productStep('public-fields', draft.id))} className="text-xs">
           {t('common.back')}
         </Button>
 

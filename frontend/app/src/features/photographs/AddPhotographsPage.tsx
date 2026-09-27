@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { ROUTES } from '@/routes';
 import {
   uploadPhotograph,
   validateImageFile,
@@ -202,7 +203,7 @@ export const AddPhotographsPage: React.FC = () => {
       setUploadError('Please upload at least one authentic photograph of your handmade craft.');
       return;
     }
-    navigate('/artisan/products/new/details');
+    navigate(ROUTES.productStep('details', draft.id));
   };
 
   const activeCoverPhoto = draft.photos[draft.coverPhotoIndex] || draft.photos[0];

@@ -28,9 +28,14 @@ export const CoordinatorLoginPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const rawReturnUrl =
-    searchParams.get('returnUrl') ||
-    (location.state as { from?: { pathname?: string; search?: string } })?.from?.pathname;
+  // Extract and sanitize target return URL (from search param or location state)
+  const fromState = (location.state as { from?: { pathname?: string; search?: string } | string })?.from;
+  const stateReturnUrl = typeof fromState === 'string'
+    ? fromState
+    : fromState?.pathname
+    ? `${fromState.pathname}${fromState.search || ''}`
+    : null;
+  const rawReturnUrl = searchParams.get('returnUrl') || stateReturnUrl;
 
   const [email, setEmail] = useState('coordinator@karigarsaathi.gov.in');
   const [password, setPassword] = useState('CoordinatorPass123!');

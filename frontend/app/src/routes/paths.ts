@@ -21,13 +21,16 @@ export const ROUTES = {
   ARTISAN_ENQUIRIES: '/artisan/enquiries',
 
   // Add Product Sequence (8 Steps)
+  PRODUCT_NEW: '/artisan/products/new',
   PRODUCT_NEW_PHOTOS: '/artisan/products/new/photos',
   PRODUCT_NEW_DETAILS: '/artisan/products/new/details',
   PRODUCT_NEW_REVIEW: '/artisan/products/new/review',
   PRODUCT_NEW_PRICE: '/artisan/products/new/price',
+  PRODUCT_NEW_PRICING: '/artisan/products/new/pricing',
   PRODUCT_NEW_PUBLIC_FIELDS: '/artisan/products/new/public-fields',
   PRODUCT_NEW_APPROVE: '/artisan/products/new/approve',
   PRODUCT_NEW_PASSPORT: '/artisan/products/new/passport',
+  PRODUCT_NEW_PASSPORT_CREATED: '/artisan/products/new/passport-created',
   PRODUCT_NEW_SHARE: '/artisan/products/new/share',
 
   // Coordinator Workspace & Login
@@ -52,7 +55,9 @@ export const ROUTES = {
   publicPassport: (slugOrId: string) => `/passport/${encodeURIComponent(slugOrId)}`,
   enquiryReply: (enquiryId: string) => `/artisan/enquiries/${encodeURIComponent(enquiryId)}`,
   productStep: (stepSlug: string, draftId?: string) => {
-    const cleanSlug = stepSlug.replace(/^\/+/, '').replace(/^artisan\/products\/new\//, '');
+    let cleanSlug = stepSlug.replace(/^\/+/, '').replace(/^artisan\/products\/new\//, '');
+    if (cleanSlug === 'pricing') cleanSlug = 'price';
+    if (cleanSlug === 'passport-created') cleanSlug = 'passport';
     const base = `/artisan/products/new/${cleanSlug}`;
     return draftId ? `${base}?draftId=${encodeURIComponent(draftId)}` : base;
   },
@@ -98,7 +103,7 @@ export function getSafeReturnUrl(url: string | null | undefined, defaultUrl: str
  * Generates the full canonical public application URL for sharing or QR code rendering.
  */
 export function getCanonicalPublicUrl(path: string): string {
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://karigarsaathi.web.app';
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://karigarsaathi.vercel.app';
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   return `${origin}${cleanPath}`;
 }
