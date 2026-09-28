@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -403,11 +403,22 @@ export const CoordinatorShell: React.FC = () => {
           </div>
         )}
 
-        {/* Child Workspace Route Output */}
+        {/* Child Workspace Route Output (Header and sidebar remain stable during transitions) */}
         <main id="main-content" tabIndex={-1} className="w-full coordinator-content py-6 sm:py-8 outline-none">
-          <PageTransitionContainer>
-            <Outlet />
-          </PageTransitionContainer>
+          <Suspense
+            fallback={
+              <div
+                aria-hidden="true"
+                className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
+              >
+                <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
+              </div>
+            }
+          >
+            <PageTransitionContainer>
+              <Outlet />
+            </PageTransitionContainer>
+          </Suspense>
         </main>
       </div>
     </PageAtmosphere>

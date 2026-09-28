@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Outlet, useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft, Volume2, VolumeX, Save, Check, Loader2, AlertCircle } from 'lucide-react';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
@@ -8,6 +8,7 @@ import { PageAtmosphere } from '@/components/layout/PageAtmosphere';
 import { SyncStatusIndicator } from '@/components/navigation/SyncStatusIndicator';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 import { clsx } from 'clsx';
 import { logger } from '@/services/logging/logger';
 import { ROUTES } from '@/routes';
@@ -52,13 +53,6 @@ export const ProductCreationShell: React.FC = () => {
 
   const currentStep = getStepNumber(location.pathname);
   const currentStepDef = STEP_DEFINITIONS.find((s) => s.step === currentStep) || STEP_DEFINITIONS[0];
-
-  const prevStepRef = React.useRef(currentStep);
-  const direction = currentStep >= prevStepRef.current ? 'forward' : 'backward';
-
-  React.useEffect(() => {
-    prevStepRef.current = currentStep;
-  }, [currentStep]);
 
   const handleSaveDraft = async () => {
     setLocalErrorMessage(null);
@@ -249,17 +243,22 @@ export const ProductCreationShell: React.FC = () => {
         </div>
       </section>
 
-      {/* Main Content Area (Max width 1140px) */}
+      {/* Main Content Area (Max width 1140px, Stepper & Header remain fixed and stable) */}
       <main id="main-content" tabIndex={-1} className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1140px] w-full mx-auto pb-16 focus:outline-none overflow-x-clip">
-        <div
-          key={currentStep}
-          className={clsx(
-            direction === 'forward' ? 'step-forward-enter' : 'step-backward-enter',
-            'w-full'
-          )}
+        <Suspense
+          fallback={
+            <div
+              aria-hidden="true"
+              className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
+            >
+              <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
+            </div>
+          }
         >
-          <Outlet />
-        </div>
+          <PageTransitionContainer transitionKey={`step-${currentStep}`}>
+            <Outlet />
+          </PageTransitionContainer>
+        </Suspense>
       </main>
     </PageAtmosphere>
   );

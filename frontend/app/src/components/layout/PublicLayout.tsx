@@ -1,34 +1,55 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { createContext, useContext, Suspense } from 'react';
+import { Link, Outlet } from 'react-router-dom';
 import { PublicLandingHeader } from '@/components/navigation/PublicLandingHeader';
 import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 
+export const PublicLayoutContext = createContext<boolean>(false);
+
 export interface PublicLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
+  const isNested = useContext(PublicLayoutContext);
   const currentYear = new Date().getFullYear();
 
+  // If already rendered inside an outer PublicLayout (e.g. from the router),
+  // render only the content to avoid duplicate headers/footers
+  if (isNested) {
+    return <>{children || <Outlet />}</>;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF9EF] text-on-surface antialiased selection:bg-secondary/20 relative isolate overflow-x-clip">
-      {/* Accessibility Skip Link */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB955]"
-      >
-        Skip to main content
-      </a>
+    <PublicLayoutContext.Provider value={true}>
+      <div className="min-h-screen flex flex-col bg-[#FFF9EF] text-on-surface antialiased selection:bg-secondary/20 relative isolate overflow-x-clip">
+        {/* Accessibility Skip Link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB955]"
+        >
+          Skip to main content
+        </a>
 
-      {/* Shared Clear iOS Glass Header */}
-      <PublicLandingHeader />
+        {/* Shared Clear iOS Glass Header */}
+        <PublicLandingHeader />
 
-      {/* Main Landmark Container */}
-      <main id="main-content" className="flex-1 flex flex-col w-full relative z-10">
-        <PageTransitionContainer>
-          {children}
-        </PageTransitionContainer>
-      </main>
+        {/* Main Landmark Container */}
+        <main id="main-content" className="flex-1 flex flex-col w-full relative z-10">
+          <Suspense
+            fallback={
+              <div
+                aria-hidden="true"
+                className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
+              >
+                <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
+              </div>
+            }
+          >
+            <PageTransitionContainer>
+              {children || <Outlet />}
+            </PageTransitionContainer>
+          </Suspense>
+        </main>
 
       {/* Shared Public Footer */}
       <footer className="w-full border-t border-[#001D36]/10 px-4 sm:px-8 lg:px-12 py-10 bg-transparent relative z-10">
@@ -72,5 +93,6 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         </div>
       </footer>
     </div>
+    </PublicLayoutContext.Provider>
   );
 };

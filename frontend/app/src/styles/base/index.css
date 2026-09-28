@@ -940,19 +940,15 @@
   /* ========================================================================= */
 
   .page-transition-enter {
-    animation: pageTransitionEnter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageTransitionEnter 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
     will-change: opacity, transform;
     transform: translateZ(0);
   }
 
-  .step-forward-enter {
-    animation: stepForwardEnter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    will-change: opacity, transform;
-    transform: translateZ(0);
-  }
-
+  /* Harmonized step transitions (consistent subtle vertical movement instead of horizontal slide) */
+  .step-forward-enter,
   .step-backward-enter {
-    animation: stepBackwardEnter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageTransitionEnter 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
     will-change: opacity, transform;
     transform: translateZ(0);
   }
@@ -991,7 +987,7 @@
   @keyframes pageTransitionEnter {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;

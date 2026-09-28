@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { PublicLandingHeader } from '@/components/navigation/PublicLandingHeader';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
@@ -14,14 +14,25 @@ export const OnboardingShell: React.FC = () => {
       <AriaLiveAnnouncer />
       <OfflineBanner />
 
-      {/* Shared Public Top Glass Navigation Bar */}
+      {/* Shared Public Top Glass Navigation Bar (Remains stable during transitions) */}
       <PublicLandingHeader />
 
       {/* Centered Main Canvas */}
       <main id="main-content" tabIndex={-1} className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-[1200px] mx-auto z-10 relative focus:outline-none">
-        <PageTransitionContainer className="flex flex-col items-center justify-center">
-          <Outlet />
-        </PageTransitionContainer>
+        <Suspense
+          fallback={
+            <div
+              aria-hidden="true"
+              className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
+            >
+              <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <PageTransitionContainer className="flex flex-col items-center justify-center">
+            <Outlet />
+          </PageTransitionContainer>
+        </Suspense>
       </main>
 
       {/* Footer */}

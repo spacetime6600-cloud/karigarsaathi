@@ -4,6 +4,7 @@ import { PublicLandingHeader } from '@/components/navigation/PublicLandingHeader
 import { LandingAtmosphere } from '@/components/layout/LandingAtmosphere';
 import { IndiaCraftMap } from '@/components/map/IndiaCraftMap';
 import { CraftGalleryBanner } from '@/components/gallery/CraftGalleryBanner';
+import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
 import {
   Camera,
   Mic,
@@ -84,7 +85,8 @@ export const LandingPage: React.FC = () => {
 
       {/* Main Content Sections (All transparent, sitting on the continuous canvas) */}
       <main id="main-content" className="flex-1 flex flex-col w-full -mt-[58px] sm:-mt-[60px] relative z-10 overflow-visible">
-        {/* ========================================================= */}
+        <PageTransitionContainer transitionKey="/" className="flex-1 flex flex-col w-full">
+          {/* ========================================================= */}
         {/* SECTION 1: HERO                                           */}
         {/* ========================================================= */}
         <section
@@ -558,6 +560,7 @@ export const LandingPage: React.FC = () => {
             <p>© {currentYear} KarigarSaathi. Preserving India’s living craft heritage.</p>
           </div>
         </footer>
+        </PageTransitionContainer>
       </main>
     </div>
   );

@@ -9,6 +9,7 @@ import { ArtisanAppShell } from '@/layouts/ArtisanAppShell';
 import { ProductCreationShell } from '@/layouts/ProductCreationShell';
 import { PublicPassportShell } from '@/layouts/PublicPassportShell';
 import { CoordinatorShell } from '@/layouts/CoordinatorShell';
+import { PublicLayout } from '@/components/layout/PublicLayout';
 
 // Eagerly loaded public entry pages for instant first paint
 import { LandingPage } from '@/features/landing/LandingPage';
@@ -79,24 +80,29 @@ export const router = createBrowserRouter([
         element: <LandingPage />,
       },
       {
-        path: '/about',
-        element: <AboutPage />,
-      },
-      {
-        path: '/marketplace',
-        element: <MarketplacePage />,
-      },
-      {
-        path: '/marketplace/products/:productId',
-        element: <ProductDetailPage />,
-      },
-      {
-        path: '/products',
-        element: <Navigate to="/marketplace" replace />,
-      },
-      {
-        path: '/reviews',
-        element: <ReviewsPage />,
+        element: <PublicLayout />,
+        children: [
+          {
+            path: '/about',
+            element: <AboutPage />,
+          },
+          {
+            path: '/marketplace',
+            element: <MarketplacePage />,
+          },
+          {
+            path: '/marketplace/products/:productId',
+            element: <ProductDetailPage />,
+          },
+          {
+            path: '/products',
+            element: <Navigate to="/marketplace" replace />,
+          },
+          {
+            path: '/reviews',
+            element: <ReviewsPage />,
+          },
+        ],
       },
 
       // Public Onboarding (Language, Artisan Login, Dedicated Coordinator Login)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
@@ -73,11 +73,22 @@ export const PublicPassportShell: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Content Area (Header remains stable during transitions) */}
       <main id="main-content" tabIndex={-1} className="flex-1 p-4 md:p-10 max-w-5xl w-full mx-auto pb-16 focus:outline-none">
-        <PageTransitionContainer>
-          <Outlet />
-        </PageTransitionContainer>
+        <Suspense
+          fallback={
+            <div
+              aria-hidden="true"
+              className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
+            >
+              <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <PageTransitionContainer>
+            <Outlet />
+          </PageTransitionContainer>
+        </Suspense>
       </main>
 
       {/* Public Footer */}
