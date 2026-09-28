@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PhotographItem } from '@/types';
 import { aiEnhancementService, JobResult, AIEnhancementError } from '@/services/ai/aiEnhancementService';
+import { enhanceImageInBrowser } from '@/services/media/clientImageEnhancer';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { ImageComparisonViewer } from './ImageComparisonViewer';
@@ -125,17 +126,38 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
           ? ['lighting_correction', 'centring', 'standard_resize']
           : undefined;
 
-      // 2. Submit to AI microservice
-      const result = await aiEnhancementService.enhanceImage({
-        imageBlob: blob,
-        consentGranted: true,
-        requestId,
-        productId,
-        artisanId: effectiveArtisanId,
-        outputSize: 512,
-        background: 'white',
-        ...(operations ? { operations } : {}),
-      });
+      // 2. Submit to AI microservice with resilient in-browser fallback
+      let result: JobResult;
+      try {
+        result = await aiEnhancementService.enhanceImage({
+          imageBlob: blob,
+          consentGranted: true,
+          requestId,
+          productId,
+          artisanId: effectiveArtisanId,
+          outputSize: 512,
+          background: 'white',
+          ...(operations ? { operations } : {}),
+        });
+      } catch (serviceErr) {
+        logger.warn('SYSTEM', 'Remote AI microservice unavailable or errored; applying in-browser Studio Enhancement', {
+          error: serviceErr,
+          photoId: photoItem.id,
+        });
+        // Graceful In-Browser Studio Fallback (HTML5 Canvas Segmentation & Luminance Normalization)
+        result = await enhanceImageInBrowser(photoItem.rawOriginalUrl || photoItem.url, {
+          mode: effectiveMode,
+          outputSize: 512,
+          background: 'white',
+          requestId,
+          artisanId: effectiveArtisanId,
+          productId,
+        });
+      }
+
+      if (!result.enhanced_image_reference && !result.enhancedDataUrl) {
+        throw new Error('Enhanced image could not be rendered.');
+      }
 
       setJobResult(result);
       setStep('REVIEW');
@@ -366,10 +388,15 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
                 <Check className="w-4 h-4 shrink-0" />
                 <span>Studio Clean applied: Background removed cleanly, lighting balanced, product centered.</span>
               </div>
-            ) : (
+            ) : jobResult.operations_applied?.some((op) => ['lighting_correction', 'centring', 'standard_resize'].includes(op)) ? (
               <div className="p-2.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-xl text-xs flex items-center gap-2 font-medium">
                 <ShieldCheck className="w-4 h-4 shrink-0" />
                 <span>Basic Enhancement applied: Authentic craft background preserved, lighting balanced, product centered.</span>
+              </div>
+            ) : (
+              <div className="p-2.5 bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-500/20 rounded-xl text-xs flex items-center gap-2 font-medium">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Original Photograph: Authentic craft presentation preserved without alteration.</span>
               </div>
             )}
 
@@ -440,6 +467,35 @@ export const AIEnhancementModal: React.FC<AIEnhancementModalProps> = ({
             <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-2 pt-2 border-t border-surface-variant">
               <Button variant="ghost" size="sm" onClick={onClose} className="w-full sm:w-auto text-xs">
                 Continue with Original Photo
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={async () => {
+                  if (!photoItem) return;
+                  setStep('PROCESSING');
+                  try {
+                    const fallbackRes = await enhanceImageInBrowser(photoItem.rawOriginalUrl || photoItem.url, {
+                      mode: enhancementMode,
+                      outputSize: 512,
+                      background: 'white',
+                      requestId: `client_direct_${Date.now()}`,
+                      artisanId: artisanId || auth?.currentUser?.uid || 'artisan',
+                      productId,
+                    });
+                    setJobResult(fallbackRes);
+                    setStep('REVIEW');
+                    announce('In-browser Studio Enhancement applied.', 'polite');
+                  } catch {
+                    setErrorMessage('In-browser processing could not be completed.');
+                    setStep('ERROR');
+                  }
+                }}
+                leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                className="w-full sm:w-auto text-xs font-semibold"
+              >
+                Enhance in Browser (Instant)
               </Button>
 
               {enhancementMode === 'full' && (

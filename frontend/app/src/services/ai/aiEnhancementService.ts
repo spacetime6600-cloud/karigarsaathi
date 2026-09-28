@@ -316,6 +316,20 @@ class AIEnhancementService {
 
       const jobResult: JobResult = await response.json();
 
+      // If backend reports explicit job failure, throw structured error so UI handles it accurately
+      if (jobResult.status === 'failed') {
+        const errorDetail = (jobResult.warnings && jobResult.warnings.length > 0)
+          ? jobResult.warnings.join('; ')
+          : 'AI service could not process this image.';
+        throw new AIEnhancementError({
+          errorCode: jobResult.failure_code || 'INTERNAL_PROCESSING_ERROR',
+          message: errorDetail,
+          retryable: jobResult.retryable ?? false,
+          requestId: jobResult.request_id || requestId,
+          details: { jobResult },
+        });
+      }
+
       // If enhanced image reference is returned, format the full URL or fetch blob preview
       if (jobResult.enhanced_image_reference) {
         jobResult.enhancedDataUrl = jobResult.enhanced_image_reference.startsWith('http')

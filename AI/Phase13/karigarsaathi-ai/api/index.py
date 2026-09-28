@@ -10,7 +10,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 # Redirect storage directories to /tmp in serverless environment
-if os.getenv("VERCEL"):
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or not os.access(".", os.W_OK):
     os.environ.setdefault("ORIGINALS_DIR", "/tmp/storage/originals")
     os.environ.setdefault("ENHANCED_DIR", "/tmp/storage/enhanced")
     os.environ.setdefault("PREVIEWS_DIR", "/tmp/storage/previews")

@@ -6,6 +6,13 @@ import os
 import logging
 from contextlib import asynccontextmanager
 
+# Redirect storage directories to /tmp in serverless environment (Vercel / Lambda / Read-Only FS)
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or not os.access(".", os.W_OK):
+    os.environ.setdefault("ORIGINALS_DIR", "/tmp/storage/originals")
+    os.environ.setdefault("ENHANCED_DIR", "/tmp/storage/enhanced")
+    os.environ.setdefault("PREVIEWS_DIR", "/tmp/storage/previews")
+    os.environ.setdefault("JOBS_DIR", "/tmp/storage/jobs")
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,13 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.api.routes import router
 from app.api.media_routes import router as media_router
-
-# Redirect storage directories to /tmp in serverless environment (Vercel)
-if os.getenv("VERCEL"):
-    os.environ.setdefault("ORIGINALS_DIR", "/tmp/storage/originals")
-    os.environ.setdefault("ENHANCED_DIR", "/tmp/storage/enhanced")
-    os.environ.setdefault("PREVIEWS_DIR", "/tmp/storage/previews")
-    os.environ.setdefault("JOBS_DIR", "/tmp/storage/jobs")
 
 # Initialize settings
 settings = get_settings()

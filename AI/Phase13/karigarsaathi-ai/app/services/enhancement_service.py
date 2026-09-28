@@ -366,10 +366,11 @@ class ImageEnhancementService:
             # Catch-all for unexpected errors
             import traceback
             traceback.print_exc()
+            err_msg = f"Processing error ({type(e).__name__}): {str(e)}"
             await self.job_repository.update_job(
                 job_id=job_id,
                 status=JobState.PERMANENT_FAILURE,
-                warnings="Unexpected processing error",
+                warnings=err_msg,
             )
             return self._build_job_result({
                 "job_id": job_id,
@@ -382,7 +383,7 @@ class ImageEnhancementService:
                 "preview_image_reference": None,
                 "operations_requested": operations,
                 "operations_applied": [],
-                "warnings": ["Unexpected processing error"],
+                "warnings": [err_msg],
                 "metrics": {},
                 "processing_duration_ms": int((time.time() - start_ms) * 1000),
                 "retryable": False,

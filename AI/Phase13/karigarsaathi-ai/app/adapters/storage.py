@@ -30,10 +30,25 @@ class LocalFileStorageAdapter(ImageStorageProtocol):
         self.previews_dir = previews_dir
         self._lock = asyncio.Lock()
 
+    def _resolve_writable_dir(self, target_dir: str, fallback_subdir: str) -> str:
+        """Verify directory is writable, falling back to /tmp if read-only or permission denied."""
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+            test_file = os.path.join(target_dir, f".write_test_{os.getpid()}")
+            with open(test_file, "w") as f:
+                f.write("1")
+            os.remove(test_file)
+            return target_dir
+        except (OSError, PermissionError):
+            fallback = f"/tmp/storage/{fallback_subdir}"
+            os.makedirs(fallback, exist_ok=True)
+            return fallback
+
     async def _ensure_dirs(self) -> None:
-        """Ensure all required directories exist."""
-        for d in [self.originals_dir, self.enhanced_dir, self.previews_dir]:
-            os.makedirs(d, exist_ok=True)
+        """Ensure all required directories exist, falling back to /tmp if filesystem is read-only."""
+        self.originals_dir = self._resolve_writable_dir(self.originals_dir, "originals")
+        self.enhanced_dir = self._resolve_writable_dir(self.enhanced_dir, "enhanced")
+        self.previews_dir = self._resolve_writable_dir(self.previews_dir, "previews")
 
     async def store_original(self, filename: str, data: bytes) -> str:
         """Store an original image immutably.
@@ -62,11 +77,16 @@ class LocalFileStorageAdapter(ImageStorageProtocol):
         Returns:
             Image bytes
         """
-        filepath = os.path.join(self.originals_dir, filename)
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Original not found: {filename}")
-        with open(filepath, "rb") as f:
-            return f.read()
+        candidates = [
+            os.path.join(self.originals_dir, filename),
+            os.path.join("/tmp/storage/originals", filename),
+            os.path.join("storage/originals", filename),
+        ]
+        for filepath in candidates:
+            if os.path.exists(filepath):
+                with open(filepath, "rb") as f:
+                    return f.read()
+        raise FileNotFoundError(f"Original not found: {filename}")
 
     async def store_enhanced(self, filename: str, data: bytes) -> str:
         """Store an enhanced image.
@@ -94,11 +114,16 @@ class LocalFileStorageAdapter(ImageStorageProtocol):
         Returns:
             Image bytes
         """
-        filepath = os.path.join(self.enhanced_dir, filename)
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Enhanced not found: {filename}")
-        with open(filepath, "rb") as f:
-            return f.read()
+        candidates = [
+            os.path.join(self.enhanced_dir, filename),
+            os.path.join("/tmp/storage/enhanced", filename),
+            os.path.join("storage/enhanced", filename),
+        ]
+        for filepath in candidates:
+            if os.path.exists(filepath):
+                with open(filepath, "rb") as f:
+                    return f.read()
+        raise FileNotFoundError(f"Enhanced not found: {filename}")
 
     async def store_preview(self, filename: str, data: bytes) -> str:
         """Store a preview image.
@@ -126,26 +151,37 @@ class LocalFileStorageAdapter(ImageStorageProtocol):
         Returns:
             Image bytes
         """
-        filepath = os.path.join(self.previews_dir, filename)
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"Preview not found: {filename}")
-        with open(filepath, "rb") as f:
-            return f.read()
+        candidates = [
+            os.path.join(self.previews_dir, filename),
+            os.path.join("/tmp/storage/previews", filename),
+            os.path.join("storage/previews", filename),
+        ]
+        for filepath in candidates:
+            if os.path.exists(filepath):
+                with open(filepath, "rb") as f:
+                    return f.read()
+        raise FileNotFoundError(f"Preview not found: {filename}")
 
     async def original_exists(self, filename: str) -> bool:
         """Check if an original image exists."""
-        filepath = os.path.join(self.originals_dir, filename)
-        return os.path.exists(filepath)
+        return any(
+            os.path.exists(os.path.join(d, filename))
+            for d in [self.originals_dir, "/tmp/storage/originals", "storage/originals"]
+        )
 
     async def enhanced_exists(self, filename: str) -> bool:
         """Check if an enhanced image exists."""
-        filepath = os.path.join(self.enhanced_dir, filename)
-        return os.path.exists(filepath)
+        return any(
+            os.path.exists(os.path.join(d, filename))
+            for d in [self.enhanced_dir, "/tmp/storage/enhanced", "storage/enhanced"]
+        )
 
     async def preview_exists(self, filename: str) -> bool:
         """Check if a preview image exists."""
-        filepath = os.path.join(self.previews_dir, filename)
-        return os.path.exists(filepath)
+        return any(
+            os.path.exists(os.path.join(d, filename))
+            for d in [self.previews_dir, "/tmp/storage/previews", "storage/previews"]
+        )
 
 
 class DurableImageStorageAdapter(LocalFileStorageAdapter):

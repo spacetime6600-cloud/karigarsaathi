@@ -4,6 +4,16 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+import os
+
+
+def _resolve_default_storage_dir(subdir: str) -> str:
+    """Resolve storage directory, falling back to /tmp if in serverless or read-only."""
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or not os.access(".", os.W_OK):
+        return f"/tmp/storage/{subdir}"
+    return f"storage/{subdir}"
+
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
@@ -25,9 +35,9 @@ class Settings(BaseSettings):
     workers: int = Field(default=1, alias="WORKERS")
 
     # Directories
-    originals_dir: str = Field(default="storage/originals", alias="ORIGINALS_DIR")
-    enhanced_dir: str = Field(default="storage/enhanced", alias="ENHANCED_DIR")
-    previews_dir: str = Field(default="storage/previews", alias="PREVIEWS_DIR")
+    originals_dir: str = Field(default_factory=lambda: _resolve_default_storage_dir("originals"), alias="ORIGINALS_DIR")
+    enhanced_dir: str = Field(default_factory=lambda: _resolve_default_storage_dir("enhanced"), alias="ENHANCED_DIR")
+    previews_dir: str = Field(default_factory=lambda: _resolve_default_storage_dir("previews"), alias="PREVIEWS_DIR")
 
     # Image validation
     min_dimension: int = Field(default=256, alias="MIN_DIMENSION")
@@ -58,9 +68,9 @@ class Settings(BaseSettings):
         default="your-dev-token-here", alias="DEVELOPMENT_BEARER_TOKEN"
     )
 
-    # ML Background Removal capability flag (disabled by default for Render Free 512MB RAM stability)
+    # ML Background Removal capability flag
     enable_ml_background_removal: bool = Field(
-        default=False, alias="ENABLE_ML_BACKGROUND_REMOVAL"
+        default=True, alias="ENABLE_ML_BACKGROUND_REMOVAL"
     )
 
     # Media Storage Provider (cloudinary | firebase_emulator | local)
