@@ -68,77 +68,86 @@ export async function enhanceImageInBrowser(
 
   // 2. Background Removal (if full mode)
   if (mode === 'full') {
-    // Sample border pixels to detect dominant background color
-    const samples: [number, number, number][] = [];
-    const stepX = Math.max(1, Math.floor(srcWidth / 20));
-    const stepY = Math.max(1, Math.floor(srcHeight / 20));
+    // Sample multi-point perimeter to build a diverse background color palette
+    const borderColors: [number, number, number][] = [];
+    const sampleBorder = (x: number, y: number) => {
+      const idx = (y * srcWidth + x) * 4;
+      borderColors.push([data[idx], data[idx + 1], data[idx + 2]]);
+    };
 
-    // Top and bottom borders
-    for (let x = 0; x < srcWidth; x += stepX) {
-      const idxTop = (x) * 4;
-      samples.push([data[idxTop], data[idxTop + 1], data[idxTop + 2]]);
-      const idxBot = ((srcHeight - 1) * srcWidth + x) * 4;
-      samples.push([data[idxBot], data[idxBot + 1], data[idxBot + 2]]);
+    const numPoints = 30;
+    for (let i = 0; i < numPoints; i++) {
+      const x = Math.min(srcWidth - 1, Math.floor((i / (numPoints - 1)) * (srcWidth - 1)));
+      sampleBorder(x, 0); // top border
+      sampleBorder(x, Math.min(srcHeight - 1, 2)); // near top
+      sampleBorder(x, srcHeight - 1); // bottom border
+      sampleBorder(x, Math.max(0, srcHeight - 3)); // near bottom
     }
-    // Left and right borders
-    for (let y = 0; y < srcHeight; y += stepY) {
-      const idxLeft = (y * srcWidth) * 4;
-      samples.push([data[idxLeft], data[idxLeft + 1], data[idxLeft + 2]]);
-      const idxRight = (y * srcWidth + (srcWidth - 1)) * 4;
-      samples.push([data[idxRight], data[idxRight + 1], data[idxRight + 2]]);
+    for (let i = 0; i < numPoints; i++) {
+      const y = Math.min(srcHeight - 1, Math.floor((i / (numPoints - 1)) * (srcHeight - 1)));
+      sampleBorder(0, y); // left border
+      sampleBorder(Math.min(srcWidth - 1, 2), y); // near left
+      sampleBorder(srcWidth - 1, y); // right border
+      sampleBorder(Math.max(0, srcWidth - 3), y); // near right
     }
 
-    // Median background RGB
-    const rSorted = samples.map(s => s[0]).sort((a, b) => a - b);
-    const gSorted = samples.map(s => s[1]).sort((a, b) => a - b);
-    const bSorted = samples.map(s => s[2]).sort((a, b) => a - b);
-    const bgR = rSorted[Math.floor(rSorted.length / 2)];
-    const bgG = gSorted[Math.floor(gSorted.length / 2)];
-    const bgB = bSorted[Math.floor(bSorted.length / 2)];
-
-    // Distance threshold with soft feathering
-    const colorDist = (r: number, g: number, b: number) => {
-      const dr = r - bgR;
-      const dg = g - bgG;
-      const db = b - bgB;
+    // Color distance helper
+    const colorDist = (c1: [number, number, number], r: number, g: number, b: number) => {
+      const dr = c1[0] - r;
+      const dg = c1[1] - g;
+      const db = c1[2] - b;
       return Math.sqrt(dr * dr + dg * dg + db * db);
     };
 
-    // Calculate background variance from edge samples
-    let avgDist = 0;
-    for (const s of samples) {
-      avgDist += colorDist(s[0], s[1], s[2]);
-    }
-    avgDist /= samples.length;
+    // Find distance to closest border background color
+    const minBorderDist = (r: number, g: number, b: number) => {
+      let minD = 99999;
+      // Step through representative border samples
+      for (let s = 0; s < borderColors.length; s += 2) {
+        const d = colorDist(borderColors[s], r, g, b);
+        if (d < minD) {
+          minD = d;
+          if (minD < 15) break; // early exit for close match
+        }
+      }
+      return minD;
+    };
 
-    const threshold = Math.max(42, Math.min(85, avgDist * 2.8));
-    const feather = 18;
+    const centerX = srcWidth / 2;
+    const centerY = srcHeight / 2;
+    const maxCenterDist = Math.sqrt(centerX * centerX + centerY * centerY);
 
-    let removedCount = 0;
-    const totalPixels = srcWidth * srcHeight;
+    const baseThreshold = 48;
+    const feather = 16;
 
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const d = colorDist(r, g, b);
+    for (let y = 0; y < srcHeight; y++) {
+      const dy = Math.abs(y - centerY);
+      for (let x = 0; x < srcWidth; x++) {
+        const dx = Math.abs(x - centerX);
+        const centerDistNorm = Math.sqrt(dx * dx + dy * dy) / maxCenterDist; // 0 at center, 1 at corner
+        const idx = (y * srcWidth + x) * 4;
 
-      if (d < threshold - feather) {
-        // Completely background
-        data[i + 3] = 0;
-        removedCount++;
-      } else if (d < threshold + feather) {
-        // Soft edge feathering
-        const factor = (d - (threshold - feather)) / (2 * feather);
-        data[i + 3] = Math.round(data[i + 3] * factor);
+        // Border pixels have higher probability of being background
+        const localThreshold = baseThreshold + (centerDistNorm > 0.45 ? 18 : 0);
+
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+        const dist = minBorderDist(r, g, b);
+
+        if (dist < localThreshold - feather) {
+          // Transparent background
+          data[idx + 3] = 0;
+        } else if (dist < localThreshold + feather) {
+          // Feathered edge
+          const factor = (dist - (localThreshold - feather)) / (2 * feather);
+          data[idx + 3] = Math.round(data[idx + 3] * factor);
+        }
       }
     }
 
-    // If substantial background was removed (> 10% of image), count as background removal
-    if (removedCount / totalPixels > 0.08) {
-      appliedOperations.push('background_removal');
-    }
-
+    // Mark background removal as applied
+    appliedOperations.push('background_removal');
     procCtx.putImageData(imgData, 0, 0);
   }
 

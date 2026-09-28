@@ -108,6 +108,8 @@ models/*.gguf
 ~/.cache/rembg/
 
 # Runtime Uploads & User Generated Output
+storage/
+**/storage/jobs/*
 storage/uploads/
 storage/recordings/
 **/storage/originals/*

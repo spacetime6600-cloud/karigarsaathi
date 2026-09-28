@@ -188,15 +188,14 @@ class RembgBackgroundRemovalAdapter:
             )
             warnings.extend(mask_warnings)
 
-            gc.collect()
-
-            # If mask is deemed suspicious, return fallback warning
-            if any("SUSPICIOUS" in w or "REJECTED" for w in mask_warnings):
+            # Only reject if mask is completely failed (e.g. 0% foreground detected or 100% solid unchanged rectangle)
+            is_fatal_failure = fg_coverage < 0.01 or fg_coverage > 0.998
+            if is_fatal_failure:
                 return {
                     "foreground": foreground_rgba,
                     "mask": None,
                     "foreground_coverage": fg_coverage,
-                    "warnings": mask_warnings,
+                    "warnings": mask_warnings or ["Background removal could not detect foreground subject."],
                     "fallback": True,
                 }
 
@@ -293,32 +292,21 @@ class RembgBackgroundRemovalAdapter:
             )
 
         # Check 3: Product touching excessive canvas boundaries
-        # If foreground touches the edge of the image on any side,
-        # it may be losing product content
-        margin = width // 10  # 10% margin
+        margin = max(1, width // 20)  # 5% border margin
         if margin > 0:
-            # Check if any non-transparent pixels exist in the margin zones
-            top_margin = alpha_channel[0:margin, :].sum()
-            bottom_margin = alpha_channel[height - margin:height, :].sum()
-            left_margin = alpha_channel[:, 0:margin].sum()
-            right_margin = alpha_channel[:, width - margin:width].sum()
+            top_max = margin * width * 255
+            bottom_max = margin * width * 255
+            left_max = margin * height * 255
+            right_max = margin * height * 255
 
-            if top_margin > 0 or bottom_margin > 0:
-                warnings.append(
-                    "SUSPICIOUS: Product touches top canvas boundary"
-                )
-            if bottom_margin > 0 or bottom_margin > 0:
-                warnings.append(
-                    "SUSPICIOUS: Product touches bottom canvas boundary"
-                )
-            if left_margin > 0:
-                warnings.append(
-                    "SUSPICIOUS: Product touches left canvas boundary"
-                )
-            if right_margin > 0:
-                warnings.append(
-                    "SUSPICIOUS: Product touches right canvas boundary"
-                )
+            if alpha_channel[0:margin, :].sum() > top_max * 0.85:
+                warnings.append("Note: Product extends to top image boundary")
+            if alpha_channel[height - margin:height, :].sum() > bottom_max * 0.85:
+                warnings.append("Note: Product extends to bottom image boundary")
+            if alpha_channel[:, 0:margin].sum() > left_max * 0.85:
+                warnings.append("Note: Product extends to left image boundary")
+            if alpha_channel[:, width - margin:width].sum() > right_max * 0.85:
+                warnings.append("Note: Product extends to right image boundary")
 
         # Check 4: Excessive internal holes
         # Count connected components of foreground minus the main component
