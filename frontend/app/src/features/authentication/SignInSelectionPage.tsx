@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/Badge';
 import {
   Palette,
   ShieldCheck,
-  ArrowRight,
-  ArrowLeft,
+  MoveRight,
+  MoveLeft,
   UserCheck,
 } from 'lucide-react';
 
@@ -33,7 +33,7 @@ export const SignInSelectionPage: React.FC = () => {
   const activeName = userAccount?.displayName || user?.name || 'User';
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-5 sm:py-7 px-3 sm:px-6 animate-in fade-in duration-200 flex flex-col items-center">
+    <div className="w-full max-w-4xl mx-auto py-5 sm:py-7 px-3 sm:px-6 flex flex-col items-center">
       {/* Header Block */}
       <div className="flex flex-col items-center text-center gap-2.5 mb-5 sm:mb-7">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md text-[#FFB955] text-xs font-bold border border-white/20 shadow-xs select-none">
@@ -75,9 +75,10 @@ export const SignInSelectionPage: React.FC = () => {
                 navigate(getSafeReturnUrl(rawReturnUrl, target, activeRole));
               }}
               size="sm"
-              className="flex-1 sm:flex-initial text-xs font-bold bg-secondary hover:bg-secondary/90 text-white"
+              className="group/work flex-1 sm:flex-initial text-xs font-bold bg-secondary hover:bg-[#8B3400] text-white inline-flex items-center gap-1.5 transition-all duration-200 active:scale-95"
             >
-              Go to Workspace
+              <span>Go to Workspace</span>
+              <MoveRight className="w-3.5 h-3.5 transition-transform duration-250 ease-out group-hover/work:translate-x-1 motion-reduce:transform-none" />
             </Button>
             <Button
               onClick={async () => {
@@ -85,7 +86,7 @@ export const SignInSelectionPage: React.FC = () => {
               }}
               variant="ghost"
               size="sm"
-              className="flex-1 sm:flex-initial text-xs font-bold border border-surface-variant"
+              className="flex-1 sm:flex-initial text-xs font-bold border border-surface-variant hover:bg-black/5 transition-colors duration-150"
             >
               Sign Out
             </Button>
@@ -123,14 +124,14 @@ export const SignInSelectionPage: React.FC = () => {
           <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.LOGIN, 'artisan')}
-              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-[#8B3400] text-white font-semibold text-sm shadow-xs hover:shadow-md hover:shadow-secondary/20 active:scale-[0.985] flex items-center justify-center gap-2 transition-all duration-200 ease-out group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
               <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Artisan</span>
-              <ArrowRight className="w-4 h-4 shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
+              <MoveRight className="w-4 h-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/btn:translate-x-1.5 motion-reduce:transform-none" />
             </Button>
             <Link
               to={ROUTES.LOGIN}
-              className="text-xs font-medium text-secondary hover:underline text-center py-1 transition-colors"
+              className="group/artisan text-xs font-medium text-secondary hover:text-secondary/80 text-center py-1 transition-all duration-200 ease-out inline-flex items-center justify-center hover:translate-x-1"
             >
               New artisan? Register here →
             </Link>
@@ -165,14 +166,14 @@ export const SignInSelectionPage: React.FC = () => {
           <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
               onClick={() => handleSelectRole(ROUTES.COORDINATOR_LOGIN, 'coordinator')}
-              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+              className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-[#8B3400] text-white font-semibold text-sm shadow-xs hover:shadow-md hover:shadow-secondary/20 active:scale-[0.985] flex items-center justify-center gap-2 transition-all duration-200 ease-out group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
               <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Coordinator</span>
-              <ArrowRight className="w-4 h-4 shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
+              <MoveRight className="w-4 h-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/btn:translate-x-1.5 motion-reduce:transform-none" />
             </Button>
             <Link
               to={ROUTES.COORDINATOR_REGISTER}
-              className="text-xs font-medium text-secondary hover:underline text-center py-1 transition-colors"
+              className="group/coord text-xs font-medium text-secondary hover:text-secondary/80 text-center py-1 transition-all duration-200 ease-out inline-flex items-center justify-center hover:translate-x-1"
             >
               New coordinator? Register for cluster access →
             </Link>
@@ -184,9 +185,9 @@ export const SignInSelectionPage: React.FC = () => {
       <div className="flex items-center justify-center mt-6 sm:mt-8 text-xs">
         <Link
           to={ROUTES.HOME}
-          className="inline-flex items-center gap-2 text-white/80 hover:text-white font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg px-3 py-1.5"
+          className="group/home inline-flex items-center gap-2 text-white/80 hover:text-white font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg px-3 py-1.5"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <MoveLeft className="w-4 h-4 transition-transform duration-250 ease-out group-hover/home:-translate-x-1 motion-reduce:transform-none" />
           <span>Back to homepage</span>
         </Link>
       </div>

@@ -10,14 +10,16 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
-  ArrowRight,
+  MoveRight,
   Loader2,
   AlertCircle,
   CheckCircle2,
   Users,
   FileCheck,
   MessageSquareQuote,
+  Sparkles,
 } from 'lucide-react';
+import { clsx } from 'clsx';
 import { auth } from '@/config/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { coordinatorApprovalService } from '@/services/coordinator/coordinatorApprovalService';
@@ -42,6 +44,14 @@ export const CoordinatorLoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [justAutofilled, setJustAutofilled] = useState(false);
+
+  const handleAutofill = () => {
+    setEmail('coordinator@karigarsaathi.gov.in');
+    setPassword('CoordinatorPass123!');
+    setJustAutofilled(true);
+    setTimeout(() => setJustAutofilled(false), 1600);
+  };
 
   // Password reset modal state
   const [showResetModal, setShowResetModal] = useState(false);
@@ -124,7 +134,7 @@ export const CoordinatorLoginPage: React.FC = () => {
   const isArtisanLoggedIn = isAuthenticated && userAccount !== null && userAccount.role === 'artisan';
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-4 sm:py-8 px-4 animate-in fade-in duration-200">
+    <div className="w-full max-w-5xl mx-auto py-4 sm:py-8 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
         {/* ========================================================= */}
         {/* LEFT COLUMN: Tasteful Craft Visual & Coordinator Copy     */}
@@ -167,7 +177,7 @@ export const CoordinatorLoginPage: React.FC = () => {
 
           {/* Feature Highlights Grid */}
           <div className="relative z-10 grid grid-cols-1 gap-3.5 my-8">
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
+            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10 hover:bg-white/[0.1] hover:border-white/20 transition-all duration-300 ease-out hover:translate-x-0.5">
               <div className="w-8 h-8 rounded-lg bg-[#FFB955]/20 text-[#FFB955] flex items-center justify-center shrink-0 mt-0.5">
                 <Users className="w-4 h-4" />
               </div>
@@ -179,7 +189,7 @@ export const CoordinatorLoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
+            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10 hover:bg-white/[0.1] hover:border-white/20 transition-all duration-300 ease-out hover:translate-x-0.5">
               <div className="w-8 h-8 rounded-lg bg-[#FFB955]/20 text-[#FFB955] flex items-center justify-center shrink-0 mt-0.5">
                 <FileCheck className="w-4 h-4" />
               </div>
@@ -191,7 +201,7 @@ export const CoordinatorLoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
+            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/10 hover:bg-white/[0.1] hover:border-white/20 transition-all duration-300 ease-out hover:translate-x-0.5">
               <div className="w-8 h-8 rounded-lg bg-[#FFB955]/20 text-[#FFB955] flex items-center justify-center shrink-0 mt-0.5">
                 <MessageSquareQuote className="w-4 h-4" />
               </div>
@@ -263,9 +273,10 @@ export const CoordinatorLoginPage: React.FC = () => {
                 </div>
                 <Link
                   to={ROUTES.COORDINATOR_DASHBOARD}
-                  className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto"
+                  className="group/hub text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto inline-flex items-center gap-1 transition-colors"
                 >
-                  Go to Coordinator Hub →
+                  <span>Go to Coordinator Hub</span>
+                  <MoveRight className="w-3.5 h-3.5 transition-transform duration-250 ease-out group-hover/hub:translate-x-1 motion-reduce:transform-none" />
                 </Link>
               </div>
             )}
@@ -315,7 +326,7 @@ export const CoordinatorLoginPage: React.FC = () => {
             )}
 
             {/* Judge & Evaluator Quick Demo Callout */}
-            <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 hover:border-secondary/40 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xs transition-colors duration-200">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4" />
@@ -336,13 +347,25 @@ export const CoordinatorLoginPage: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setEmail('coordinator@karigarsaathi.gov.in');
-                  setPassword('CoordinatorPass123!');
-                }}
-                className="px-2.5 py-1 text-[11px] font-bold text-secondary bg-white hover:bg-amber-50 border border-secondary/30 rounded-lg shadow-2xs transition-colors shrink-0"
+                onClick={handleAutofill}
+                className={clsx(
+                  'px-3 py-1.5 text-[11px] font-bold rounded-lg border shadow-2xs transition-all duration-200 shrink-0 flex items-center gap-1.5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary',
+                  justAutofilled
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-200'
+                    : 'text-secondary bg-white hover:bg-secondary hover:text-white border-secondary/30 hover:border-secondary'
+                )}
               >
-                Auto-fill
+                {justAutofilled ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Filled</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Auto-fill</span>
+                    <Sparkles className="w-3 h-3 opacity-70" />
+                  </>
+                )}
               </button>
             </div>
 
@@ -361,7 +384,7 @@ export const CoordinatorLoginPage: React.FC = () => {
                   placeholder="coordinator@karigarsaathi.gov.in"
                   required
                   autoComplete="email"
-                  className="w-full border border-outline-variant rounded-xl bg-white px-3.5 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                  className="w-full border border-outline-variant/60 hover:border-secondary/40 focus:border-secondary rounded-xl bg-white px-3.5 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-4 focus:ring-secondary/15 transition-all duration-200 ease-out shadow-2xs placeholder:text-on-surface-variant/40"
                 />
               </div>
 
@@ -379,7 +402,7 @@ export const CoordinatorLoginPage: React.FC = () => {
                       setResetSuccess(false);
                       setResetError(null);
                     }}
-                    className="text-xs text-secondary font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+                    className="text-xs text-secondary hover:text-secondary/80 font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded transition-colors duration-150"
                   >
                     Forgot Password?
                   </button>
@@ -395,13 +418,13 @@ export const CoordinatorLoginPage: React.FC = () => {
                     required
                     minLength={6}
                     autoComplete="current-password"
-                    className="w-full border border-outline-variant rounded-xl bg-white pl-3.5 pr-10 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                    className="w-full border border-outline-variant/60 hover:border-secondary/40 focus:border-secondary rounded-xl bg-white pl-3.5 pr-10 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-4 focus:ring-secondary/15 transition-all duration-200 ease-out shadow-2xs placeholder:text-on-surface-variant/40"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary hover:bg-black/5 p-1.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary transition-all duration-150 active:scale-90"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -411,51 +434,52 @@ export const CoordinatorLoginPage: React.FC = () => {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full h-[52px] min-h-[52px] font-bold text-sm rounded-xl mt-2 bg-secondary hover:bg-secondary/90 text-white shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2.5 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
+                className="w-full h-[52px] min-h-[52px] font-bold text-sm rounded-xl mt-2 bg-secondary hover:bg-[#8B3400] active:bg-[#782C00] text-white shadow-sm hover:shadow-md hover:shadow-secondary/20 active:scale-[0.985] flex items-center justify-center gap-2.5 transition-all duration-200 ease-out group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
               >
-                <span className="whitespace-nowrap font-bold text-sm">Sign in as Coordinator</span>
-                <ArrowRight className="w-[18px] h-[18px] shrink-0 transition-transform duration-150 group-hover/btn:translate-x-[3px] motion-reduce:transform-none" />
+                <span className="whitespace-nowrap font-bold text-sm tracking-wide">Sign in as Coordinator</span>
+                <MoveRight className="w-5 h-5 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/btn:translate-x-1.5 motion-reduce:transform-none" />
               </Button>
             </form>
 
             {/* Navigation & Role Switch Links */}
             <div className="flex flex-col gap-3 pt-3 border-t border-surface-variant text-center">
               {/* New Coordinator Registration Link */}
-              <div className="flex items-center justify-between p-3 bg-amber-50/70 rounded-xl border border-amber-200/70 text-xs">
+              <div className="flex items-center justify-between p-3 bg-amber-50/70 rounded-xl border border-amber-200/70 text-xs transition-colors">
                 <div className="flex flex-col text-left">
                   <span className="font-bold text-amber-950">New coordinator?</span>
                   <span className="text-[11px] text-amber-800">Register your agency for cluster access.</span>
                 </div>
                 <Link
                   to={ROUTES.COORDINATOR_REGISTER}
-                  className="font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded px-2.5 py-1 bg-white border border-secondary/20 shadow-2xs shrink-0"
+                  className="group/reg font-bold text-secondary hover:text-white hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-xl px-3 py-1.5 bg-white border border-secondary/30 shadow-2xs shrink-0 inline-flex items-center gap-1 transition-all duration-200 ease-out active:scale-95"
                 >
-                  Register →
+                  <span className="group-hover/reg:translate-x-0.5 transition-transform duration-200">Register →</span>
                 </Link>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 bg-surface-container-low rounded-xl border border-surface-variant text-xs">
+              <div className="flex items-center justify-between p-2.5 bg-surface-container-low/80 rounded-xl border border-surface-variant/80 text-xs">
                 <span className="font-medium text-primary">Need a different role?</span>
                 <Link
                   to={ROUTES.SIGN_IN}
-                  className="font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+                  className="group/role font-bold text-secondary hover:text-secondary/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded transition-all duration-200 ease-out inline-flex items-center hover:translate-x-1"
                 >
                   Change sign-in type →
                 </Link>
               </div>
 
-              <div className="flex items-center justify-between text-xs px-1">
+              <div className="flex items-center justify-between text-xs px-1 pt-1">
                 <Link
                   to={ROUTES.HOME}
-                  className="text-on-surface-variant hover:text-primary font-medium hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded"
+                  className="group/home text-on-surface-variant hover:text-primary font-medium focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-all duration-200 ease-out inline-flex items-center hover:-translate-x-1"
                 >
                   ← Back to home
                 </Link>
                 <Link
                   to={ROUTES.LOGIN}
-                  className="text-secondary font-semibold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+                  className="group/artisan text-secondary hover:text-secondary/80 font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded inline-flex items-center gap-1.5 transition-colors duration-150"
                 >
-                  Artisan Sign In
+                  <span>Artisan Sign In</span>
+                  <MoveRight className="w-3.5 h-3.5 transition-transform duration-250 ease-out group-hover/artisan:translate-x-1 motion-reduce:transform-none" aria-hidden="true" />
                 </Link>
               </div>
             </div>

@@ -5,7 +5,18 @@ import { useLanguage } from '@/app/providers/LanguageProvider';
 import { ROUTES, getSafeReturnUrl } from '@/routes';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck, UserCheck } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  User,
+  MoveRight,
+  Loader2,
+  ShieldCheck,
+  UserCheck,
+  CheckCircle2,
+  Sparkles,
+} from 'lucide-react';
+import { clsx } from 'clsx';
 
 export const SignInPage: React.FC = () => {
   const { signInWithEmail, registerArtisan, isAuthenticated, isLoading: authLoading, user, userAccount } = useAuth();
@@ -32,6 +43,14 @@ export const SignInPage: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [justAutofilled, setJustAutofilled] = useState(false);
+
+  const handleAutofill = () => {
+    setEmail('artisan_a@karigarsaathi.local');
+    setPassword('KarigarPass123!');
+    setJustAutofilled(true);
+    setTimeout(() => setJustAutofilled(false), 1600);
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +88,11 @@ export const SignInPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[480px] flex flex-col gap-6 mx-auto animate-in fade-in duration-200">
-      <Card className="p-6 md:p-10 flex flex-col gap-6 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-variant relative overflow-hidden">
+    <div className="w-full max-w-[480px] flex flex-col gap-6 mx-auto">
+      <Card className="p-6 md:p-10 flex flex-col gap-6 bg-surface-container-lowest rounded-2xl shadow-xl border border-surface-variant relative overflow-hidden">
         {/* Loading Overlay */}
         {(isLoading || authLoading) && (
-          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-20 animate-in fade-in">
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20 animate-in fade-in">
             <Loader2 className="w-10 h-10 animate-spin text-secondary mb-3" />
             <span className="text-sm font-bold tracking-wider text-primary uppercase">
               {authMode === 'email_register' ? 'Creating Account...' : 'Authenticating...'}
@@ -102,21 +121,22 @@ export const SignInPage: React.FC = () => {
             </div>
             <Link
               to={userAccount?.role === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD}
-              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto"
+              className="group/work text-xs font-bold text-emerald-800 hover:text-emerald-950 underline whitespace-nowrap self-end sm:self-auto inline-flex items-center gap-1 transition-colors"
             >
-              Go to Workspace →
+              <span>Go to Workspace</span>
+              <MoveRight className="w-3.5 h-3.5 transition-transform duration-250 ease-out group-hover/work:translate-x-1 motion-reduce:transform-none" />
             </Link>
           </div>
         )}
 
         {/* Mode Selector: 2 Equal Width Centered Tabs */}
-        <div className="grid grid-cols-2 gap-1.5 p-1 bg-surface-container rounded-lg text-xs font-bold">
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-surface-container rounded-xl text-xs font-bold">
           <button
             type="button"
             onClick={() => { setAuthMode('email_signin'); setError(''); }}
-            className={`py-2 px-2 rounded-md transition-all text-center ${
+            className={`py-2.5 px-2 rounded-lg transition-all duration-200 text-center ${
               authMode === 'email_signin'
-                ? 'bg-white text-primary shadow-sm'
+                ? 'bg-white text-primary shadow-xs'
                 : 'text-on-surface-variant hover:text-primary'
             }`}
           >
@@ -125,9 +145,9 @@ export const SignInPage: React.FC = () => {
           <button
             type="button"
             onClick={() => { setAuthMode('email_register'); setError(''); }}
-            className={`py-2 px-2 rounded-md transition-all text-center ${
+            className={`py-2.5 px-2 rounded-lg transition-all duration-200 text-center ${
               authMode === 'email_register'
-                ? 'bg-white text-primary shadow-sm'
+                ? 'bg-white text-primary shadow-xs'
                 : 'text-on-surface-variant hover:text-primary'
             }`}
           >
@@ -137,14 +157,14 @@ export const SignInPage: React.FC = () => {
 
         {/* Error notification */}
         {error && (
-          <div className="p-3 bg-red-50 text-error text-xs rounded-md border border-red-200 font-medium">
+          <div className="p-3 bg-red-50 text-error text-xs rounded-xl border border-red-200 font-medium animate-in fade-in">
             {error}
           </div>
         )}
 
         {/* Judge & Evaluator Quick Demo Callout */}
         {authMode === 'email_signin' && (
-          <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+          <div className="p-3 sm:p-3.5 bg-[#FFFDF9] border border-secondary/25 hover:border-secondary/40 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs transition-colors duration-200">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-4 h-4" />
@@ -165,13 +185,25 @@ export const SignInPage: React.FC = () => {
             </div>
             <button
               type="button"
-              onClick={() => {
-                setEmail('artisan_a@karigarsaathi.local');
-                setPassword('KarigarPass123!');
-              }}
-              className="px-2.5 py-1 text-[11px] font-bold text-secondary bg-white hover:bg-amber-50 border border-secondary/30 rounded-lg shadow-2xs transition-colors shrink-0"
+              onClick={handleAutofill}
+              className={clsx(
+                'px-3 py-1.5 text-[11px] font-bold rounded-lg border shadow-2xs transition-all duration-200 shrink-0 flex items-center gap-1.5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary',
+                justAutofilled
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-200'
+                  : 'text-secondary bg-white hover:bg-secondary hover:text-white border-secondary/30 hover:border-secondary'
+              )}
             >
-              Auto-fill
+              {justAutofilled ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Filled</span>
+                </>
+              ) : (
+                <>
+                  <span>Auto-fill</span>
+                  <Sparkles className="w-3 h-3 opacity-70" />
+                </>
+              )}
             </button>
           </div>
         )}
@@ -190,7 +222,7 @@ export const SignInPage: React.FC = () => {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="e.g. Ravi Kumar"
                 required
-                className="w-full border border-outline-variant rounded-md bg-white px-3.5 min-h-[44px] text-sm text-primary font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                className="w-full border border-outline-variant/60 hover:border-primary/40 focus:border-primary rounded-xl bg-white px-3.5 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-4 focus:ring-primary/15 transition-all duration-200 ease-out shadow-2xs placeholder:text-on-surface-variant/40"
               />
             </div>
           )}
@@ -206,7 +238,7 @@ export const SignInPage: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="artisan@example.com"
               required
-              className="w-full border border-outline-variant rounded-md bg-white px-3.5 min-h-[44px] text-sm text-primary font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+              className="w-full border border-outline-variant/60 hover:border-primary/40 focus:border-primary rounded-xl bg-white px-3.5 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-4 focus:ring-primary/15 transition-all duration-200 ease-out shadow-2xs placeholder:text-on-surface-variant/40"
             />
           </div>
 
@@ -222,44 +254,45 @@ export const SignInPage: React.FC = () => {
               placeholder="Minimum 6 characters"
               required
               minLength={6}
-              className="w-full border border-outline-variant rounded-md bg-white px-3.5 min-h-[44px] text-sm text-primary font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+              className="w-full border border-outline-variant/60 hover:border-primary/40 focus:border-primary rounded-xl bg-white px-3.5 min-h-[46px] text-sm text-primary font-medium focus:outline-none focus:ring-4 focus:ring-primary/15 transition-all duration-200 ease-out shadow-2xs placeholder:text-on-surface-variant/40"
             />
           </div>
 
           <Button
             type="submit"
             size="lg"
-            className="w-full font-bold text-base min-h-[50px] rounded-lg mt-2"
-            rightIcon={<ArrowRight className="w-5 h-5" />}
+            className="w-full font-bold text-base min-h-[50px] rounded-xl mt-2 bg-primary hover:bg-[#00284D] active:bg-[#00172C] text-white shadow-sm hover:shadow-md hover:shadow-primary/20 active:scale-[0.985] flex items-center justify-center gap-2.5 transition-all duration-200 ease-out group/btn focus-visible:ring-2 focus-visible:ring-secondary"
           >
-            {authMode === 'email_register' ? 'Register & Enter Dashboard' : 'Sign In with Firebase'}
+            <span className="tracking-wide font-bold">{authMode === 'email_register' ? 'Register & Enter Dashboard' : 'Sign In with Firebase'}</span>
+            <MoveRight className="w-5 h-5 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/btn:translate-x-1.5 motion-reduce:transform-none" />
           </Button>
         </form>
 
         {/* Footer & Role Navigation */}
         <div className="border-t border-surface-variant pt-4 flex flex-col gap-3 text-center text-xs text-on-surface-variant">
-          <div className="flex items-center justify-between p-2.5 bg-surface-container-low rounded-xl border border-surface-variant">
+          <div className="flex items-center justify-between p-2.5 bg-surface-container-low/80 rounded-xl border border-surface-variant/80">
             <span className="font-medium text-primary">Need a different role?</span>
             <Link
               to={ROUTES.SIGN_IN}
-              className="font-bold text-secondary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+              className="group/role font-bold text-secondary hover:text-secondary/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded transition-all duration-200 ease-out inline-flex items-center hover:translate-x-1"
             >
               Change sign-in type →
             </Link>
           </div>
 
-          <div className="flex items-center justify-between text-xs px-1">
+          <div className="flex items-center justify-between text-xs px-1 pt-1">
             <Link
               to={ROUTES.HOME}
-              className="text-on-surface-variant hover:text-primary font-medium hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded"
+              className="group/home text-on-surface-variant hover:text-primary font-medium focus:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded transition-all duration-200 ease-out inline-flex items-center hover:-translate-x-1"
             >
               ← Back to home
             </Link>
             <Link
               to={ROUTES.COORDINATOR_LOGIN}
-              className="text-secondary font-semibold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded"
+              className="group/coord text-secondary hover:text-secondary/80 font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary rounded inline-flex items-center gap-1.5 transition-colors duration-150"
             >
-              Coordinator Sign In
+              <span>Coordinator Sign In</span>
+              <MoveRight className="w-3.5 h-3.5 transition-transform duration-250 ease-out group-hover/coord:translate-x-1 motion-reduce:transform-none" aria-hidden="true" />
             </Link>
           </div>
 
