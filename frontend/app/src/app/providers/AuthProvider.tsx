@@ -16,8 +16,8 @@ interface AuthContextType {
   profileIncomplete: boolean;
   error: string | null;
   signIn: (phone: string, otp: string, role?: 'artisan' | 'coordinator') => Promise<void>;
-  signInWithEmail: (input: SignInInput) => Promise<void>;
-  registerArtisan: (input: RegisterArtisanInput) => Promise<void>;
+  signInWithEmail: (input: SignInInput) => Promise<UserAccount>;
+  registerArtisan: (input: RegisterArtisanInput) => Promise<UserAccount>;
   registerCoordinator: (input: RegisterCoordinatorInput) => Promise<CoordinatorRegistrationRecord>;
   signOut: () => Promise<void>;
   switchRole: (role: 'artisan' | 'coordinator') => void;
@@ -159,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithEmail = async (input: SignInInput) => {
+  const signInWithEmail = async (input: SignInInput): Promise<UserAccount> => {
     setIsLoading(true);
     setError(null);
     authSessionIdRef.current += 1;
@@ -170,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserAccount(account);
       await loadUserProfile(account, currentSessionId);
       logger.info('AUTH', 'Email sign-in successful', { uid: account.uid, role: account.role });
+      return account;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
       logger.error('AUTH', 'Email sign-in failed', err);
@@ -180,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const registerArtisan = async (input: RegisterArtisanInput) => {
+  const registerArtisan = async (input: RegisterArtisanInput): Promise<UserAccount> => {
     setIsLoading(true);
     setError(null);
     authSessionIdRef.current += 1;
@@ -191,6 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserAccount(account);
       await loadUserProfile(account, currentSessionId);
       logger.info('AUTH', 'Artisan registration successful', { uid: account.uid });
+      return account;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Registration failed';
       logger.error('AUTH', 'Artisan registration failed', err);

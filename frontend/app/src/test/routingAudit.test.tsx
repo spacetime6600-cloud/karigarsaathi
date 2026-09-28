@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ROUTES, getSafeReturnUrl, getCanonicalPublicUrl } from '@/routes';
+import { ROUTES, getSafeReturnUrl, getCanonicalPublicUrl, isPathRoleCompatible } from '@/routes';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { RouteScrollManager } from '@/components/layout/RouteScrollManager';
 import { AuthProvider } from '@/app/providers/AuthProvider';
@@ -157,6 +157,37 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
       expect(getSafeReturnUrl('')).toBe(ROUTES.ARTISAN_DASHBOARD);
       expect(getSafeReturnUrl(null)).toBe(ROUTES.ARTISAN_DASHBOARD);
       expect(getSafeReturnUrl(undefined)).toBe(ROUTES.ARTISAN_DASHBOARD);
+    });
+
+    it('enforces role compatibility and isolates cross-role return URLs', () => {
+      // isPathRoleCompatible tests
+      expect(isPathRoleCompatible('/artisan/dashboard', 'coordinator')).toBe(false);
+      expect(isPathRoleCompatible('/artisan/products/new', 'coordinator')).toBe(false);
+      expect(isPathRoleCompatible('/coordinator/reviews', 'coordinator')).toBe(true);
+      expect(isPathRoleCompatible('/coordinator/reviews', 'artisan')).toBe(false);
+      expect(isPathRoleCompatible('/artisan/inventory', 'artisan')).toBe(true);
+      expect(isPathRoleCompatible('/marketplace/products/p1', 'coordinator')).toBe(true);
+      expect(isPathRoleCompatible('/marketplace/products/p1', 'artisan')).toBe(true);
+
+      // Auth loops and root landing pages are never compatible return URLs
+      expect(isPathRoleCompatible('/', 'artisan')).toBe(false);
+      expect(isPathRoleCompatible('/sign-in', 'artisan')).toBe(false);
+      expect(isPathRoleCompatible('/coordinator/login', 'coordinator')).toBe(false);
+
+      // getSafeReturnUrl role-boundary enforcement:
+      // When targetRole is coordinator, reject artisan paths and fall back to coordinator dashboard
+      expect(getSafeReturnUrl('/artisan/dashboard', ROUTES.COORDINATOR_DASHBOARD, 'coordinator')).toBe(ROUTES.COORDINATOR_DASHBOARD);
+      expect(getSafeReturnUrl('/artisan/products/new?draftId=abc', ROUTES.COORDINATOR_DASHBOARD, 'coordinator')).toBe(ROUTES.COORDINATOR_DASHBOARD);
+      expect(getSafeReturnUrl('/coordinator/reviews?tab=needs_review', ROUTES.COORDINATOR_DASHBOARD, 'coordinator')).toBe('/coordinator/reviews?tab=needs_review');
+
+      // When targetRole is artisan, reject coordinator paths and fall back to artisan dashboard
+      expect(getSafeReturnUrl('/coordinator/reviews', ROUTES.ARTISAN_DASHBOARD, 'artisan')).toBe(ROUTES.ARTISAN_DASHBOARD);
+      expect(getSafeReturnUrl('/coordinator', ROUTES.ARTISAN_DASHBOARD, 'artisan')).toBe(ROUTES.ARTISAN_DASHBOARD);
+      expect(getSafeReturnUrl('/artisan/products/new?draftId=abc', ROUTES.ARTISAN_DASHBOARD, 'artisan')).toBe('/artisan/products/new?draftId=abc');
+
+      // Default dashboards are never valid return URLs (prevent lingering post-signout traps)
+      expect(getSafeReturnUrl('/artisan/dashboard', ROUTES.ARTISAN_DASHBOARD, 'artisan')).toBe(ROUTES.ARTISAN_DASHBOARD);
+      expect(getSafeReturnUrl('/coordinator', ROUTES.COORDINATOR_DASHBOARD, 'coordinator')).toBe(ROUTES.COORDINATOR_DASHBOARD);
     });
 
     it('generates canonical public URLs with configured origin', () => {
@@ -319,6 +350,28 @@ describe('KarigarSaathi Comprehensive Routing & Navigation Audit', () => {
       expect(container.querySelector('[data-testid="artisan-dashboard-view"]')).toBeNull();
       expect(container.textContent).toContain('Role Access Restricted');
       expect(container.textContent).toContain('This area is restricted to authorized artisan accounts');
+    });
+
+    it('signing out of artisan dashboard and signing into coordinator lands on coordinator hub without role restriction', async () => {
+      // 1. Initially signed in as Artisan
+      await authService.signIn('9876543210', '123456', 'artisan');
+      await renderRouterTree(['/artisan/dashboard']);
+      expect(container.textContent).toContain('Artisan Dashboard Content');
+
+      // 2. Artisan signs out
+      await authService.signOut();
+
+      // 3. User visits sign-in selection page and chooses Coordinator
+      await renderRouterTree(['/sign-in']);
+      expect(container.textContent).toContain('Coordinator sign in');
+
+      // 4. User signs in as Coordinator
+      await authService.signIn('9123456780', '123456', 'coordinator');
+      await renderRouterTree(['/coordinator']);
+
+      // 5. Coordinator should be at Coordinator Hub and NOT see Role Access Restricted
+      expect(container.querySelector('[data-testid="coordinator-portal-view"]')).not.toBeNull();
+      expect(container.textContent).not.toContain('Role Access Restricted');
     });
   });
 

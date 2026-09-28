@@ -39,25 +39,27 @@ export const SignInPage: React.FC = () => {
     setIsLoading(true);
 
     try {
+      let accountRole: 'artisan' | 'coordinator' = 'artisan';
       if (authMode === 'email_register') {
         if (!displayName.trim()) {
           setError('Please provide your name or workshop title.');
           setIsLoading(false);
           return;
         }
-        await registerArtisan({
+        const createdAccount = await registerArtisan({
           email,
           password,
           displayName,
           preferredLanguage: 'en',
         });
+        accountRole = (createdAccount?.role as 'artisan' | 'coordinator') || 'artisan';
       } else {
-        await signInWithEmail({ email, password });
+        const loggedInAccount = await signInWithEmail({ email, password });
+        accountRole = (loggedInAccount?.role as 'artisan' | 'coordinator') || (userAccount?.role as 'artisan' | 'coordinator') || 'artisan';
       }
 
-      const currentRole = userAccount?.role || user?.role || 'artisan';
-      const defaultDest = currentRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
-      const target = getSafeReturnUrl(rawReturnUrl, defaultDest);
+      const defaultDest = accountRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
+      const target = getSafeReturnUrl(rawReturnUrl, defaultDest, accountRole);
       navigate(target, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed.');

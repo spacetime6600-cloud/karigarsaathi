@@ -75,9 +75,9 @@ export const CoordinatorLoginPage: React.FC = () => {
     }
 
     try {
-      await signInWithEmail({ email: trimmedEmail, password });
+      const loggedInAccount = await signInWithEmail({ email: trimmedEmail, password });
 
-      const currentRole = userAccount?.role || user?.role || 'coordinator';
+      const currentRole = loggedInAccount?.role || userAccount?.role || user?.role || 'coordinator';
       const isApproved = coordinatorApprovalService.isApproved(trimmedEmail);
 
       if (!isApproved || currentRole !== 'coordinator') {
@@ -92,7 +92,7 @@ export const CoordinatorLoginPage: React.FC = () => {
           );
         }
       } else {
-        const target = getSafeReturnUrl(rawReturnUrl, ROUTES.COORDINATOR_DASHBOARD);
+        const target = getSafeReturnUrl(rawReturnUrl, ROUTES.COORDINATOR_DASHBOARD, 'coordinator');
         navigate(target, { replace: true });
       }
     } catch (err: unknown) {

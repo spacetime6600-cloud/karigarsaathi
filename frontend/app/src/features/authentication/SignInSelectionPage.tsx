@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { ROUTES, getSafeReturnUrl } from '@/routes';
+import { ROUTES, getSafeReturnUrl, isPathRoleCompatible } from '@/routes';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -20,8 +20,9 @@ export const SignInSelectionPage: React.FC = () => {
 
   const rawReturnUrl = searchParams.get('returnUrl');
 
-  const handleSelectRole = (targetPath: string) => {
-    if (rawReturnUrl) {
+  const handleSelectRole = (targetPath: string, role: 'artisan' | 'coordinator') => {
+    const isCompatible = rawReturnUrl && isPathRoleCompatible(rawReturnUrl, role);
+    if (isCompatible && rawReturnUrl) {
       navigate(`${targetPath}?returnUrl=${encodeURIComponent(rawReturnUrl)}`);
     } else {
       navigate(targetPath);
@@ -71,7 +72,7 @@ export const SignInSelectionPage: React.FC = () => {
             <Button
               onClick={() => {
                 const target = activeRole === 'coordinator' ? ROUTES.COORDINATOR_DASHBOARD : ROUTES.ARTISAN_DASHBOARD;
-                navigate(getSafeReturnUrl(rawReturnUrl, target));
+                navigate(getSafeReturnUrl(rawReturnUrl, target, activeRole));
               }}
               size="sm"
               className="flex-1 sm:flex-initial text-xs font-bold bg-secondary hover:bg-secondary/90 text-white"
@@ -121,7 +122,7 @@ export const SignInSelectionPage: React.FC = () => {
           {/* Bottom row: Divider, Action Button and Secondary Link */}
           <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
-              onClick={() => handleSelectRole(ROUTES.LOGIN)}
+              onClick={() => handleSelectRole(ROUTES.LOGIN, 'artisan')}
               className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
               <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Artisan</span>
@@ -163,7 +164,7 @@ export const SignInSelectionPage: React.FC = () => {
           {/* Bottom row: Divider, Action Button and Secondary Link */}
           <div className="pt-4 mt-auto flex flex-col gap-2.5 border-t border-[color-mix(in_srgb,var(--color-primary,#001D36)_10%,transparent)]">
             <Button
-              onClick={() => handleSelectRole(ROUTES.COORDINATOR_LOGIN)}
+              onClick={() => handleSelectRole(ROUTES.COORDINATOR_LOGIN, 'coordinator')}
               className="w-full h-12 min-h-[48px] rounded-xl bg-secondary hover:bg-secondary/90 text-white font-semibold text-sm shadow-xs hover:shadow active:scale-[0.99] flex items-center justify-center gap-2 transition-all duration-150 group/btn focus-visible:ring-2 focus-visible:ring-[#FFB955]"
             >
               <span className="whitespace-nowrap font-semibold text-sm text-[#FFFDF9]">Continue as Coordinator</span>

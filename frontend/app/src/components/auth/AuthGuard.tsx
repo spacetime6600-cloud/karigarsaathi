@@ -33,12 +33,27 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
     );
   }
 
-  // 2. Unauthenticated state: redirect to central sign-in access portal with returnUrl preserved
+  // 2. Unauthenticated state: redirect to central sign-in access portal
+  // Only preserve returnUrl for deep specific paths, omitting default dashboards and auth pages
   if (!isAuthenticated) {
+    const isDefaultDashboardOrAuth =
+      location.pathname === ROUTES.ARTISAN_DASHBOARD ||
+      location.pathname === ROUTES.COORDINATOR_DASHBOARD ||
+      location.pathname === '/coordinator/dashboard' ||
+      location.pathname === '/' ||
+      location.pathname === ROUTES.SIGN_IN ||
+      location.pathname === ROUTES.LOGIN ||
+      location.pathname === ROUTES.COORDINATOR_LOGIN ||
+      location.pathname === ROUTES.COORDINATOR_REGISTER;
+
     const returnPath = location.pathname + location.search;
+    const returnUrlParam = !isDefaultDashboardOrAuth
+      ? `?returnUrl=${encodeURIComponent(returnPath)}`
+      : '';
+
     return (
       <Navigate
-        to={`${ROUTES.SIGN_IN}?returnUrl=${encodeURIComponent(returnPath)}`}
+        to={`${ROUTES.SIGN_IN}${returnUrlParam}`}
         state={{ from: location }}
         replace
       />

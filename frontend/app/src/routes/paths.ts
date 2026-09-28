@@ -64,11 +64,74 @@ export const ROUTES = {
 } as const;
 
 /**
- * Validates and sanitizes a return URL to prevent open redirect vulnerabilities.
- * Only relative paths within the application are permitted.
- * Protocol-relative URLs (//example.com) and external schemas (javascript:, http:, etc.) are rejected.
+ * Checks whether a relative application path is compatible with a given role.
+ * Prevents cross-role redirection (e.g. an artisan returnUrl sent to a coordinator or vice versa).
  */
-export function getSafeReturnUrl(url: string | null | undefined, defaultUrl: string = ROUTES.ARTISAN_DASHBOARD): string {
+export function isPathRoleCompatible(
+  url: string | null | undefined,
+  targetRole?: 'artisan' | 'coordinator' | 'buyer'
+): boolean {
+  if (!url || typeof url !== 'string') return false;
+
+  const trimmed = url.trim();
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || trimmed.includes('://')) {
+    return false;
+  }
+
+  // Extract base pathname without query string or hash
+  const pathname = trimmed.split('?')[0].split('#')[0];
+
+  // Auth pages and default roots should never be return URLs (avoids loops & cross-role traps)
+  const authOrRootPaths = [
+    '/',
+    ROUTES.SIGN_IN,
+    ROUTES.LOGIN,
+    ROUTES.COORDINATOR_LOGIN,
+    ROUTES.COORDINATOR_REGISTER,
+    ROUTES.LANGUAGE,
+  ];
+  if (authOrRootPaths.includes(pathname)) {
+    return false;
+  }
+
+  // Artisan-specific workspaces
+  const isArtisanPath =
+    pathname.startsWith('/artisan') ||
+    pathname.startsWith('/inventory') ||
+    pathname.startsWith('/enquiries') ||
+    pathname.startsWith('/products/new');
+
+  // Coordinator-specific workspaces
+  const isCoordinatorPath =
+    pathname.startsWith('/coordinator') &&
+    pathname !== ROUTES.COORDINATOR_LOGIN &&
+    pathname !== ROUTES.COORDINATOR_REGISTER;
+
+  if (targetRole === 'coordinator') {
+    // A coordinator should never be redirected to an artisan workspace
+    if (isArtisanPath) return false;
+    return true;
+  }
+
+  if (targetRole === 'artisan') {
+    // An artisan should never be redirected to a coordinator workspace
+    if (isCoordinatorPath) return false;
+    return true;
+  }
+
+  return true;
+}
+
+/**
+ * Validates and sanitizes a return URL to prevent open redirect vulnerabilities and cross-role traps.
+ * Only relative paths within the application are permitted.
+ * Role boundaries are strictly enforced to prevent coordinators from landing on artisan dashboards or vice versa.
+ */
+export function getSafeReturnUrl(
+  url: string | null | undefined,
+  defaultUrl: string = ROUTES.ARTISAN_DASHBOARD,
+  targetRole?: 'artisan' | 'coordinator' | 'buyer'
+): string {
   if (!url || typeof url !== 'string') return defaultUrl;
 
   const trimmed = url.trim();
@@ -94,6 +157,55 @@ export function getSafeReturnUrl(url: string | null | undefined, defaultUrl: str
   // Reject control characters or newlines
   if (/[\r\n\t]/.test(trimmed)) {
     return defaultUrl;
+  }
+
+  // Extract base pathname
+  const pathname = trimmed.split('?')[0].split('#')[0];
+
+  // Auth pages and default roots should never be return URLs:
+  if (
+    pathname === ROUTES.SIGN_IN ||
+    pathname === ROUTES.LOGIN ||
+    pathname === ROUTES.COORDINATOR_LOGIN ||
+    pathname === ROUTES.COORDINATOR_REGISTER ||
+    pathname === ROUTES.LANGUAGE
+  ) {
+    return defaultUrl;
+  }
+
+  // If a target role is specified, strictly enforce role boundaries:
+  if (targetRole) {
+    if (targetRole === 'coordinator') {
+      if (
+        pathname === ROUTES.ARTISAN_DASHBOARD ||
+        pathname === ROUTES.COORDINATOR_DASHBOARD ||
+        pathname === '/coordinator/dashboard' ||
+        !isPathRoleCompatible(trimmed, 'coordinator')
+      ) {
+        return defaultUrl;
+      }
+    }
+
+    if (targetRole === 'artisan') {
+      if (
+        pathname === ROUTES.ARTISAN_DASHBOARD ||
+        pathname === ROUTES.COORDINATOR_DASHBOARD ||
+        pathname === '/coordinator/dashboard' ||
+        !isPathRoleCompatible(trimmed, 'artisan')
+      ) {
+        return defaultUrl;
+      }
+    }
+  } else {
+    // If targetRole is not passed, infer from default destination if it's coordinator
+    if (defaultUrl.startsWith('/coordinator')) {
+      if (pathname === ROUTES.ARTISAN_DASHBOARD || !isPathRoleCompatible(trimmed, 'coordinator')) {
+        return defaultUrl;
+      }
+    }
+    if (defaultUrl.startsWith('/artisan') && (pathname === ROUTES.COORDINATOR_DASHBOARD || pathname === '/coordinator/dashboard')) {
+      return defaultUrl;
+    }
   }
 
   return trimmed;
