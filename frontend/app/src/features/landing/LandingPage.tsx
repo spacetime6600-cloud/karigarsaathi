@@ -426,44 +426,58 @@ export const LandingPage: React.FC = () => {
         <section
           id="artisan-story"
           aria-label="Artisan Control Story"
-          className="motion-reveal px-4 sm:px-8 lg:px-12 py-14 lg:py-20 w-full max-w-[1220px] mx-auto bg-transparent"
+          className="motion-reveal px-4 sm:px-8 lg:px-12 py-14 lg:py-20 w-full max-w-[1220px] mx-auto bg-transparent relative"
         >
-          <div className="w-full bg-[#001D36] rounded-3xl border border-white/20 shadow-2xl p-6 sm:p-10 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
-            {/* Left Column: Heading & Philosophy */}
-            <div className="flex flex-col gap-3.5 max-w-xl text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#FFB955]">
-                Ethical Philosophy
-              </span>
+          <div className="ethical-section relative w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-[8%]">
+            {/* Left Column: Heading & Philosophy (44% on desktop) */}
+            <div className="w-full lg:w-[44%] flex flex-col gap-4 text-left">
+              <div className="ethical-motion-heading flex flex-col gap-2.5">
+                <span className="text-[12px] sm:text-[13px] font-bold uppercase tracking-wider text-secondary">
+                  Ethical Philosophy
+                </span>
 
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
-                The artisan remains in control.
-              </h2>
+                <div className="w-11 h-[2px] bg-secondary rounded-full" aria-hidden="true" />
 
-              <p className="text-sm sm:text-base text-white/90 leading-relaxed font-normal">
+                <h2 className="font-sans text-[30px] sm:text-[34px] lg:text-[42px] font-bold text-primary leading-[1.15] tracking-tight">
+                  The artisan remains in control.
+                </h2>
+              </div>
+
+              <p className="ethical-motion-desc text-[15px] sm:text-[16px] text-primary/80 font-normal sm:font-medium leading-relaxed">
                 KarigarSaathi suggests, explains and organises. The maker reviews every description, price and Craft Passport before sharing.
               </p>
             </div>
 
-            {/* Right Column: 4 Trust & Accessibility Pillars (2x2 Grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full lg:max-w-lg shrink-0">
-              <div className="flex items-center gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm font-semibold text-white">
-                <CheckCircle2 className="w-5 h-5 text-[#4BB543] shrink-0" />
-                <span>Editable at every step</span>
-              </div>
+            {/* Right Column: 4 Features (48% on desktop) */}
+            <div className="w-full lg:w-[48%] shrink-0">
+              <div className="ethical-feature-list">
+                <div className="ethical-feature-item ethical-motion-feature flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" aria-hidden="true" />
+                  <span className="text-[15px] sm:text-[16px] font-semibold text-primary leading-snug">
+                    Editable at every step
+                  </span>
+                </div>
 
-              <div className="flex items-center gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm font-semibold text-white">
-                <CheckCircle2 className="w-5 h-5 text-[#4BB543] shrink-0" />
-                <span>Manual fallback available</span>
-              </div>
+                <div className="ethical-feature-item ethical-motion-feature flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" aria-hidden="true" />
+                  <span className="text-[15px] sm:text-[16px] font-semibold text-primary leading-snug">
+                    Manual fallback available
+                  </span>
+                </div>
 
-              <div className="flex items-center gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm font-semibold text-white">
-                <CheckCircle2 className="w-5 h-5 text-[#4BB543] shrink-0" />
-                <span>Designed for low connectivity</span>
-              </div>
+                <div className="ethical-feature-item ethical-motion-feature flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" aria-hidden="true" />
+                  <span className="text-[15px] sm:text-[16px] font-semibold text-primary leading-snug">
+                    Designed for low connectivity
+                  </span>
+                </div>
 
-              <div className="flex items-center gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm font-semibold text-white">
-                <Globe className="w-5 h-5 text-[#FFB955] shrink-0" />
-                <span>English, Hindi, Odia & Bengali</span>
+                <div className="ethical-feature-item ethical-motion-feature flex items-center gap-3">
+                  <Globe className="w-5 h-5 text-secondary shrink-0" aria-hidden="true" />
+                  <span className="text-[15px] sm:text-[16px] font-semibold text-primary leading-snug">
+                    English, Hindi, Odia & Bengali
+                  </span>
+                </div>
               </div>
             </div>
           </div>
