@@ -7,7 +7,8 @@ import { storage } from '@/services/storage/localStorage';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Shield, Trash2, Wifi, WifiOff, ExternalLink } from 'lucide-react';
+import { Shield, Trash2, Wifi, WifiOff, ExternalLink, Sparkles, X } from 'lucide-react';
+import { KarigarLoader } from '@/components/loading';
 
 import { storageUploadQueue } from '@/services/storage/storageUploadQueue';
 
@@ -24,6 +25,12 @@ export const DevStatesPage: React.FC = () => {
     whatsAppUnavailable: localStorage.getItem('simulate_whatsapp_unavailable') === 'true',
     enquiryWaiting: localStorage.getItem('simulate_enquiry_waiting') === 'true',
   });
+
+  const [activeLoaderPreview, setActiveLoaderPreview] = useState<{
+    variant: 'initial' | 'route' | 'auth';
+    destination?: string;
+    error?: string;
+  } | null>(null);
 
   const handleToggle = (key: keyof typeof toggles, storageKey: string) => {
     const nextVal = !toggles[key];
@@ -244,6 +251,105 @@ export const DevStatesPage: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Loading Experience & Page Transition Showcase */}
+      <div className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-secondary" />
+            06 Loading & Transition Architecture
+          </h2>
+          <p className="text-sm text-on-surface-variant">
+            Full-screen artisan craft-thread animations, anti-flicker protection, contextual vernacular messaging, and error recovery states.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-surface-variant">
+            <div>
+              <h3 className="font-bold text-sm text-primary">Initial App Startup</h3>
+              <p className="text-xs text-on-surface-variant mt-1">Deep navy backdrop, subtle workshop texture, artisan thread drawing animation.</p>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setActiveLoaderPreview({ variant: 'initial' })}
+              className="text-xs font-bold w-full"
+            >
+              Preview Initial Startup
+            </Button>
+          </Card>
+
+          <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-surface-variant">
+            <div>
+              <h3 className="font-bold text-sm text-primary">Marketplace Route Veil</h3>
+              <p className="text-xs text-on-surface-variant mt-1">Atmospheric blur preserving page position with contextual vernacular copy.</p>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setActiveLoaderPreview({ variant: 'route', destination: '/marketplace' })}
+              className="text-xs font-bold w-full"
+            >
+              Preview Route Transition
+            </Button>
+          </Card>
+
+          <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-surface-variant">
+            <div>
+              <h3 className="font-bold text-sm text-primary">Auth Resolution</h3>
+              <p className="text-xs text-on-surface-variant mt-1">Secure credential verification with bilingual security guarantee indicator.</p>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setActiveLoaderPreview({ variant: 'auth' })}
+              className="text-xs font-bold w-full"
+            >
+              Preview Auth Loader
+            </Button>
+          </Card>
+
+          <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-surface-variant">
+            <div>
+              <h3 className="font-bold text-sm text-primary">Error Recovery State</h3>
+              <p className="text-xs text-on-surface-variant mt-1">Shows retry & safe return actions when network or dynamic chunks fail.</p>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                setActiveLoaderPreview({
+                  variant: 'route',
+                  error: 'Network connection interrupted while loading artisan catalog.',
+                })
+              }
+              className="text-xs font-bold w-full"
+            >
+              Preview Error Recovery
+            </Button>
+          </Card>
+        </div>
+      </div>
+
+      {/* Active Preview Modal Overlay */}
+      {activeLoaderPreview && (
+        <div className="fixed inset-0 z-50">
+          <KarigarLoader
+            variant={activeLoaderPreview.variant}
+            destination={activeLoaderPreview.destination}
+            error={activeLoaderPreview.error}
+            onRetry={() => setActiveLoaderPreview(null)}
+            visible={true}
+          />
+          <button
+            onClick={() => setActiveLoaderPreview(null)}
+            className="fixed top-6 right-6 z-[100] px-4 py-2 bg-white/90 backdrop-blur-md text-[#001D36] text-xs font-bold rounded-full shadow-lg border border-white/20 hover:bg-white flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <X className="w-4 h-4" /> Exit Preview
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,11 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogIn, Info, ShoppingBag, Star, Home, Volume2, VolumeX } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAudioHelp } from '@/app/providers/AudioHelpProvider';
+import { useSafeNavigation } from '@/components/loading';
 
 export const PublicLandingHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigation = useSafeNavigation();
+  const isNavigating = navigation.state !== 'idle';
   const { isPlaying, toggleHelp } = useAudioHelp();
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -99,7 +102,14 @@ export const PublicLandingHeader: React.FC = () => {
           </Link>
 
           {/* Center: Public Page Navigation (Home | About Us | Marketplace | Reviews) */}
-          <nav aria-label="Public Navigation" className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 relative z-10">
+          <nav
+            aria-label="Public Navigation"
+            aria-busy={isNavigating}
+            className={clsx(
+              'flex items-center gap-1 sm:gap-1.5 lg:gap-2 relative z-10 transition-opacity duration-150',
+              isNavigating && 'pointer-events-none opacity-85'
+            )}
+          >
             {navLinks.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
@@ -196,7 +206,11 @@ export const PublicLandingHeader: React.FC = () => {
             ref={mobileMenuRef}
             role="dialog"
             aria-label="Public Navigation Menu"
-            className="md:hidden mt-2 p-3 rounded-[22px] glass-menu shadow-xl flex flex-col gap-2 animate-in slide-in-from-top-2 duration-150 relative z-50"
+            aria-busy={isNavigating}
+            className={clsx(
+              'md:hidden mt-2 p-3 rounded-[22px] glass-menu shadow-xl flex flex-col gap-2 animate-in slide-in-from-top-2 duration-150 relative z-50',
+              isNavigating && 'pointer-events-none opacity-85'
+            )}
           >
             {navLinks.map((item) => {
               const isActive = location.pathname === item.path;

@@ -6,6 +6,7 @@ import { AuthProvider } from './providers/AuthProvider';
 import { SyncProvider } from './providers/SyncProvider';
 import { AudioHelpProvider } from './providers/AudioHelpProvider';
 import { ProductDraftProvider } from './providers/ProductDraftProvider';
+import { InitialAppLoader } from '@/components/loading';
 
 export const App: React.FC = () => {
   return (
@@ -14,7 +15,9 @@ export const App: React.FC = () => {
         <SyncProvider>
           <AudioHelpProvider>
             <ProductDraftProvider>
-              <RouterProvider router={router} future={{ v7_startTransition: true }} />
+              <InitialAppLoader>
+                <RouterProvider router={router} future={{ v7_startTransition: true }} />
+              </InitialAppLoader>
             </ProductDraftProvider>
           </AudioHelpProvider>
         </SyncProvider>

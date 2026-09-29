@@ -2,6 +2,7 @@ import React, { createContext, useContext, Suspense } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { PublicLandingHeader } from '@/components/navigation/PublicLandingHeader';
 import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
+import { SuspenseRouteLoader } from '@/components/loading';
 
 export const PublicLayoutContext = createContext<boolean>(false);
 
@@ -35,16 +36,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
         {/* Main Landmark Container */}
         <main id="main-content" className="flex-1 flex flex-col w-full relative z-10">
-          <Suspense
-            fallback={
-              <div
-                aria-hidden="true"
-                className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
-              >
-                <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
-              </div>
-            }
-          >
+          <Suspense fallback={<SuspenseRouteLoader />}>
             <PageTransitionContainer>
               {children || <Outlet />}
             </PageTransitionContainer>

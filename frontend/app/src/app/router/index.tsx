@@ -52,19 +52,19 @@ const CoordinatorSettingsPage = lazy(() => import('@/features/coordinator').then
 const DevStatesPage = lazy(() => import('@/features/dev/DevStatesPage').then((m) => ({ default: m.DevStatesPage })));
 const NotFoundPage = lazy(() => import('@/features/not-found/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
+import { SuspenseRouteLoader, RouteTransitionOverlay, RouteErrorBoundary } from '@/components/loading';
+import { PageTransition } from '@/components/layout/PageTransition';
+
 // Root Layout Shell with Scroll Restoration, Focus Management & Route Title sync
 const RootAppLayout: React.FC = () => {
   return (
     <>
       <RouteScrollManager />
-      <Suspense
-        fallback={
-          <div className="w-full min-h-[30vh] flex items-center justify-center p-8 opacity-0 animate-in fade-in duration-150">
-            <div className="w-6 h-6 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
-          </div>
-        }
-      >
-        <Outlet />
+      <RouteTransitionOverlay />
+      <Suspense fallback={<SuspenseRouteLoader />}>
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </Suspense>
     </>
   );
@@ -73,6 +73,7 @@ const RootAppLayout: React.FC = () => {
 export const router = createBrowserRouter([
   {
     element: <RootAppLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       // Public Marketing Landing & Informational Pages
       {

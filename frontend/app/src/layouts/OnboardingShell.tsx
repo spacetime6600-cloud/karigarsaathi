@@ -6,6 +6,7 @@ import { PageAtmosphere } from '@/components/layout/PageAtmosphere';
 import { SkipLink } from '@/components/ui/SkipLink';
 import { AriaLiveAnnouncer } from '@/components/ui/AriaLiveAnnouncer';
 import { PageTransitionContainer } from '@/components/layout/PageTransitionContainer';
+import { SuspenseRouteLoader } from '@/components/loading';
 
 export const OnboardingShell: React.FC = () => {
   return (
@@ -19,16 +20,7 @@ export const OnboardingShell: React.FC = () => {
 
       {/* Centered Main Canvas */}
       <main id="main-content" tabIndex={-1} className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-[1200px] mx-auto z-10 relative focus:outline-none">
-        <Suspense
-          fallback={
-            <div
-              aria-hidden="true"
-              className="w-full min-h-[40vh] flex items-center justify-center opacity-30"
-            >
-              <div className="w-5 h-5 border-2 border-secondary/40 border-t-secondary rounded-full animate-spin" />
-            </div>
-          }
-        >
+        <Suspense fallback={<SuspenseRouteLoader destination="login" />}>
           <PageTransitionContainer className="flex flex-col items-center justify-center">
             <Outlet />
           </PageTransitionContainer>

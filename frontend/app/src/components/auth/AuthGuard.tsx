@@ -2,10 +2,11 @@ import React from 'react';
 import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ROUTES } from '@/routes';
-import { Loader2, ShieldAlert, ArrowRight, RefreshCw, Clock } from 'lucide-react';
+import { ShieldAlert, ArrowRight, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { coordinatorApprovalService } from '@/services/coordinator/coordinatorApprovalService';
+import { KarigarLoader } from '@/components/loading';
 
 interface AuthGuardProps {
   requiredRole?: 'artisan' | 'coordinator';
@@ -20,16 +21,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ requiredRole, children }) 
   // 1. Loading / Signing Out state: wait for auth verification before making routing decisions
   if (isLoading || isSigningOut) {
     return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-primary animate-in fade-in"
-      >
-        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
-        <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-          {isSigningOut ? 'Signing out securely...' : 'Verifying security credentials...'}
-        </span>
-      </div>
+      <KarigarLoader
+        visible={true}
+        variant="auth"
+        destination={location.pathname}
+        message={isSigningOut ? 'Signing out securely...' : undefined}
+      />
     );
   }
 

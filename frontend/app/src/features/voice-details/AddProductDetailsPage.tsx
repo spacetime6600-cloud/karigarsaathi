@@ -3,21 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useProductDraft } from '@/app/providers/ProductDraftProvider';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 import { ROUTES } from '@/routes';
-import {
-  catalogueSuggestionService,
-  normalizeTags,
-} from '@/services/suggestions/mockSuggestionService';
+import { normalizeTags } from '@/services/suggestions/mockSuggestionService';
 import { productRepository } from '@/services/api/productRepository';
 import { VoiceCatalogueStudioModal } from '@/features/voice-details/components/VoiceCatalogueStudioModal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { TextArea } from '@/components/ui/TextArea';
-import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import {
   ArrowRight,
-  Lightbulb,
   X,
   Mic,
 } from 'lucide-react';
@@ -31,17 +26,6 @@ export const AddProductDetailsPage: React.FC = () => {
 
   // Tag input state
   const [tagInput, setTagInput] = useState('');
-
-  // Suggestion states
-  const [suggestedTitle, setSuggestedTitle] = useState<string | null>(null);
-  const [suggestedDescription, setSuggestedDescription] = useState<string | null>(null);
-  const [suggestedTags, setSuggestedTags] = useState<string[] | null>(null);
-  const [isSuggesting, setIsSuggesting] = useState(false);
-  const [overwriteModal, setOverwriteModal] = useState<{
-    isOpen: boolean;
-    field: 'title' | 'description';
-    newValue: string;
-  }>({ isOpen: false, field: 'title', newValue: '' });
 
   const handleApplyVoiceStudioSuggestions = (payload: {
     title: string;
@@ -76,77 +60,6 @@ export const AddProductDetailsPage: React.FC = () => {
       confirmedFacts: confirmed,
       needsReviewFacts: needsReview,
     });
-  };
-
-  // Mock Suggestions
-  const handleGenerateTitleSuggestion = async () => {
-    setIsSuggesting(true);
-    const res = await catalogueSuggestionService.suggestTitle({
-      category: draft.category,
-      subcategory: draft.subcategory,
-      craftType: draft.technique || draft.craftType,
-      material: draft.materials.join(', '),
-      colour: draft.colour,
-      origin: draft.origin,
-    });
-    setSuggestedTitle(res.data);
-    setIsSuggesting(false);
-  };
-
-  const handleApplyTitleSuggestion = () => {
-    if (!suggestedTitle) return;
-    if (draft.title && draft.title.trim() && draft.title !== suggestedTitle) {
-      setOverwriteModal({ isOpen: true, field: 'title', newValue: suggestedTitle });
-    } else {
-      updateDraft({ title: suggestedTitle });
-      setSuggestedTitle(null);
-    }
-  };
-
-  const handleGenerateDescriptionSuggestion = async () => {
-    setIsSuggesting(true);
-    const res = await catalogueSuggestionService.suggestDescription({
-      category: draft.category,
-      subcategory: draft.subcategory,
-      craftType: draft.technique || draft.craftType,
-      material: draft.materials.join(', '),
-      origin: draft.origin,
-      dimensions: draft.dimensions,
-      makingTime: draft.makingTime,
-    });
-    setSuggestedDescription(res.data);
-    setIsSuggesting(false);
-  };
-
-  const handleApplyDescriptionSuggestion = () => {
-    if (!suggestedDescription) return;
-    if (draft.story && draft.story.trim() && draft.story !== suggestedDescription) {
-      setOverwriteModal({ isOpen: true, field: 'description', newValue: suggestedDescription });
-    } else {
-      updateDraft({ story: suggestedDescription, description: suggestedDescription });
-      setSuggestedDescription(null);
-    }
-  };
-
-  const handleGenerateTagsSuggestion = async () => {
-    setIsSuggesting(true);
-    const res = await catalogueSuggestionService.suggestTags({
-      category: draft.category,
-      subcategory: draft.subcategory,
-      craftType: draft.technique || draft.craftType,
-      material: draft.materials.join(', '),
-      colour: draft.colour,
-      origin: draft.origin,
-    });
-    setSuggestedTags(res.data);
-    setIsSuggesting(false);
-  };
-
-  const handleApplySuggestedTags = () => {
-    if (!suggestedTags) return;
-    const combined = normalizeTags([...(draft.tags || []), ...suggestedTags]);
-    updateDraft({ tags: combined });
-    setSuggestedTags(null);
   };
 
   const handleAddTag = (e: React.KeyboardEvent | React.MouseEvent) => {
@@ -208,48 +121,17 @@ export const AddProductDetailsPage: React.FC = () => {
             <div className="flex flex-col gap-3.5">
               {/* Product Title (English) */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-primary">
-                    Product Title (English) <span className="text-error">*</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleGenerateTitleSuggestion}
-                    disabled={isSuggesting}
-                    className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
-                  >
-                    <Lightbulb className="w-3 h-3" /> Suggest Title
-                  </button>
-                </div>
+                <label className="text-xs font-bold text-primary block mb-1">
+                  Product Title (English) <span className="text-error">*</span>
+                </label>
                 <Input
-                  value={draft.title}
+                  value={draft.title || ''}
                   onChange={(e) => updateDraft({ title: e.target.value })}
                   placeholder="e.g. Indigo & Terracotta Silk Jamdani Saree"
                   required
                   className="h-11 text-sm bg-surface-container-lowest"
                 />
               </div>
-
-              {/* Title Suggestion Box */}
-              {suggestedTitle && (
-                <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/20 flex flex-col gap-2 animate-in fade-in">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-secondary">
-                    <span className="flex items-center gap-1">
-                      <Lightbulb className="w-3.5 h-3.5" /> Suggestion (Craft Guide)
-                    </span>
-                    <Badge variant="indigo">Optional</Badge>
-                  </div>
-                  <p className="text-xs font-semibold text-primary">"{suggestedTitle}"</p>
-                  <div className="flex items-center gap-2 pt-1">
-                    <Button size="sm" variant="secondary" onClick={handleApplyTitleSuggestion} className="text-xs py-1">
-                      Apply Suggestion
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setSuggestedTitle(null)} className="text-xs py-1">
-                      Dismiss
-                    </Button>
-                  </div>
-                </div>
-              )}
 
               {/* Product Title (Hindi) */}
               <div>
@@ -266,19 +148,9 @@ export const AddProductDetailsPage: React.FC = () => {
 
               {/* Heritage Story & Craft Description */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-primary">
-                    Heritage Story & Craft Description <span className="text-error">*</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleGenerateDescriptionSuggestion}
-                    disabled={isSuggesting}
-                    className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
-                  >
-                    <Lightbulb className="w-3 h-3" /> Suggest Description
-                  </button>
-                </div>
+                <label className="text-xs font-bold text-primary block mb-1">
+                  Heritage Story & Craft Description <span className="text-error">*</span>
+                </label>
                 <TextArea
                   value={draft.story || draft.description || ''}
                   onChange={(e) => updateDraft({ story: e.target.value, description: e.target.value })}
@@ -287,27 +159,6 @@ export const AddProductDetailsPage: React.FC = () => {
                   className="min-h-[100px] text-sm bg-surface-container-lowest"
                 />
               </div>
-
-              {/* Description Suggestion Box */}
-              {suggestedDescription && (
-                <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/20 flex flex-col gap-2 animate-in fade-in">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-secondary">
-                    <span className="flex items-center gap-1">
-                      <Lightbulb className="w-3.5 h-3.5" /> Suggestion (Craft Guide)
-                    </span>
-                    <Badge variant="indigo">Optional</Badge>
-                  </div>
-                  <p className="text-xs text-primary leading-relaxed">"{suggestedDescription}"</p>
-                  <div className="flex items-center gap-2 pt-1">
-                    <Button size="sm" variant="secondary" onClick={handleApplyDescriptionSuggestion} className="text-xs py-1">
-                      Apply Suggestion
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setSuggestedDescription(null)} className="text-xs py-1">
-                      Dismiss
-                    </Button>
-                  </div>
-                </div>
-              )}
 
               {/* Description (Hindi) */}
               <div>
@@ -334,7 +185,7 @@ export const AddProductDetailsPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <Input
                 label="Category *"
-                value={draft.category}
+                value={draft.category || ''}
                 onChange={(e) => updateDraft({ category: e.target.value })}
                 placeholder="e.g. Sarees & Textiles"
                 required
@@ -342,7 +193,7 @@ export const AddProductDetailsPage: React.FC = () => {
               />
               <Input
                 label="Sub-Category"
-                value={draft.subcategory}
+                value={draft.subcategory || ''}
                 onChange={(e) => updateDraft({ subcategory: e.target.value })}
                 placeholder="e.g. Jamdani Saree"
                 className="h-11 text-sm bg-surface-container-lowest"
@@ -360,7 +211,7 @@ export const AddProductDetailsPage: React.FC = () => {
               />
               <Input
                 label="Materials Used *"
-                value={draft.materials.join(', ')}
+                value={(draft.materials || []).join(', ')}
                 onChange={(e) =>
                   updateDraft({
                     materials: e.target.value
@@ -378,7 +229,7 @@ export const AddProductDetailsPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <Input
                 label="Base Colour *"
-                value={draft.colour}
+                value={draft.colour || ''}
                 onChange={(e) => updateDraft({ colour: e.target.value })}
                 placeholder="e.g. Terracotta Red"
                 required
@@ -386,14 +237,14 @@ export const AddProductDetailsPage: React.FC = () => {
               />
               <Input
                 label="Dimensions / Size *"
-                value={draft.dimensions}
+                value={draft.dimensions || ''}
                 onChange={(e) => updateDraft({ dimensions: e.target.value })}
                 placeholder="e.g. 5.5 x 1.2 meters"
                 className="h-11 text-sm bg-surface-container-lowest"
               />
               <Input
                 label="Origin / Region *"
-                value={draft.origin}
+                value={draft.origin || ''}
                 onChange={(e) => updateDraft({ origin: e.target.value })}
                 placeholder="e.g. Assam & Pochampally, India"
                 className="h-11 text-sm bg-surface-container-lowest"
@@ -428,44 +279,11 @@ export const AddProductDetailsPage: React.FC = () => {
 
           {/* Tags & Additional Details Card */}
           <Card className="p-5 sm:p-6 bg-white rounded-2xl border border-surface-variant/80 card-shadow flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-surface-variant/70 pb-2.5">
+            <div className="border-b border-surface-variant/70 pb-2.5">
               <h2 className="font-bold text-base text-primary">
                 3. Search Tags & Care Information
               </h2>
-              <button
-                type="button"
-                onClick={handleGenerateTagsSuggestion}
-                disabled={isSuggesting}
-                className="text-[11px] text-secondary font-bold hover:underline flex items-center gap-1"
-              >
-                <Lightbulb className="w-3 h-3" /> Suggest Tags
-              </button>
             </div>
-
-            {/* Tag suggestions */}
-            {suggestedTags && (
-              <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/20 flex flex-col gap-2 animate-in fade-in">
-                <div className="flex items-center justify-between text-[11px] font-bold text-secondary">
-                  <span>Suggested Search Tags:</span>
-                  <Badge variant="indigo">Optional</Badge>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggestedTags.map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-xs font-semibold">
-                      +{tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 pt-1">
-                  <Button size="sm" variant="secondary" onClick={handleApplySuggestedTags} className="text-xs py-1">
-                    Apply All Tags
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setSuggestedTags(null)} className="text-xs py-1">
-                    Dismiss
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {/* Tag Chips & Input */}
             <div className="flex flex-col gap-2">
@@ -622,49 +440,6 @@ export const AddProductDetailsPage: React.FC = () => {
         initialDraftTitle={draft.title}
         initialDraftDescription={draft.story || draft.description}
       />
-
-      {/* Overwrite Confirmation Modal */}
-      <Modal
-        isOpen={overwriteModal.isOpen}
-        onClose={() => setOverwriteModal({ isOpen: false, field: 'title', newValue: '' })}
-        title="Replace Existing Text?"
-      >
-        <div className="flex flex-col gap-4">
-          <p className="text-xs text-on-surface-variant leading-relaxed">
-            You already have entered a {overwriteModal.field}. Applying this mock suggestion will replace your current text with:
-          </p>
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-variant text-xs font-semibold text-primary">
-            "{overwriteModal.newValue}"
-          </div>
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setOverwriteModal({ isOpen: false, field: 'title', newValue: '' })}
-              className="text-xs"
-            >
-              Keep Current Text
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                if (overwriteModal.field === 'title') {
-                  updateDraft({ title: overwriteModal.newValue });
-                  setSuggestedTitle(null);
-                } else {
-                  updateDraft({ story: overwriteModal.newValue, description: overwriteModal.newValue });
-                  setSuggestedDescription(null);
-                }
-                setOverwriteModal({ isOpen: false, field: 'title', newValue: '' });
-              }}
-              className="text-xs font-bold"
-            >
-              Replace with Suggestion
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };
