@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Shield, Trash2, Wifi, WifiOff, ExternalLink, Sparkles, X } from 'lucide-react';
-import { KarigarLoader } from '@/components/loading';
+import { KarigarLoader, KarigarIntro } from '@/components/loading';
 
 import { storageUploadQueue } from '@/services/storage/storageUploadQueue';
 
@@ -27,7 +27,7 @@ export const DevStatesPage: React.FC = () => {
   });
 
   const [activeLoaderPreview, setActiveLoaderPreview] = useState<{
-    variant: 'initial' | 'route' | 'auth';
+    variant: 'intro' | 'initial' | 'route' | 'auth';
     destination?: string;
     error?: string;
   } | null>(null);
@@ -264,7 +264,25 @@ export const DevStatesPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-secondary/30 ring-1 ring-secondary/20">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-[10px] font-bold text-secondary uppercase tracking-wider bg-secondary/10 px-1.5 py-0.5 rounded">NEW</span>
+                <h3 className="font-bold text-sm text-primary">Opening Animation</h3>
+              </div>
+              <p className="text-xs text-on-surface-variant">Continuous handcrafted thread drawing, potter's loom curve, brand reveal & radial mask.</p>
+            </div>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setActiveLoaderPreview({ variant: 'intro' })}
+              className="text-xs font-bold w-full bg-secondary hover:bg-secondary/90 text-white"
+            >
+              Play Opening Intro
+            </Button>
+          </Card>
+
           <Card className="p-4 flex flex-col justify-between gap-3 bg-surface-container-lowest border border-surface-variant">
             <div>
               <h3 className="font-bold text-sm text-primary">Initial App Startup</h3>
@@ -335,16 +353,24 @@ export const DevStatesPage: React.FC = () => {
       {/* Active Preview Modal Overlay */}
       {activeLoaderPreview && (
         <div className="fixed inset-0 z-50">
-          <KarigarLoader
-            variant={activeLoaderPreview.variant}
-            destination={activeLoaderPreview.destination}
-            error={activeLoaderPreview.error}
-            onRetry={() => setActiveLoaderPreview(null)}
-            visible={true}
-          />
+          {activeLoaderPreview.variant === 'intro' ? (
+            <KarigarIntro
+              forceShow={true}
+              appReady={true}
+              onComplete={() => setActiveLoaderPreview(null)}
+            />
+          ) : (
+            <KarigarLoader
+              variant={activeLoaderPreview.variant}
+              destination={activeLoaderPreview.destination}
+              error={activeLoaderPreview.error}
+              onRetry={() => setActiveLoaderPreview(null)}
+              visible={true}
+            />
+          )}
           <button
             onClick={() => setActiveLoaderPreview(null)}
-            className="fixed top-6 right-6 z-[100] px-4 py-2 bg-white/90 backdrop-blur-md text-[#001D36] text-xs font-bold rounded-full shadow-lg border border-white/20 hover:bg-white flex items-center gap-1.5 transition-all cursor-pointer"
+            className="fixed top-6 right-6 z-[100000] px-4 py-2 bg-white/90 backdrop-blur-md text-[#001D36] text-xs font-bold rounded-full shadow-lg border border-white/20 hover:bg-white flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <X className="w-4 h-4" /> Exit Preview
           </button>

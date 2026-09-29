@@ -314,6 +314,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+export const useOptionalAuth = (): AuthContextType | undefined => {
+  return useContext(AuthContext);
+};
+
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');

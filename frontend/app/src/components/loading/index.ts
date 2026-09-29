@@ -10,6 +10,8 @@ export { RouteErrorBoundary } from './RouteErrorBoundary';
 export type { RouteErrorBoundaryProps } from './RouteErrorBoundary';
 export { InitialAppLoader } from './InitialAppLoader';
 export type { InitialAppLoaderProps } from './InitialAppLoader';
+export { KarigarIntro, INTRO_SESSION_KEY } from './KarigarIntro';
+export type { KarigarIntroProps } from './KarigarIntro';
 export { useLoaderFlicker } from './useLoaderFlicker';
 export { useSafeNavigation } from './useSafeNavigation';
 export type { SafeNavigation } from './useSafeNavigation';
